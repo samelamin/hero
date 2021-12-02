@@ -1,0 +1,159 @@
+[package]
+name = 'paid-chain'
+version = '0.0.1'
+authors = ['PAID Network DevHub <https://github.com/PAIDNetwork>']
+build = 'build.rs'
+description = 'Paid Chain is a substrate chain which we can deploy the solidity smart contracts.'
+edition = '2018'
+homepage = 'https://paidnetwork.com/'
+license = 'Unlicense'
+publish = false
+repository = 'https://github.com/PAIDNetwork/paid-chain'
+
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[dependencies]
+async-trait = '0.1'
+futures = '0.3'
+jsonrpc-core = '18.0.0'
+jsonrpc-pubsub = '18.0.0'
+log = '0.4.8'
+structopt = '0.3.8'
+
+[dependencies.fc-consensus]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fc-db]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fc-mapping-sync]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fc-rpc]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fc-rpc-core]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fp-consensus]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.fp-rpc]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.frame-benchmarking]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.frame-benchmarking-cli]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.paid-chain-runtime]
+default-features = false
+features = ['std']
+path = '../runtime'
+
+[dependencies.pallet-dynamic-fee]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.pallet-ethereum]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.pallet-evm]
+git = 'https://github.com/paritytech/frontier.git'
+
+[dependencies.pallet-transaction-payment-rpc]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-basic-authorship]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-cli]
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-client-api]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-consensus]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-consensus-aura]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-consensus-manual-seal]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-executor]
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-finality-grandpa]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-keystore]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-network]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-rpc]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-rpc-api]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-service]
+features = ['wasmtime']
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-telemetry]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-transaction-pool]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sc-transaction-pool-api]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-api]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-block-builder]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-blockchain]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-consensus]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-consensus-aura]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-core]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-finality-grandpa]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-inherents]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-runtime]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.sp-timestamp]
+git = 'https://github.com/paritytech/substrate'
+
+[dependencies.substrate-frame-rpc-system]
+git = 'https://github.com/paritytech/substrate'
+
+[build-dependencies.substrate-build-script-utils]
+git = 'https://github.com/paritytech/substrate'
+
+[features]
+aura = ['paid-chain-runtime/aura']
+default = ['aura']
+manual-seal = ['paid-chain-runtime/manual-seal']
+runtime-benchmarks = ['paid-chain-runtime/runtime-benchmarks']
