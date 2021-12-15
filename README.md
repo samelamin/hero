@@ -21,6 +21,12 @@ To execute the chain, run:
 $ ./target/release/paid-chain --dev --tmp
 ```
 
+To start the fresh chain, run:
+
+```
+$ ./target/release/paid-chain purge-chain --dev
+```
+
 ## Test
 
 To build run the test cases of the chain, execute the following commands:

@@ -118,6 +118,12 @@ where
 		fallback: Box::new(RuntimeApiStorageOverride::new(client.clone())),
 	});
 
+    let signers = Vec::new();
+
+    // Limit the number of queryable logs. In a chain, this could be extended back to the CLI.
+    let _max_past_logs = 1024;
+
+    // Reasonable default caching.
 	let block_data_cache = Arc::new(EthBlockDataCache::new(50, 50));
 
 	io.extend_with(EthApiServer::to_delegate(EthApi::new(
@@ -146,6 +152,7 @@ where
 		)));
 	}
 
+    // Extending this RPC with a custom API.
 	io.extend_with(NetApiServer::to_delegate(NetApi::new(
 		client.clone(),
 		network.clone(),
