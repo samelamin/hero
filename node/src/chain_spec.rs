@@ -1,6 +1,6 @@
 use cumulus_primitives_core::ParaId;
 use paid_chain_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT,
-	GenesisAccount, GenesisConfig, EVMConfig};
+	GenesisAccount, GenesisConfig, EVMConfig, EthereumConfig,};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
@@ -168,7 +168,7 @@ pub fn local_testnet_config() -> ChainSpec {
 		// Extensions
 		Extensions {
 			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 1000,
+			para_id: 2000,
 		},
 	)
 }
@@ -227,5 +227,6 @@ fn testnet_genesis(
 				accounts
 			}
 		},
+		ethereum: EthereumConfig{},
 	}
 }

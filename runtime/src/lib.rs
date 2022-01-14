@@ -8,11 +8,11 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata};
+use sp_core::{crypto::KeyTypeId, H160, H256, OpaqueMetadata};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
-	traits::{AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, Verify},
-	transaction_validity::{TransactionSource, TransactionValidity},
+	traits::{PostDispatchInfoOf, Dispatchable, AccountIdLookup, BlakeTwo256, Block as BlockT, IdentifyAccount, Verify},
+	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, MultiSignature,
 };
 
@@ -67,11 +67,15 @@ pub use pallet_testing;
 // Imports added whil install Frontier
 use sp_core::U256;
 use pallet_evm::{
-	EnsureAddressRoot, EnsureAddressNever, HashedAddressMapping, SubstrateBlockHashMapping,
+	Account as EVMAccount, EnsureAddressRoot, EnsureAddressNever, HashedAddressMapping,
+	FeeCalculator, Runner,
 };
 // pub use this so we can import it in the chain spec.
 #[cfg(feature = "std")]
 pub use pallet_evm::GenesisAccount;
+
+use pallet_ethereum::{Call::transact, EthereumBlockHashMapping, Transaction as EthereumTransaction};
+use fp_rpc::TransactionStatus;
 
 /// Alias to 512-bit hash when used in the context of a transaction signature on the chain.
 pub type Signature = MultiSignature;
@@ -119,7 +123,7 @@ pub type SignedExtra = (
 );
 
 /// Unchecked extrinsic type as expected by this runtime.
-pub type UncheckedExtrinsic = generic::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
+pub type UncheckedExtrinsic = fp_self_contained::UncheckedExtrinsic<Address, Call, Signature, SignedExtra>;
 
 /// Extrinsic type that has already been checked.
 pub type CheckedExtrinsic = generic::CheckedExtrinsic<AccountId, Call, SignedExtra>;
@@ -185,8 +189,8 @@ impl_opaque_keys! {
 
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("template-parachain"),
-	impl_name: create_runtime_str!("template-parachain"),
+	spec_name: create_runtime_str!("paid-parachain"),
+	impl_name: create_runtime_str!("paid-parachain"),
 	authoring_version: 1,
 	spec_version: 1,
 	impl_version: 0,
@@ -414,7 +418,7 @@ impl pallet_evm::Config for Runtime {
 
 	type BlockGasLimit = BlockGasLimit;
 	type ChainId = LeetChainId;
-	type BlockHashMapping = SubstrateBlockHashMapping<Self>;
+	type BlockHashMapping = EthereumBlockHashMapping<Self>;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 
 	type CallOrigin = EnsureAddressRoot<AccountId>;
@@ -427,6 +431,142 @@ impl pallet_evm::Config for Runtime {
 	type PrecompilesType = ();
 	type PrecompilesValue = ();
 	type FindAuthor = ();
+}
+
+impl pallet_ethereum::Config for Runtime {
+	type Event = Event;
+	type StateRoot = pallet_ethereum::IntermediateStateRoot;
+}
+
+impl fp_rpc::runtime_decl_for_EthereumRuntimeRPCApi::EthereumRuntimeRPCApi<Block> for Runtime {
+	fn chain_id() -> u64 {
+		<Runtime as pallet_evm::Config>::ChainId::get()
+	}
+
+	fn account_basic(address: H160) -> EVMAccount {
+		EVM::account_basic(&address)
+	}
+
+	fn gas_price() -> U256 {
+		<Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price()
+	}
+
+	fn account_code_at(address: H160) -> Vec<u8> {
+		EVM::account_codes(address)
+	}
+
+	fn author() -> H160 {
+		<pallet_evm::Pallet<Runtime>>::find_author()
+	}
+
+	fn storage_at(address: H160, index: U256) -> H256 {
+		let mut tmp = [0u8; 32];
+		index.to_big_endian(&mut tmp);
+		EVM::account_storages(address, H256::from_slice(&tmp[..]))
+	}
+
+	fn call(
+		from: H160,
+		to: H160,
+		data: Vec<u8>,
+		value: U256,
+		gas_limit: U256,
+		max_fee_per_gas: Option<U256>,
+		max_priority_fee_per_gas: Option<U256>,
+		nonce: Option<U256>,
+		estimate: bool,
+		access_list: Option<Vec<(H160, Vec<H256>)>>,
+	) -> Result<pallet_evm::CallInfo, sp_runtime::DispatchError> {
+		let config = if estimate {
+			let mut config = <Runtime as pallet_evm::Config>::config().clone();
+			config.estimate = true;
+			Some(config)
+		} else {
+			None
+		};
+
+		<Runtime as pallet_evm::Config>::Runner::call(
+			from,
+			to,
+			data,
+			value,
+			gas_limit.low_u64(),
+			max_fee_per_gas,
+			max_priority_fee_per_gas,
+			nonce,
+			Vec::new(),
+			config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+		).map_err(|err| err.into())
+	}
+
+	fn create(
+		from: H160,
+		data: Vec<u8>,
+		value: U256,
+		gas_limit: U256,
+		max_fee_per_gas: Option<U256>,
+		max_priority_fee_per_gas: Option<U256>,
+		nonce: Option<U256>,
+		estimate: bool,
+		access_list: Option<Vec<(H160, Vec<H256>)>>,
+	) -> Result<pallet_evm::CreateInfo, sp_runtime::DispatchError> {
+		let config = if estimate {
+			let mut config = <Runtime as pallet_evm::Config>::config().clone();
+			config.estimate = true;
+			Some(config)
+		} else {
+			None
+		};
+
+		<Runtime as pallet_evm::Config>::Runner::create(
+			from,
+			data,
+			value,
+			gas_limit.low_u64(),
+			max_fee_per_gas,
+			max_priority_fee_per_gas,
+			nonce,
+			Vec::new(),
+			config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
+		).map_err(|err| err.into())
+	}
+
+	fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {
+		Ethereum::current_transaction_statuses()
+	}
+
+	fn current_block() -> Option<pallet_ethereum::Block> {
+		Ethereum::current_block()
+	}
+
+	fn current_receipts() -> Option<Vec<pallet_ethereum::Receipt>> {
+		Ethereum::current_receipts()
+	}
+
+	fn current_all() -> (
+		Option<pallet_ethereum::Block>,
+		Option<Vec<pallet_ethereum::Receipt>>,
+		Option<Vec<TransactionStatus>>
+	) {
+		(
+			Ethereum::current_block(),
+			Ethereum::current_receipts(),
+			Ethereum::current_transaction_statuses()
+		)
+	}
+
+	fn extrinsic_filter(
+		xts: Vec<<Block as BlockT>::Extrinsic>,
+	) -> Vec<EthereumTransaction> {
+		xts.into_iter().filter_map(|xt| match xt.0.function {
+			Call::Ethereum(transact{transaction}) => Some(transaction),
+			_ => None
+		}).collect::<Vec<EthereumTransaction>>()
+	}
+
+	fn elasticity() -> Option<Permill> {
+		Some(Permill::zero()) // temp until paid parachain is functional
+	}
 }
 
 parameter_types! {
@@ -636,6 +776,52 @@ impl pallet_template::Config for Runtime {
 	type Event = Event;
 }
 
+impl fp_self_contained::SelfContainedCall for Call {
+	type SignedInfo = H160;
+
+	fn is_self_contained(&self) -> bool {
+		match self {
+			Call::Ethereum(call) => call.is_self_contained(),
+			_ => false,
+		}
+	}
+
+	fn check_self_contained(&self) -> Option<Result<Self::SignedInfo, TransactionValidityError>> {
+		match self {
+			Call::Ethereum(call) => call.check_self_contained(),
+			_ => None,
+		}
+	}
+
+	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+		match self {
+			Call::Ethereum(call) => call.validate_self_contained(info),
+			_ => None,
+		}
+	}
+
+	fn pre_dispatch_self_contained(&self, info: &Self::SignedInfo)
+		-> Option<Result<(), TransactionValidityError>> {
+			match self {
+				Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
+				_ => None,
+			}
+		}
+
+	fn apply_self_contained(
+		self,
+		info: Self::SignedInfo,
+	) -> Option<sp_runtime::DispatchResultWithInfo<PostDispatchInfoOf<Self>>> {
+		match self {
+			call @ Call::Ethereum(pallet_ethereum::Call::transact { .. }) => Some(call.dispatch(
+				Origin::from(pallet_ethereum::RawOrigin::EthereumTransaction(info)),
+			)),
+			_ => None,
+		}
+	}
+}
+
+
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -674,7 +860,8 @@ construct_runtime!(
 		// Testing - Andrew
 		TestingPallet: pallet_testing::{Pallet, Call, Storage, Event<T>} = 42,
 
-		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>},
+		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
+		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
 	}
 );
 
