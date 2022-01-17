@@ -7,7 +7,7 @@
 
 use std::sync::Arc;
 
-use paid_chain_runtime::{Hash, opaque::Block, AccountId, Balance, Index as Nonce};
+use paid_chain_runtime::{Hash, opaque::Block, AccountId, Balance, Index};
 // use node_template_runtime::{Hash, opaque::Block, AccountId, Balance, Index};
  use sc_client_api::backend::{Backend, StorageProvider};
 
@@ -44,12 +44,12 @@ where
 		+ HeaderMetadata<Block, Error = BlockChainError>
 		+ Send
 		+ Sync
-		+ StorageProvider<Block, BE>
 		+ 'static,
+	C: StorageProvider<Block, BE>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Nonce>,
+	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: BlockBuilder<Block>,
-	C::Api: fp_rpc::runtime_decl_for_EthereumRuntimeRPCApi::EthereumRuntimeRPCApi<Block>,
+	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
 	P: TransactionPool + Sync + Send + 'static,
 {
 	use fc_rpc::{NetApi, NetApiServer};
@@ -61,7 +61,7 @@ where
 
 	io.extend_with(SystemApi::to_delegate(FullSystem::new(client.clone(), pool, deny_unsafe)));
 	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client)));
-	io.extend_with(NetApiServer::to_delegate(NetApi::new(
+	io.extend_with(NetApiServer::to_delegate(NetApi::new( // Todo
 		client.clone(),
 		network.clone(),
 		// Whether to format the `peer_count` response as Hex (default) or not.

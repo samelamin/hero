@@ -6,7 +6,6 @@
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
-use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
 use sp_core::{crypto::KeyTypeId, H160, H256, OpaqueMetadata};
 use sp_runtime::{
@@ -15,6 +14,8 @@ use sp_runtime::{
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, MultiSignature,
 };
+
+use smallvec::smallvec;
 
 use sp_std::prelude::*;
 #[cfg(feature = "std")]
@@ -193,7 +194,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	impl_name: create_runtime_str!("paid-parachain"),
 	authoring_version: 1,
 	spec_version: 1,
-	impl_version: 0,
+	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
 };
@@ -438,7 +439,7 @@ impl pallet_ethereum::Config for Runtime {
 	type StateRoot = pallet_ethereum::IntermediateStateRoot;
 }
 
-impl fp_rpc::runtime_decl_for_EthereumRuntimeRPCApi::EthereumRuntimeRPCApi<Block> for Runtime {
+impl fp_rpc::EthereumRuntimeRPCApi for Runtime {
 	fn chain_id() -> u64 {
 		<Runtime as pallet_evm::Config>::ChainId::get()
 	}

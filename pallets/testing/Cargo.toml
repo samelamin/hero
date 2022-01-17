@@ -2,7 +2,7 @@
 name = "pallet-testing"
 authors = ["Anonymous"]
 description = "FRAME pallet testing initial pallet addition"
-version = "0.1.0"
+version = "0.0.1"
 license = "Unlicense"
 homepage = "https://substrate.io"
 repository = "https://github.com/paritytech/substrate/"
