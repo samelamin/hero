@@ -1,4 +1,4 @@
-//! Substrate Parachain Node Template CLI
+//! Paidchain CLI
 
 #![warn(missing_docs)]
 

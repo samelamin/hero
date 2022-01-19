@@ -1,7 +1,7 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 // std
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 // Local Runtime Types
 use paid_chain_runtime::{
@@ -20,16 +20,22 @@ use cumulus_client_service::{
 use cumulus_primitives_core::ParaId;
 
 // Substrate Imports
-use sc_client_api::ExecutorProvider;
+use sc_client_api::{ExecutorProvider, BlockchainEvents};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::NetworkService;
-use sc_service::{Configuration, PartialComponents, Role, TFullBackend, TFullClient, TaskManager};
+use sc_service::{BasePath, Configuration, PartialComponents, Role, TFullBackend, TFullClient, TaskManager};
 use sc_telemetry::{Telemetry, TelemetryHandle, TelemetryWorker, TelemetryWorkerHandle};
 use sp_api::ConstructRuntimeApi;
 use sp_consensus::SlotData;
 use sp_keystore::SyncCryptoStorePtr;
 use sp_runtime::traits::BlakeTwo256;
 use substrate_prometheus_endpoint::Registry;
+use sc_cli::SubstrateCli;
+
+// Frontier
+use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+
+use futures::StreamExt;
 
 /// Native executor instance.
 pub struct PaidChainRuntimeExecutor;
@@ -44,6 +50,29 @@ impl sc_executor::NativeExecutionDispatch for PaidChainRuntimeExecutor {
 	fn native_version() -> sc_executor::NativeVersion {
 		paid_chain_runtime::native_version()
 	}
+}
+
+pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
+	let config_dir = config
+		.base_path
+		.as_ref()
+		.map(|base_path| base_path.config_dir(config.chain_spec.id()))
+		.unwrap_or_else(|| {
+			BasePath::from_project("", "", &crate::cli::Cli::executable_name())
+				.config_dir(config.chain_spec.id())
+		});
+	config_dir.join("frontier").join("db")
+}
+
+pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backend<Block>>, String> {
+	Ok(Arc::new(fc_db::Backend::<Block>::new(
+		&fc_db::DatabaseSettings {
+			source: fc_db::DatabaseSettingsSrc::RocksDb {
+				path: frontier_database_dir(&config),
+				cache_size: 0,
+			},
+		},
+	)?))
 }
 
 /// Starts a `ServiceBuilder` for a full service.
@@ -67,7 +96,11 @@ pub fn new_partial<RuntimeApi, Executor, BIQ>(
 			Block,
 			TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>,
 		>,
-		(Option<Telemetry>, Option<TelemetryWorkerHandle>),
+		(
+			Arc<fc_db::Backend<Block>>,
+			Option<Telemetry>,
+			Option<TelemetryWorkerHandle>,
+		),
 	>,
 	sc_service::Error,
 >
@@ -140,6 +173,8 @@ where
 		client.clone(),
 	);
 
+	let frontier_backend = open_frontier_backend(config)?;
+
 	let import_queue = build_import_queue(
 		client.clone(),
 		config,
@@ -155,7 +190,7 @@ where
 		task_manager,
 		transaction_pool,
 		select_chain: (),
-		other: (telemetry, telemetry_worker_handle),
+		other: (frontier_backend, telemetry, telemetry_worker_handle),
 	};
 
 	Ok(params)
@@ -236,7 +271,7 @@ where
 	let parachain_config = prepare_node_config(parachain_config);
 
 	let params = new_partial::<RuntimeApi, Executor, BIQ>(&parachain_config, build_import_queue)?;
-	let (mut telemetry, telemetry_worker_handle) = params.other;
+	let (frontier_backend, mut telemetry, telemetry_worker_handle) = params.other;
 
 	let relay_chain_full_node =
 		cumulus_client_service::build_polkadot_full_node(polkadot_config, telemetry_worker_handle)
@@ -270,6 +305,20 @@ where
 			block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
 			warp_sync: None,
 		})?;
+
+	task_manager.spawn_essential_handle().spawn(
+        "frontier-mapping-sync-worker",
+        None,
+        fc_mapping_sync::MappingSyncWorker::new(
+            client.import_notification_stream(),
+            Duration::new(6, 0),
+            client.clone(),
+            backend.clone(),
+            frontier_backend.clone(),
+            fc_mapping_sync::SyncStrategy::Parachain,
+        )
+        .for_each(|()| futures::future::ready(())),
+    );
 
 	let rpc_extensions_builder = {
 		let client = client.clone();

@@ -30,6 +30,7 @@ codec = { package = "parity-scale-codec", version = "2.0.0" }
 structopt = "0.3.8"
 serde = { version = "1.0.119", features = ["derive"] }
 hex-literal = "0.3.1"
+futures = "0.3.1"
 
 # RPC related Dependencies
 jsonrpc-core = "18.0.0"
@@ -81,6 +82,8 @@ sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch 
 #Frontier
 fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
+fc-db = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
+fc-mapping-sync = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 
 # Cumulus dependencies
 cumulus-client-cli = { git = 'https://github.com/paritytech/cumulus', branch = 'polkadot-v0.9.13' }

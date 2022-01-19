@@ -2013,7 +2013,7 @@ dependencies = [
 [[package]]
 name = "fc-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "async-trait",
  "derive_more",
@@ -2039,7 +2039,7 @@ dependencies = [
 [[package]]
 name = "fc-db"
 version = "2.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "fp-storage",
  "kvdb",
@@ -2053,9 +2053,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "fc-mapping-sync"
+version = "2.0.0-dev"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
+dependencies = [
+ "fc-consensus",
+ "fc-db",
+ "fp-consensus",
+ "fp-rpc",
+ "futures 0.3.19",
+ "futures-timer 3.0.2",
+ "log",
+ "sc-client-api",
+ "sp-api",
+ "sp-blockchain",
+ "sp-runtime",
+]
+
+[[package]]
 name = "fc-rpc"
 version = "2.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2096,13 +2114,12 @@ dependencies = [
  "sp-runtime",
  "sp-storage",
  "sp-transaction-pool",
- "tokio",
 ]
 
 [[package]]
 name = "fc-rpc-core"
 version = "1.1.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2210,7 +2227,7 @@ dependencies = [
 [[package]]
 name = "fp-consensus"
 version = "2.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "parity-scale-codec",
@@ -2224,7 +2241,7 @@ dependencies = [
 [[package]]
 name = "fp-evm"
 version = "3.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "evm",
  "parity-scale-codec",
@@ -2236,7 +2253,7 @@ dependencies = [
 [[package]]
 name = "fp-rpc"
 version = "3.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -2253,7 +2270,7 @@ dependencies = [
 [[package]]
 name = "fp-self-contained"
 version = "1.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "frame-support",
@@ -2270,7 +2287,7 @@ dependencies = [
 [[package]]
 name = "fp-storage"
 version = "2.0.0"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 
 [[package]]
 name = "frame-benchmarking"
@@ -4799,10 +4816,13 @@ dependencies = [
  "cumulus-primitives-core",
  "cumulus-primitives-parachain-inherent",
  "derive_more",
+ "fc-db",
+ "fc-mapping-sync",
  "fc-rpc",
  "fp-rpc",
  "frame-benchmarking",
  "frame-benchmarking-cli",
+ "futures 0.3.19",
  "hex-literal",
  "jsonrpc-core",
  "log",
@@ -5162,7 +5182,7 @@ dependencies = [
 [[package]]
 name = "pallet-ethereum"
 version = "4.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "ethereum",
  "ethereum-types",
@@ -5192,7 +5212,7 @@ dependencies = [
 [[package]]
 name = "pallet-evm"
 version = "6.0.0-dev"
-source = "git+https://github.com/paritytech/frontier?branch=frontier-para#b4100366654f054c834f2a17857e979e63dd34ac"
+source = "git+https://github.com/paritytech/frontier?branch=frontier-para#2afca77a60bafc270a78fcc6abcbb8372e926961"
 dependencies = [
  "evm",
  "evm-gasometer",
@@ -10312,7 +10332,7 @@ dependencies = [
  "chrono",
  "lazy_static",
  "matchers",
- "parking_lot 0.11.2",
+ "parking_lot 0.10.2",
  "regex",
  "serde",
  "serde_json",
