@@ -8,8 +8,7 @@
 use std::sync::Arc;
 
 use paid_chain_runtime::{Hash, opaque::Block, AccountId, Balance, Index};
-// use node_template_runtime::{Hash, opaque::Block, AccountId, Balance, Index};
- use sc_client_api::backend::{Backend, StorageProvider};
+use sc_client_api::backend::{Backend, StorageProvider};
 
 use sc_client_api::AuxStore;
 pub use sc_rpc::{DenyUnsafe, SubscriptionTaskExecutor};
@@ -60,8 +59,8 @@ where
 	let FullDeps { client, pool, deny_unsafe, network } = deps;
 
 	io.extend_with(SystemApi::to_delegate(FullSystem::new(client.clone(), pool, deny_unsafe)));
-	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client)));
-	io.extend_with(NetApiServer::to_delegate(NetApi::new( // Todo
+	io.extend_with(TransactionPaymentApi::to_delegate(TransactionPayment::new(client.clone())));
+	io.extend_with(NetApiServer::to_delegate(NetApi::new(
 		client.clone(),
 		network.clone(),
 		// Whether to format the `peer_count` response as Hex (default) or not.
