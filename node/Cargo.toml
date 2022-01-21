@@ -82,6 +82,7 @@ sp-transaction-pool = { git = "https://github.com/paritytech/substrate", branch 
 #Frontier
 fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
+fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 fc-db = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 fc-mapping-sync = { git = "https://github.com/paritytech/frontier", branch = "frontier-para" }
 

@@ -1,7 +1,9 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
 // std
-use std::{sync::Arc, time::Duration};
+use std::{sync::Arc, time::Duration, collections::BTreeMap, sync::Mutex};
+
+use fc_rpc_core::types::FeeHistoryCache;
 
 // Local Runtime Types
 use paid_chain_runtime::{
@@ -289,6 +291,7 @@ where
 		relay_chain_full_node.backend.clone(),
 	);
 
+	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 	let force_authoring = parachain_config.force_authoring;
 	let validator = parachain_config.role.is_authority();
 	let prometheus_registry = parachain_config.prometheus_registry().cloned();
@@ -305,6 +308,21 @@ where
 			block_announce_validator_builder: Some(Box::new(|_| block_announce_validator)),
 			warp_sync: None,
 		})?;
+	let is_authority = parachain_config.role.is_authority();
+
+	task_manager.spawn_essential_handle().spawn(
+        "frontier-mapping-sync-worker",
+        None,
+        MappingSyncWorker::new(
+            client.import_notification_stream(),
+            Duration::new(6, 0),
+            client.clone(),
+            backend.clone(),
+            frontier_backend.clone(),
+            SyncStrategy::Parachain,
+        )
+        .for_each(|()| futures::future::ready(())),
+    );
 
 	task_manager.spawn_essential_handle().spawn(
         "frontier-mapping-sync-worker",
@@ -324,13 +342,20 @@ where
 		let client = client.clone();
 		let transaction_pool = transaction_pool.clone();
 		let network = network.clone();
+		let frontier_backend = frontier_backend.clone();
+		let fee_history_limit = 65; // temporary hard-coded PLEASE DELETE ASAP(Work towards implementing this as an input)
 
 		Box::new(move |deny_unsafe, _| {
 			let deps = crate::rpc::FullDeps {
 				client: client.clone(),
 				pool: transaction_pool.clone(),
+				graph: transaction_pool.pool().clone(),
 				deny_unsafe,
-				network: network.clone()
+				network: network.clone(),
+				is_authority,
+				backend: frontier_backend.clone(),
+				fee_history_limit: fee_history_limit,
+				fee_history_cache: fee_history_cache.clone(),
 			};
 
 			Ok(crate::rpc::create_full(deps))
