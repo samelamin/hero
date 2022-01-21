@@ -1,5 +1,6 @@
 use cumulus_primitives_core::ParaId;
-use paid_chain_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT,
+use paid_chain_runtime::{
+	AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT, SudoConfig,
 	GenesisAccount, GenesisConfig, EVMConfig, EthereumConfig,};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
@@ -10,7 +11,7 @@ use sp_core::{H160, U256};
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
-	sc_service::GenericChainSpec<paid_chain_runtime::GenesisConfig, Extensions>;
+	sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_public_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -100,6 +101,9 @@ pub fn development_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
+
+				get_account_id_from_seed::<sr25519::Public>("Alice"),
+
 				1000.into(),
 			)
 		},
@@ -154,6 +158,9 @@ pub fn local_testnet_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
+
+				get_account_id_from_seed::<sr25519::Public>("Alice"),
+
 				1000.into(),
 			)
 		},
@@ -176,9 +183,10 @@ pub fn local_testnet_config() -> ChainSpec {
 fn testnet_genesis(
 	invulnerables: Vec<(AccountId, AuraId)>,
 	endowed_accounts: Vec<AccountId>,
+	root_key: AccountId,
 	id: ParaId,
-) -> paid_chain_runtime::GenesisConfig {
-	paid_chain_runtime::GenesisConfig {
+) -> GenesisConfig {
+	GenesisConfig {
 		system: paid_chain_runtime::SystemConfig {
 			code: paid_chain_runtime::WASM_BINARY
 				.expect("WASM binary was not build, please build it!")
@@ -228,5 +236,9 @@ fn testnet_genesis(
 			}
 		},
 		ethereum: EthereumConfig{},
+		sudo: SudoConfig {
+			// Assign network admin rights.
+			key: root_key,
+		},
 	}
 }

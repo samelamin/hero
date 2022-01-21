@@ -194,7 +194,7 @@ pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("paid-parachain"),
 	impl_name: create_runtime_str!("paid-parachain"),
 	authoring_version: 1,
-	spec_version: 1,
+	spec_version: 2,
 	impl_version: 1,
 	apis: RUNTIME_API_VERSIONS,
 	transaction_version: 1,
@@ -410,7 +410,7 @@ impl pallet_testing::Config for Runtime {
 }
 
 parameter_types! {
-	pub const LeetChainId: u64 = 1337;
+	pub const LeetChainId: u64 = 134242;
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
 }
 
@@ -608,6 +608,11 @@ impl pallet_session::Config for Runtime {
 	type WeightInfo = ();
 }
 
+impl pallet_sudo::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+}
+
 impl pallet_aura::Config for Runtime {
 	type AuthorityId = AuraId;
 	type DisabledValidators = ();
@@ -733,6 +738,9 @@ construct_runtime!(
 
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
+
+		// sudo pallet adding for testing, remove before deploying live chain.
+		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 47,
 	}
 );
 

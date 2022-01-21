@@ -327,13 +327,13 @@ where
 	task_manager.spawn_essential_handle().spawn(
         "frontier-mapping-sync-worker",
         None,
-        fc_mapping_sync::MappingSyncWorker::new(
+        MappingSyncWorker::new(
             client.import_notification_stream(),
             Duration::new(6, 0),
             client.clone(),
             backend.clone(),
             frontier_backend.clone(),
-            fc_mapping_sync::SyncStrategy::Parachain,
+            SyncStrategy::Parachain,
         )
         .for_each(|()| futures::future::ready(())),
     );
