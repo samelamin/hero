@@ -7,7 +7,7 @@ use fc_rpc_core::types::FeeHistoryCache;
 
 // Local Runtime Types
 use paid_chain_runtime::{
-	opaque::Block, AccountId, Balance, Hash, Index as Nonce, RuntimeApi,
+	opaque::Block, AccountId, Balance, Hash, RuntimeApi,
 };
 
 // Cumulus Imports
@@ -38,6 +38,8 @@ use sc_cli::SubstrateCli;
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 
 use futures::StreamExt;
+
+use crate::primitives::*;
 
 /// Native executor instance.
 pub struct PaidChainRuntimeExecutor;
