@@ -4902,8 +4902,6 @@ dependencies = [
  "pallet-evm",
  "pallet-session",
  "pallet-sudo",
- "pallet-template",
- "pallet-testing",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
@@ -5526,21 +5524,6 @@ dependencies = [
 
 [[package]]
 name = "pallet-template"
-version = "0.0.1"
-dependencies = [
- "frame-benchmarking",
- "frame-support",
- "frame-system",
- "parity-scale-codec",
- "scale-info",
- "serde",
- "sp-core",
- "sp-io",
- "sp-runtime",
-]
-
-[[package]]
-name = "pallet-testing"
 version = "0.0.1"
 dependencies = [
  "frame-benchmarking",

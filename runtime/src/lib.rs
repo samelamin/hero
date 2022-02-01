@@ -60,18 +60,13 @@ use xcm_builder::{
 };
 use xcm_executor::{Config, XcmExecutor};
 
-/// Import the template pallet.
-pub use pallet_template;
-
-// Import testing pallet
-pub use pallet_testing;
-
-// Imports added whil install Frontier
+// Frontier Imports
 use sp_core::U256;
 use pallet_evm::{
 	Account as EVMAccount, EnsureAddressRoot, EnsureAddressNever, HashedAddressMapping,
 	FeeCalculator, Runner,
 };
+
 // pub use this so we can import it in the chain spec.
 #[cfg(feature = "std")]
 pub use pallet_evm::GenesisAccount;
@@ -191,8 +186,8 @@ impl_opaque_keys! {
 
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("paid-parachain"),
-	impl_name: create_runtime_str!("paid-parachain"),
+	spec_name: create_runtime_str!("paid-chain"),
+	impl_name: create_runtime_str!("paid-chain"),
 	authoring_version: 1,
 	spec_version: 1,
 	impl_version: 1,
@@ -273,7 +268,6 @@ parameter_types! {
 }
 
 // Configure FRAME pallets to include in runtime.
-
 impl frame_system::Config for Runtime {
 	/// The identifier used to distinguish between accounts.
 	type AccountId = AccountId;
@@ -404,13 +398,8 @@ parameter_types! {
 	pub const MaxValue: u32 = 50;
 }
 
-impl pallet_testing::Config for Runtime {
-    type Event = Event;
-    type MaxValue = MaxValue;
-}
-
 parameter_types! {
-	pub const LeetChainId: u64 = 134242;
+	pub const EthChainId: u64 = 1345;
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
 }
 
@@ -419,7 +408,7 @@ impl pallet_evm::Config for Runtime {
 	type Currency = Balances;
 
 	type BlockGasLimit = BlockGasLimit;
-	type ChainId = LeetChainId;
+	type ChainId = EthChainId;
 	type BlockHashMapping = EthereumBlockHashMapping<Self>;
 	type Runner = pallet_evm::runner::stack::Runner<Self>;
 
@@ -647,11 +636,6 @@ impl pallet_collator_selection::Config for Runtime {
 	type WeightInfo = ();
 }
 
-/// Configure the pallet template in pallets/template.
-impl pallet_template::Config for Runtime {
-	type Event = Event;
-}
-
 impl fp_self_contained::SelfContainedCall for Call {
 	type SignedInfo = H160;
 
@@ -723,6 +707,7 @@ construct_runtime!(
 		Session: pallet_session::{Pallet, Call, Storage, Event, Config<T>} = 22,
 		Aura: pallet_aura::{Pallet, Storage, Config<T>} = 23,
 		AuraExt: cumulus_pallet_aura_ext::{Pallet, Storage, Config} = 24,
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 25,
 
 		// XCM helpers.
 		XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 30,
@@ -730,17 +715,10 @@ construct_runtime!(
 		CumulusXcm: cumulus_pallet_xcm::{Pallet, Event<T>, Origin} = 32,
 		DmpQueue: cumulus_pallet_dmp_queue::{Pallet, Call, Storage, Event<T>} = 33,
 
-		// Template
-		TemplatePallet: pallet_template::{Pallet, Call, Storage, Event<T>}  = 40,
-
-		// Testing - Andrew
-		TestingPallet: pallet_testing::{Pallet, Call, Storage, Event<T>} = 42,
-
+        // Frontier support pallets
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
 
-		// sudo pallet adding for testing, remove before deploying live chain.
-		Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 47,
 	}
 );
 

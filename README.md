@@ -1,6 +1,6 @@
-# Paid Parachain Collator
+# Paid-chain
 
-Tha Paid Parachain Collator is substrate based Blockchain on which we can deploy and use Paid solidity smart contracts. 
+Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts. 
 
 ## Installation
 The first thing you will need to do is prepare the system for Substrate development.

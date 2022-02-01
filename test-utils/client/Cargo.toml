@@ -2,7 +2,7 @@
 name = 'paid-chain-test-client'
 version = '0.0.1'
 authors = ['PAID Network DevHub <https://github.com/PAIDNetwork>']
-description = 'Paid Chain is a substrate chain which we can deploy the solidity smart contracts.'
+description = 'Paid Chain is a Polkadot parachain on which we can deploy the solidity smart contracts.'
 edition = '2018'
 license = 'Unlicense'
 publish = false

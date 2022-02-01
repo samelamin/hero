@@ -10,7 +10,7 @@ use std::sync::Arc;
 use paid_chain_runtime::{Hash, opaque::Block, AccountId, Balance, Index};
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider};
 
-//EthApi
+// Imports to support Ethereum RPC.
 use sc_transaction_pool::{ChainApi, Pool};
 use std::collections::BTreeMap;
 use fc_rpc::{
@@ -73,7 +73,7 @@ where
 	P: TransactionPool<Block = Block> + Sync + Send + 'static,
 	A: ChainApi<Block = Block> + 'static,
 {
-	use fc_rpc::{EthApi, EthApiServer, NetApi, NetApiServer};
+	use fc_rpc::{EthApi, EthApiServer, NetApi, NetApiServer, Web3Api, Web3ApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApi};
 	use substrate_frame_rpc_system::{FullSystem, SystemApi};
 
@@ -98,6 +98,12 @@ where
 		// Whether to format the `peer_count` response as Hex (default) or not.
 		true,
 	)));
+
+    io.extend_with(
+    		Web3ApiServer::to_delegate(Web3Api::new(
+    			client.clone(),
+    		))
+    	);
 
 	// We won't use the override feature
 	let overrides = Arc::new(OverrideHandle {
