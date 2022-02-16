@@ -36,8 +36,9 @@ const config: HardhatUserConfig = {
   networks: {
     paidchain: {
       url: `${PAID_CHAIN_URL}`,
-      chainId: 1342,
+      chainId: 1345,
       accounts: [`0x${DEPLOYER_PRIVATE_KEY}`],
+      gas: 2100000,
     },
   },
   solidity: {
@@ -61,8 +62,8 @@ const config: HardhatUserConfig = {
 
   gasReporter: {
     currency: "USD",
-    // gasPrice: 20,      // automatically deduce gas price based on network congestion
-    // enabled: process.env.REPORT_GAS ? true : false,
+    gasPrice: 20000,      // automatically deduce gas price based on network congestion
+    enabled: process.env.REPORT_GAS ? true : false,
   },
   typechain: {
     outDir: "./build/typechain/",

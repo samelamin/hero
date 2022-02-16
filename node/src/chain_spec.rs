@@ -8,6 +8,7 @@ use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public};
 use sp_runtime::traits::{IdentifyAccount, Verify};
 use sp_core::{H160, U256};
+use std::str::FromStr;
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
@@ -222,12 +223,14 @@ fn testnet_genesis(
 			accounts: {
 				// Prefund the "Gerald" account
 				let mut accounts = std::collections::BTreeMap::new();
+				const PREFUNDS_AMOUNT: &str = "0xffffffffffffffffffffffffffffffff"; // 3.4 * 10^39
 				accounts.insert(
 					H160::from_slice(&hex_literal::hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
 					GenesisAccount{
 						nonce: U256::zero(),
 						// Using a larger number, so I can tell the accounts apart by balance.
-						balance: U256::from(1u64 << 61),
+						balance: U256::from_str(&PREFUNDS_AMOUNT)
+                                                    .expect("Please provide a valid balance value"),
 						code: vec![],
 						storage: std::collections::BTreeMap::new(),
 					}
