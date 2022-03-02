@@ -1,0 +1,46 @@
+version: "3.2"
+
+services:
+  collator:
+    container_name: collator
+    image: paidnetwork/collator            
+    ports:
+      - "30343:30343"
+      - "40333:40333"
+      - "6969:6969"
+      - "8844:8844"
+      - "9977:9977"
+    command: bash -c "apt-get install -y wget; wget -O paid-testnet.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/paid-testnet.json; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/parachain-collator --alice --collator --force-authoring --chain paid-testnet.json --unsafe-ws-external --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --rpc-port 6969 --rpc-cors all -- --execution wasm --chain rococo-private-relay.json --port 30343 --ws-port 9977 > collator.out 2>&1; tail -f /dev/null" 
+    depends_on:
+      - charlie-relay
+  alice-relay:
+    container_name: alice-relay
+    image: paidnetwork/relay
+    ports:
+      - "30333:30333"
+      - "9944:9944"
+    command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --alice --validator --base-path /tmp/relay/alice --chain rococo-private-relay.json --port 30333 --ws-port 9944 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > alice.out 2>&1; tail -f /dev/null"
+  
+  bob-relay:
+    container_name: bob-relay
+    image: paidnetwork/relay
+    ports:
+      - "30334:30334"
+      - "9945:9945"
+    command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --bob --validator --base-path /tmp/relay/bob --chain rococo-private-relay.json --port 30334 --ws-port 9945 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > bob.out 2>&1; tail -f /dev/null"
+    
+  charlie-relay:
+    container_name: charlie-relay
+    image: paidnetwork/relay
+    ports:
+      - "30335:30335"
+      - "9946:9946"
+    command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --charlie --validator --base-path /tmp/relay/charlie --chain rococo-private-relay.json --port 30335 --ws-port 9946 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > charlie.out 2>&1; tail -f /dev/null"
+  
+  frontend:
+    container_name: frontend
+    image: jacogr/polkadot-js-apps:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - collator

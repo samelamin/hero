@@ -1,0 +1,21 @@
+version: "3.2"
+
+services:
+  paid-collator:
+    container_name: paid-collator
+    image: gcr.io/paid-network-202104/collator
+    ports:
+      - "30344:30344"
+      - "40334:40334"
+      - "6968:6968"
+      - "8845:8845"
+      - "9978:9978"
+    command: bash -c "apt-get install -y wget; wget -O paid-testnet.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/paid-testnet.json; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/parachain-collator --bob --collator --force-authoring --chain paid-testnet.json --bootnodes /ip4/34.77.219.227/tcp/40333/p2p/12D3KooWGBaBcRp4DTndFAfRHCcQU3kKH9tKxtPxxUysCD7ANAk6 --unsafe-ws-external --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40334 --ws-port 8845 --rpc-port 6968 --rpc-cors all -- --execution wasm --chain rococo-private-relay.json --port 30344 --ws-port 9978 --bootnodes /ip4/34.77.219.227/tcp/30333/p2p/12D3KooWBkNJacodDkLqbA26CavG4aqddD1imXCRL4JewVFVZXdf --sync Fast > collator.out 2>&1; tail -f /dev/null"
+
+  frontend:
+    container_name: frontend
+    image: jacogr/polkadot-js-apps:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - paid-collator

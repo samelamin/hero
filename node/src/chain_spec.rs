@@ -6,9 +6,12 @@ use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public};
-use sp_runtime::traits::{IdentifyAccount, Verify};
+use sp_runtime::{AccountId32, traits::{IdentifyAccount, Verify}};
 use sp_core::{H160, U256};
 use std::str::FromStr;
+
+use std::str::FromStr;
+use hex_literal::hex;
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
 pub type ChainSpec =
@@ -119,6 +122,65 @@ pub fn development_config() -> ChainSpec {
 	)
 }
 
+pub fn rococo_live_config() -> ChainSpec {
+	// Give your base currency a unit name and decimal places
+	let mut properties = sc_chain_spec::Properties::new();
+	properties.insert("tokenSymbol".into(), "PAID".into());
+	properties.insert("tokenDecimals".into(), 12.into());
+	properties.insert("ss58Format".into(), 42.into());
+
+	ChainSpec::from_genesis(
+		// Name
+		"Paid Chain Testnet",
+		// ID
+		"paid_testnet",
+		ChainType::Live,
+		move || {
+			testnet_genesis(
+				// initial collators.
+				vec![
+					(
+						get_account_id_from_seed::<sr25519::Public>("Alice"),
+						get_collator_keys_from_seed("Alice"),
+					),
+					(
+						get_account_id_from_seed::<sr25519::Public>("Bob"),
+						get_collator_keys_from_seed("Bob"),
+					),
+				],
+				vec![
+					// sudo user ROCTEST
+					AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
+					.unwrap(),
+					AccountId32::from_str("5CGHAX9Xy5Ut7jYquYT9KaegBetF1V3aAHRPbp9Kr4aaGzGi")
+					.unwrap(),
+					get_account_id_from_seed::<sr25519::Public>("Alice"),
+					get_account_id_from_seed::<sr25519::Public>("Bob"),
+				],
+
+				// get_account_id_from_seed::<sr25519::Public>("Alice"),
+				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
+				.unwrap(),
+
+				2024.into(),
+			)
+		},
+		// Bootnodes
+		Vec::new(),
+		// Telemetry
+		None,
+		// Protocol ID
+		Some("paid"),
+		// Properties
+		Some(properties),
+		// Extensions
+		Extensions {
+			relay_chain: "rococo".into(), // You MUST set this to the correct network!
+			para_id: 2024,
+		},
+	)
+}
+
 pub fn local_testnet_config() -> ChainSpec {
 	// Give your base currency a unit name and decimal places
 	let mut properties = sc_chain_spec::Properties::new();
@@ -162,7 +224,7 @@ pub fn local_testnet_config() -> ChainSpec {
 
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 
-				1000.into(),
+				2000.into(),
 			)
 		},
 		// Bootnodes
@@ -180,6 +242,74 @@ pub fn local_testnet_config() -> ChainSpec {
 		},
 	)
 }
+
+pub fn rococo_local_config() -> ChainSpec {
+	// Give your base currency a unit name and decimal places
+	let mut properties = sc_chain_spec::Properties::new();
+	properties.insert("tokenSymbol".into(), "PAID".into());
+	properties.insert("tokenDecimals".into(), 12.into());
+	properties.insert("ss58Format".into(), 42.into());
+
+	ChainSpec::from_genesis(
+		// Name
+		"Paid Chain Testnet",
+		// ID
+		"paid_testnet",
+		ChainType::Local,
+		move || {
+			testnet_genesis(
+				// initial collators.
+				vec![
+					(
+						get_account_id_from_seed::<sr25519::Public>("Alice"),
+						get_collator_keys_from_seed("Alice"),
+					),
+					(
+						get_account_id_from_seed::<sr25519::Public>("Bob"),
+						get_collator_keys_from_seed("Bob"),
+					),
+				],
+				vec![
+					// sudo user RocTest
+					AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
+					.unwrap(),
+					// Kyles
+					AccountId32::from_str("5CGHAX9Xy5Ut7jYquYT9KaegBetF1V3aAHRPbp9Kr4aaGzGi")
+					.unwrap(),
+					get_account_id_from_seed::<sr25519::Public>("Alice"),
+					get_account_id_from_seed::<sr25519::Public>("Bob"),
+					// get_account_id_from_seed::<sr25519::Public>("Ferdie"),
+					// get_account_id_from_seed::<sr25519::Public>("Alice//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Bob//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Charlie//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Dave//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
+					// get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
+				],
+
+				// get_account_id_from_seed::<sr25519::Public>("Alice"),
+				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
+				.unwrap(),
+
+				2000.into(),
+			)
+		},
+		// Bootnodes
+		Vec::new(),
+		// Telemetry
+		None,
+		// Protocol ID
+		Some("paid"),
+		// Properties
+		Some(properties),
+		// Extensions
+		Extensions {
+			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
+			para_id: 2000,
+		},
+	)
+}
+
 
 fn testnet_genesis(
 	invulnerables: Vec<(AccountId, AuraId)>,
@@ -225,7 +355,7 @@ fn testnet_genesis(
 				let mut accounts = std::collections::BTreeMap::new();
 				const PREFUNDS_AMOUNT: &str = "0xffffffffffffffffffffffffffffffff"; // 3.4 * 10^39
 				accounts.insert(
-					H160::from_slice(&hex_literal::hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
+					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
 					GenesisAccount{
 						nonce: U256::zero(),
 						// Using a larger number, so I can tell the accounts apart by balance.

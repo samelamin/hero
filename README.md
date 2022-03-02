@@ -2,7 +2,52 @@
 
 Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts. 
 
-## Installation
+
+## Running a PaidChain Collator
+1.) First things first is to [install docker](https://www.docker.com/products/docker-desktop) for your particular platform.
+
+2.) clone Paidchain repository `git clone https://github.com/PAIDNetwork/paid-chain.git && cd paid-chain`
+and checkout the correct branch `git checkout issue19_andrew/docker_deployment`
+
+3.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .`
+
+4.) build collator image `docker build -t paidnetwork/collator .`
+
+5.) Open the following ports `30344` `40334` `6968` `8845` `9978` if you would like to connect to your collator remotely open port `80`
+
+6.) run the collator and frontend `docker-compose -f scripts/docker-compose-collator.yaml up -d`
+
+You now should beable to view your collator via [polkadotjs](https://polkadot.js.org/apps/#/explorer) switch your network and under
+the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `Switch` at the top.
+
+## Paid Dev Environment Docker
+
+1.) Clone paid-chain `git clone https://github.com/PAIDNetwork/paid-chain.git && cd paid-chain`
+
+2.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .` 
+
+3.) build collator image `docker build -t paidnetwork/collator .`
+
+4.) Clone Polkadot `cd $HOME && git clone https://github.com/PAIDNetwork/polkadot.git`
+
+5.) checkout correct polkadot version `cd polkadot && git checkout release-v0.9.13`
+
+6.) build relay chain image `docker build -f Dockerfile.relay -t paidnetwork/relay .`
+
+7.) Run containers via docker compose `cd $HOME/paid-chain && docker-compose -f docker-compose-relay.yaml up -d`
+
+You now should beable to view your collator via [polkadotjs](https://polkadot.js.org/apps/#/explorer) switch your network and under
+the `Develoment tab` click `Custom` and paste `ws://localhost:8844` then click `Switch` at the top. For the relay chain 
+connect to `ws://localhost:9944`
+
+Note** the chainspec which is being used for the parachain is "rococo-local" please reference paid-chain/node/src/chain_spec.rs for more
+details on the exact configuration. If you would like to change simply make an edit to the docker-compose or upgrade the chain_spec.rs
+i.e.(Sudo key)
+
+
+Follow instructions on [Cumulus Tutorial](https://docs.substrate.io/tutorials/v3/cumulus/connect-parachain/) for registering your parachain on the local relay chain. Remember the paraid is 2000
+
+## Installation Paid Development
 The first thing you will need to do is prepare the system for Substrate development.
 
 Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) for development environment setup.
