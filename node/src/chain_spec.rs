@@ -10,7 +10,6 @@ use sp_runtime::{AccountId32, traits::{IdentifyAccount, Verify}};
 use sp_core::{H160, U256};
 use std::str::FromStr;
 
-use std::str::FromStr;
 use hex_literal::hex;
 
 /// Specialized `ChainSpec` for the normal parachain runtime.
