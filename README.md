@@ -53,61 +53,52 @@ The first thing you will need to do is prepare the system for Substrate developm
 Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) for development environment setup.
 
 ## Download and install Polkadot
-
-Clone repo:
+* Clone repo:
 ```bash
-git clone https://github.com/paritytech/polkadot.git
+$ git clone hhttps://github.com/PAIDNetwork/polkadot.git
 ```
-
-Change to polkadot directory:
+* Change to polkadot directory:
 ```bash
-cd polkadot
+$ cd polkadot
 ```
-
-Checkout the latest working commit:
+* Checkout the latest working commit:
 ```bash
-git checkout v0.9.13
+$ git checkout v0.9.13
 ```
-
-Build the relay chain:
+* Build the relay chain:
 ```bash
-cargo build --release
+$ cargo build --release
 ```
-
-Check if the build succeeded:
+* Check if the build succeeded:
 ```bash
-./target/release/polkadot --help
+$ ./target/release/polkadot --help
 ```
-
 
 ## Download and install paid-collator
-
-Clone repo:
+* Clone repo:
 ```bash
-git clone git@github.com:PAIDNetwork/paid-chain.git
+$ git clone git@github.com:PAIDNetwork/paid-chain.git
 ```
-
-Change directory:
+* Change directory:
 ```bash
-cd paid-chain
+$ cd paid-chain
 ```
-
-Build paid parachain collator:
+* Build paid parachain collator:
 ```bash
-cargo build --release
+$ cargo build --release
 ```
-
-Check if build succeeded:
+* Check if build succeeded:
 ```bash
-./target/release/parachain-collator --help
+$ ./target/release/parachain-collator --help
 ```
 ## Start Local Relay Chain Validators
-
-Open 2 Seperate Terminals:
+* Open 2 Seperate Terminals via <kbd>cmd+t</kbd> (for Mac) & <kbd>ctrl+t</kbd> (for Win, Linux machine) in the `PAIDNetwork/polkadot` cloned repo.
+* Before proceeding further, a file named `rococo-custom-2-raw.json` is needed which can be copied from [here](https://github.com/PAIDNetwork/paid-chain/blob/main/res/dev/rococo-custom-2-raw.json) & pasted in the root directory of polkadot repo.
+* In terminal-1,
 
 Start Alice:
 ```bash
-./target/release/polkadot --alice \
+$ ./target/release/polkadot --alice \
 --validator \
 --base-path /tmp/relay/alice \
 --chain rococo-custom-2-raw.json \
@@ -117,12 +108,15 @@ Start Alice:
 
 Copy Alices Local Node Identity which looks something like this in Alices terminal output:
 ```bash
-Local node identity is: 12D3KooWGjsmVmZCM1jPtVNp6hRbbkGBK3LADYNniJAKJ19NUYiq
+Local node identity is: 12D3KooWEwPTb5sQamy43HuqTc9doUyVwUZs7dNUrJEPJ48pc9Yr
 ```
+& paste in place of `<Alices local node identity from above>` for Bob in terminal-2
+
+* In terminal-2,
 
 Start Bob:
 ```bash
-./target/release/polkadot --bob \
+$ ./target/release/polkadot --bob \
 --validator \
 --base-path /tmp/relay-bob \
 --chain rococo-custom-2-raw.json \
@@ -134,18 +128,18 @@ Start Bob:
 ## Obtain Wasm runtime validation function and parachain genesis state
 
 ```bash
-./target/release/parachain-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
+$ ./target/release/parachain-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
 ```
 
 ```bash
-./target/release/parachain-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
+$ ./target/release/parachain-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
 ```
 
 ## Start parachain collator
 
 Start Paid Parachain:
 ```bash
-./target/release/parachain-collator --alice \
+$ ./target/release/parachain-collator --alice \
 --collator \
 --force-authoring \
 --chain rococo-local-parachain-2000-raw.json \
@@ -163,20 +157,21 @@ Start Paid Parachain:
 
 ## Register parathread/parachain
 
-Start polkadot js apps:
+* Start polkadot js apps:
 ```
 https://polkadot.js.org/apps/#/explorer
 #click drop down arrow on the top left by "Rococo Local Testnet"
 #select Local Node 127.0.0.1:9944
 ```
 
-Navigate the ui to register a parathread id
+* Navigate the ui to register a parathread id
 ```
 Network -> Parachains -> Parathreads -> ParaId(with a plus sign)
 #click sign and submit
 ```
 
-Register the parathread id on your relay chain
+* Register the parathread id on your relay chain
+
 On polkadot.js app do the following:
 ```
 Developer -> Sudo -> (under submit the following change) paraSudoWrapper ->
@@ -185,7 +180,7 @@ Developer -> Sudo -> (under submit the following change) paraSudoWrapper ->
 #upload para-2000-genesis && para-2000-wasm in their respective field.
 #change parachain bool to 'yes'
 ```
-You will need to wait 2 minutes for your parachain to be accepted by the relay chain validators.
+* You will need to wait 2 minutes for your parachain to be accepted by the relay chain validators.
 check this in:
 ```
 Network -> Parachains -> Overview
