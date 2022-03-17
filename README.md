@@ -55,7 +55,7 @@ Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) f
 ## Download and install Polkadot
 * Clone repo:
 ```bash
-$ git clone hhttps://github.com/PAIDNetwork/polkadot.git
+$ git clone https://github.com/PAIDNetwork/polkadot.git
 ```
 * Change to polkadot directory:
 ```bash
@@ -93,7 +93,7 @@ $ ./target/release/parachain-collator --help
 ```
 ## Start Local Relay Chain Validators
 * Open 2 Seperate Terminals via <kbd>cmd+t</kbd> (for Mac) & <kbd>ctrl+t</kbd> (for Win, Linux machine) in the `PAIDNetwork/polkadot` cloned repo.
-* Before proceeding further, a file named `rococo-custom-2-raw.json` is needed which can be copied from [here](https://github.com/PAIDNetwork/paid-chain/blob/main/res/dev/rococo-custom-2-raw.json) & pasted in the root directory of polkadot repo.
+
 * In terminal-1,
 
 Start Alice:
@@ -101,7 +101,7 @@ Start Alice:
 $ ./target/release/polkadot --alice \
 --validator \
 --base-path /tmp/relay/alice \
---chain rococo-custom-2-raw.json \
+--chain rococo-local \
 --port 30333 \
 --ws-port 9944
 ```
@@ -119,7 +119,7 @@ Start Bob:
 $ ./target/release/polkadot --bob \
 --validator \
 --base-path /tmp/relay-bob \
---chain rococo-custom-2-raw.json \
+--chain rococo-local \
 --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/<Alices local node identity from above> \
 --port 30334 \
 --ws-port 9945
@@ -128,21 +128,28 @@ $ ./target/release/polkadot --bob \
 ## Obtain Wasm runtime validation function and parachain genesis state
 
 ```bash
-$ ./target/release/parachain-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
+$ ./target/release/parachain-collator export-genesis-wasm --chain rococo-local > para-2000-wasm
 ```
 
 ```bash
-$ ./target/release/parachain-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
+$ ./target/release/parachain-collator export-genesis-state --chain rococo-local > para-2000-genesis
 ```
+
+## Obtain relay chain spec
+* Now, go to the `polkadot` repo, generate `relay-chain-spec.json` via running this command 
+```
+$ ./target/release/polkadot build-spec --chain rococo-local --disable-default-bootnode --raw > relay-chain-spec.json
+```
+ & then copy into root of the `paid-chain` repo.
 
 ## Start parachain collator
 
-Start Paid Parachain:
+* Start Paid Parachain:
 ```bash
 $ ./target/release/parachain-collator --alice \
 --collator \
 --force-authoring \
---chain rococo-local-parachain-2000-raw.json \
+--chain rococo-local \
 --base-path /tmp/parachain/alice \
 --port 40333 \
 --ws-port 8844 \
