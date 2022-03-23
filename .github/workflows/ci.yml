@@ -1,8 +1,6 @@
 name: Build Collator
 
 on:
-  push:
-    branches: ["*"]
   pull_request:
     types: [opened, synchronize]
     branches: [main]
