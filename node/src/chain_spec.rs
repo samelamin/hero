@@ -1,20 +1,25 @@
 use cumulus_primitives_core::ParaId;
+use hex_literal::hex;
 use paid_chain_runtime::{
-	AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT, SudoConfig,
-	GenesisAccount, GenesisConfig, EVMConfig, EthereumConfig,};
+	AccountId, AuraId, EVMConfig, EthereumConfig, GenesisAccount, GenesisConfig, Signature,
+	SudoConfig, EXISTENTIAL_DEPOSIT,
+};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public};
-use sp_runtime::{AccountId32, traits::{IdentifyAccount, Verify}};
 use sp_core::{H160, U256};
+use sp_runtime::{
+	traits::{IdentifyAccount, Verify},
+	AccountId32,
+};
 use std::str::FromStr;
 
-use hex_literal::hex;
-
 /// Specialized `ChainSpec` for the normal parachain runtime.
-pub type ChainSpec =
-	sc_service::GenericChainSpec<GenesisConfig, Extensions>;
+pub type ChainSpec = sc_service::GenericChainSpec<paid_chain_runtime::GenesisConfig, Extensions>;
+
+/// The default XCM version to set in genesis config.
+const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_public_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -104,13 +109,12 @@ pub fn development_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
-
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
-
 				1000.into(),
 			)
 		},
 		Vec::new(),
+		None,
 		None,
 		None,
 		None,
@@ -150,17 +154,13 @@ pub fn rococo_live_config() -> ChainSpec {
 				vec![
 					// sudo user ROCTEST
 					AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
-					.unwrap(),
+						.unwrap(),
 					AccountId32::from_str("5CGHAX9Xy5Ut7jYquYT9KaegBetF1V3aAHRPbp9Kr4aaGzGi")
-					.unwrap(),
+						.unwrap(),
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
 				],
-
-				// get_account_id_from_seed::<sr25519::Public>("Alice"),
-				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
-				.unwrap(),
-
+				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
 				2024.into(),
 			)
 		},
@@ -170,6 +170,7 @@ pub fn rococo_live_config() -> ChainSpec {
 		None,
 		// Protocol ID
 		Some("paid"),
+		None,
 		// Properties
 		Some(properties),
 		// Extensions
@@ -220,9 +221,7 @@ pub fn local_testnet_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 					get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
-
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
-
 				2000.into(),
 			)
 		},
@@ -232,6 +231,8 @@ pub fn local_testnet_config() -> ChainSpec {
 		None,
 		// Protocol ID
 		Some("template-local"),
+		// Fork ID
+		None,
 		// Properties
 		Some(properties),
 		// Extensions
@@ -271,10 +272,10 @@ pub fn rococo_local_config() -> ChainSpec {
 				vec![
 					// sudo user RocTest
 					AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
-					.unwrap(),
-					// Kyles
+						.unwrap(),
+
 					AccountId32::from_str("5CGHAX9Xy5Ut7jYquYT9KaegBetF1V3aAHRPbp9Kr4aaGzGi")
-					.unwrap(),
+						.unwrap(),
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
 					// get_account_id_from_seed::<sr25519::Public>("Ferdie"),
@@ -285,12 +286,10 @@ pub fn rococo_local_config() -> ChainSpec {
 					// get_account_id_from_seed::<sr25519::Public>("Eve//stash"),
 					// get_account_id_from_seed::<sr25519::Public>("Ferdie//stash"),
 				],
-
 				// get_account_id_from_seed::<sr25519::Public>("Alice"),
-				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
-				.unwrap(),
-
+				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
 				2000.into(),
+				//30_000_000,
 			)
 		},
 		// Bootnodes
@@ -299,6 +298,7 @@ pub fn rococo_local_config() -> ChainSpec {
 		None,
 		// Protocol ID
 		Some("paid"),
+		None,
 		// Properties
 		Some(properties),
 		// Extensions
@@ -308,7 +308,6 @@ pub fn rococo_local_config() -> ChainSpec {
 		},
 	)
 }
-
 
 fn testnet_genesis(
 	invulnerables: Vec<(AccountId, AuraId)>,
@@ -348,6 +347,9 @@ fn testnet_genesis(
 		aura: Default::default(),
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
+		polkadot_xcm: paid_chain_runtime::PolkadotXcmConfig {
+			safe_xcm_version: Some(SAFE_XCM_VERSION),
+		},
 		evm: EVMConfig {
 			accounts: {
 				// Prefund the "Gerald" account
@@ -355,22 +357,22 @@ fn testnet_genesis(
 				const PREFUNDS_AMOUNT: &str = "0xffffffffffffffffffffffffffffffff"; // 3.4 * 10^39
 				accounts.insert(
 					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
-					GenesisAccount{
-						nonce: U256::zero(),
+					GenesisAccount {
 						// Using a larger number, so I can tell the accounts apart by balance.
+						nonce: U256::zero(),
 						balance: U256::from_str(&PREFUNDS_AMOUNT)
-                                                    .expect("Please provide a valid balance value"),
+							.expect("Please provide a valid balance value"),
 						code: vec![],
 						storage: std::collections::BTreeMap::new(),
-					}
+					},
 				);
 				accounts
-			}
+			},
 		},
-		ethereum: EthereumConfig{},
+		ethereum: EthereumConfig {},
 		sudo: SudoConfig {
 			// Assign network admin rights.
-			key: root_key,
+			key: Some(root_key),
 		},
 	}
 }

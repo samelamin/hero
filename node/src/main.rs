@@ -1,4 +1,4 @@
-//! Paidchain CLI
+//! Substrate Parachain Node Template CLI
 
 #![warn(missing_docs)]
 
@@ -8,7 +8,7 @@ mod service;
 mod cli;
 mod command;
 mod rpc;
-mod primitives;
+
 fn main() -> sc_cli::Result<()> {
 	command::run()
 }

@@ -7,3 +7,15 @@ members = [
 	'pallets/*',
 	'runtime',
 ]
+
+[patch."https://github.com/paritytech/frontier"]
+pallet-evm = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+pallet-ethereum = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fp-self-contained = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fp-rpc = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fp-storage = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+
+fc-rpc = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fc-rpc-core = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fc-db = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+fc-mapping-sync = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }

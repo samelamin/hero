@@ -1,13 +1,12 @@
 # Paid-chain
 
-Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts. 
+Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts.
 
 
 ## Running a PaidChain Collator
 1.) First things first is to [install docker](https://www.docker.com/products/docker-desktop) for your particular platform.
 
 2.) clone Paidchain repository `git clone https://github.com/PAIDNetwork/paid-chain.git && cd paid-chain`
-and checkout the correct branch `git checkout issue19_andrew/docker_deployment`
 
 3.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .`
 
@@ -30,7 +29,7 @@ the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `
 
 4.) Clone Polkadot `cd $HOME && git clone https://github.com/PAIDNetwork/polkadot.git`
 
-5.) checkout correct polkadot version `cd polkadot && git checkout release-v0.9.13`
+5.) checkout correct polkadot version `cd polkadot && git checkout release-v0.9.17`
 
 6.) build relay chain image `docker build -f Dockerfile.relay -t paidnetwork/relay .`
 
@@ -63,7 +62,7 @@ $ cd polkadot
 ```
 * Checkout the latest working commit:
 ```bash
-$ git checkout v0.9.13
+$ git checkout v0.9.17
 ```
 * Build the relay chain:
 ```bash
