@@ -64,6 +64,8 @@ use xcm_executor::{Config, XcmExecutor};
 // Import the template pallet.
 pub use pallet_template;
 
+pub use pallet_erc721;
+
 // Frontier Imports
 use pallet_evm::{
 	Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, FeeCalculator,
@@ -442,6 +444,18 @@ impl pallet_ethereum::Config for Runtime {
 }
 
 parameter_types! {
+	pub const NftTokenLimit: u128 = 100;
+	pub const NftTokenLimitForUser: u64 = 10;
+}
+
+impl pallet_erc721::Config for Runtime {
+	type Event = Event;
+	type TokenLimit = NftTokenLimit;
+	type TokenLimitForAccount = NftTokenLimitForUser;
+	type TokenCreator = frame_system::EnsureRoot<Self::AccountId>;
+}
+
+parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
 	pub const RelayNetwork: NetworkId = NetworkId::Any;
 	pub RelayChainOrigin: Origin = cumulus_pallet_xcm::Origin::Relay.into();
@@ -736,6 +750,7 @@ construct_runtime!(
 		// Frontier support pallets
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
+		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
 
 		// Template
 		TemplatePallet: pallet_template::{Pallet, Call, Storage, Event<T>}  = 40,

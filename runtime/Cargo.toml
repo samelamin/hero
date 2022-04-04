@@ -25,6 +25,7 @@ smallvec = "1.6.1"
 
 # Local Dependencies
 pallet-template = { path = "../pallets/template", default-features = false }
+pallet-erc721 = { path = "../pallets/erc721", default-features = false }
 
 ## Substrate FRAME Dependencies
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, optional = true , branch = "polkadot-v0.9.17" }
@@ -116,6 +117,7 @@ std = [
 	"pallet-sudo/std",
 	"pallet-template/std",
 	"fp-self-contained/std",
+	"pallet-erc721/std",
 	"pallet-evm/std",
 	"pallet-ethereum/std",
 	"pallet-timestamp/std",

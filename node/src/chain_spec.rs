@@ -273,7 +273,6 @@ pub fn rococo_local_config() -> ChainSpec {
 					// sudo user RocTest
 					AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw")
 						.unwrap(),
-
 					AccountId32::from_str("5CGHAX9Xy5Ut7jYquYT9KaegBetF1V3aAHRPbp9Kr4aaGzGi")
 						.unwrap(),
 					get_account_id_from_seed::<sr25519::Public>("Alice"),
