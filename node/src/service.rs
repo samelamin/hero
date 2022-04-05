@@ -1,7 +1,7 @@
 use std::{collections::BTreeMap, sync::Arc, sync::Mutex, time::Duration};
 use fc_rpc_core::types::FeeHistoryCache;
 // Local Runtime Types
-use paid_chain_runtime::{opaque::Block, AccountId, Balance, Hash, Index as Nonce, RuntimeApi};
+pub use paid_chain_runtime::{opaque::Block, AccountId, Balance, Hash, Index as Nonce, RuntimeApi};
 
 // Cumulus Imports
 use cumulus_client_consensus_aura::{AuraConsensus, BuildAuraConsensusParams, SlotProportion};

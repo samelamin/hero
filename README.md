@@ -149,6 +149,7 @@ $ ./target/release/parachain-collator --alice \
 --collator \
 --force-authoring \
 --chain rococo-local \
+--parachain-id 2000 \
 --base-path /tmp/parachain/alice \
 --port 40333 \
 --ws-port 8844 \

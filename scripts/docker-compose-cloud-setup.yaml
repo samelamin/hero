@@ -3,7 +3,7 @@ version: "3.2"
 services:
   collator:
     container_name: collator
-    image: paidnetwork/collator            
+    image: paidnetwork/collator
     ports:
       - "30343:30343"
       - "40333:40333"
@@ -20,7 +20,7 @@ services:
       - "30333:30333"
       - "9944:9944"
     command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --alice --validator --base-path /tmp/relay/alice --chain rococo-private-relay.json --port 30333 --ws-port 9944 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > alice.out 2>&1; tail -f /dev/null"
-  
+
   bob-relay:
     container_name: bob-relay
     image: paidnetwork/relay
@@ -28,7 +28,7 @@ services:
       - "30334:30334"
       - "9945:9945"
     command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --bob --validator --base-path /tmp/relay/bob --chain rococo-private-relay.json --port 30334 --ws-port 9945 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > bob.out 2>&1; tail -f /dev/null"
-    
+
   charlie-relay:
     container_name: charlie-relay
     image: paidnetwork/relay
@@ -36,7 +36,7 @@ services:
       - "30335:30335"
       - "9946:9946"
     command: bash -c "apt-get install -y wget; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/polkadot --charlie --validator --base-path /tmp/relay/charlie --chain rococo-private-relay.json --port 30335 --ws-port 9946 --unsafe-ws-external --rpc-cors all --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe > charlie.out 2>&1; tail -f /dev/null"
-  
+
   frontend:
     container_name: frontend
     image: jacogr/polkadot-js-apps:latest

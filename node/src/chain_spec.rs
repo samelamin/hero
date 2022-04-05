@@ -125,7 +125,7 @@ pub fn development_config() -> ChainSpec {
 	)
 }
 
-pub fn rococo_live_config() -> ChainSpec {
+pub fn rococo_live_config(para_id: ParaId) -> ChainSpec {
 	// Give your base currency a unit name and decimal places
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "PAID".into());
@@ -161,7 +161,7 @@ pub fn rococo_live_config() -> ChainSpec {
 					get_account_id_from_seed::<sr25519::Public>("Bob"),
 				],
 				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
-				2024.into(),
+				para_id,
 			)
 		},
 		// Bootnodes
@@ -176,7 +176,7 @@ pub fn rococo_live_config() -> ChainSpec {
 		// Extensions
 		Extensions {
 			relay_chain: "rococo".into(), // You MUST set this to the correct network!
-			para_id: 2024,
+			para_id: para_id.into(),
 		},
 	)
 }
@@ -243,7 +243,7 @@ pub fn local_testnet_config() -> ChainSpec {
 	)
 }
 
-pub fn rococo_local_config() -> ChainSpec {
+pub fn rococo_local_config(para_id: ParaId) -> ChainSpec {
 	// Give your base currency a unit name and decimal places
 	let mut properties = sc_chain_spec::Properties::new();
 	properties.insert("tokenSymbol".into(), "PAID".into());
@@ -287,7 +287,7 @@ pub fn rococo_local_config() -> ChainSpec {
 				],
 				// get_account_id_from_seed::<sr25519::Public>("Alice"),
 				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
-				2000.into(),
+				para_id,
 				//30_000_000,
 			)
 		},
@@ -303,7 +303,7 @@ pub fn rococo_local_config() -> ChainSpec {
 		// Extensions
 		Extensions {
 			relay_chain: "rococo-local".into(), // You MUST set this to the correct network!
-			para_id: 2000,
+			para_id: para_id.into(),
 		},
 	)
 }
