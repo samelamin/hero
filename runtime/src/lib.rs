@@ -8,7 +8,10 @@ include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use codec::{Decode, Encode};
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
-use sp_core::{crypto::KeyTypeId, OpaqueMetadata, H160, H256};
+use sp_core::{
+	crypto::{ByteArray, KeyTypeId},
+	OpaqueMetadata, H160, H256,
+};
 use sp_runtime::{
 	create_runtime_str, generic, impl_opaque_keys,
 	traits::{
@@ -19,20 +22,20 @@ use sp_runtime::{
 	ApplyExtrinsicResult, MultiSignature,
 };
 
-use sp_std::prelude::*;
+use sp_std::{marker::PhantomData, prelude::*};
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
 use sp_version::RuntimeVersion;
 
 use frame_support::{
 	construct_runtime, match_type, parameter_types,
-	traits::{Everything, Nothing},
+	traits::{Everything, Nothing, FindAuthor},
 	weights::{
 		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, WEIGHT_PER_SECOND},
 		DispatchClass, IdentityFee, Weight, WeightToFeeCoefficient, WeightToFeeCoefficients,
 		WeightToFeePolynomial,
 	},
-	PalletId,
+	ConsensusEngineId, PalletId,
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
@@ -71,7 +74,8 @@ use pallet_evm::{
 	Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, FeeCalculator,
 	HashedAddressMapping, Runner,
 };
-
+mod precompiles;
+use precompiles::FrontierPrecompiles;
 use sp_core::U256;
 
 // pub use this so we can import it in the chain spec.
@@ -415,6 +419,70 @@ parameter_types! {
 parameter_types! {
 	pub const EthChainId: u64 = 1345;
 	pub BlockGasLimit: U256 = U256::from(u32::max_value());
+	pub PrecompilesValue: FrontierPrecompiles<Runtime> = FrontierPrecompiles::<_>::new();
+}
+
+pub mod currency {
+	use super::Balance;
+
+	// Provide a common factor between runtimes based on a supply of tokens.
+	pub const SUPPLY_FACTOR: Balance = 100;
+
+	pub const WEI: Balance = 1;
+	pub const KILOWEI: Balance = 1_000;
+	pub const MEGAWEI: Balance = 1_000_000;
+	pub const GIGAWEI: Balance = 1_000_000_000;
+	pub const MICROPAID: Balance = 1_000_000_000_000;
+	pub const MILLIPAID: Balance = 1_000_000_000_000_000;
+	pub const PAID: Balance = 1_000_000_000_000_000_000;
+	pub const KILOPAID: Balance = 1_000_000_000_000_000_000_000;
+
+	pub const TRANSACTION_BYTE_FEE: Balance = 10 * MICROPAID * SUPPLY_FACTOR;
+	pub const STORAGE_BYTE_FEE: Balance = 100 * MICROPAID * SUPPLY_FACTOR;
+
+	pub const fn deposit(items: u32, bytes: u32) -> Balance {
+		items as Balance * 100 * MILLIPAID * SUPPLY_FACTOR + (bytes as Balance) * STORAGE_BYTE_FEE
+	}
+}
+
+pub struct FixedGasPrice;
+
+impl FeeCalculator for FixedGasPrice {
+	fn min_gas_price() -> U256 {
+		(1 * currency::GIGAWEI * currency::SUPPLY_FACTOR).into()
+	}
+}
+
+/// Current approximation of the gas/s consumption considering
+/// EVM execution over compiled WASM (on 4.4Ghz CPU).
+/// Given the 500ms Weight, from which 75% only are used for transactions,
+/// the total EVM execution gas limit is: GAS_PER_SECOND * 0.500 * 0.75 ~= 15_000_000.
+pub const GAS_PER_SECOND: u64 = 40_000_000;
+pub const WEIGHT_PER_GAS: u64 = WEIGHT_PER_SECOND / GAS_PER_SECOND;
+
+pub struct PaidGasWeightMapping;
+
+impl pallet_evm::GasWeightMapping for PaidGasWeightMapping {
+	fn gas_to_weight(gas: u64) -> Weight {
+		gas.saturating_mul(WEIGHT_PER_GAS)
+	}
+	fn weight_to_gas(weight: Weight) -> u64 {
+		u64::try_from(weight.wrapping_div(WEIGHT_PER_GAS)).unwrap_or(u32::MAX as u64)
+	}
+}
+
+pub struct FindAuthorAdapter<F>(PhantomData<F>);
+impl<F: FindAuthor<u32>> FindAuthor<H160> for FindAuthorAdapter<F> {
+	fn find_author<'a, I>(digests: I) -> Option<H160>
+	where
+		I: 'a + IntoIterator<Item = (ConsensusEngineId, &'a [u8])>,
+	{
+		if let Some(author_index) = F::find_author(digests) {
+			let authority_id = Aura::authorities()[author_index as usize].clone();
+			return Some(H160::from_slice(&authority_id.to_raw_vec()[4..24]));
+		}
+		None
+	}
 }
 
 impl pallet_evm::Config for Runtime {
@@ -430,12 +498,18 @@ impl pallet_evm::Config for Runtime {
 	type WithdrawOrigin = EnsureAddressNever<AccountId>;
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 
-	type FeeCalculator = ();
-	type GasWeightMapping = ();
-	type OnChargeTransaction = ();
-	type PrecompilesType = ();
-	type PrecompilesValue = ();
-	type FindAuthor = ();
+	type FeeCalculator = FixedGasPrice;
+	type GasWeightMapping = PaidGasWeightMapping;
+
+	/// To handle fee deduction for EVM transactions.
+	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, ()>;
+
+	/// Precompiles associated with this EVM engine.
+	type PrecompilesType = FrontierPrecompiles<Self>;
+	type PrecompilesValue = PrecompilesValue;
+
+	/// Find author for the current block.
+	type FindAuthor = FindAuthorAdapter<Aura>;
 }
 
 impl pallet_ethereum::Config for Runtime {

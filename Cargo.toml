@@ -14,8 +14,10 @@ pallet-ethereum = { git = "https://github.com/AuroraLantean/frontier-mod", branc
 fp-self-contained = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
 fp-rpc = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
 fp-storage = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
-
 fc-rpc = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
 fc-rpc-core = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
 fc-db = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
 fc-mapping-sync = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+pallet-evm-precompile-simple = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+pallet-evm-precompile-sha3fips = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }
+pallet-evm-precompile-modexp = { git = "https://github.com/AuroraLantean/frontier-mod", branch = "polkadot-v0.9.17" }

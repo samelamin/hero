@@ -112,5 +112,3 @@ fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "master" }
 fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "master" }
 fc-db = { git = "https://github.com/paritytech/frontier", branch = "master" }
 fc-mapping-sync = { git = "https://github.com/paritytech/frontier", branch = "master" }
-
-
