@@ -186,6 +186,7 @@ construct_runtime!(
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
 		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
+		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>}  = 48,
 
 		// Template
 		TemplatePallet: pallet_template::{Pallet, Call, Storage, Event<T>}  = 40,

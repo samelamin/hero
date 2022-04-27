@@ -1,7 +1,7 @@
 use sp_core::{crypto::ByteArray, H160};
 use sp_runtime::{
 	generic,
-	traits::{AccountIdLookup, BlakeTwo256},
+	traits::{AccountIdLookup, BlakeTwo256, BlockNumberProvider},
 };
 
 use sp_std::{marker::PhantomData, prelude::*};
@@ -540,4 +540,29 @@ impl pallet_collator_selection::Config for Runtime {
 
 impl pallet_template::Config for Runtime {
 	type Event = Event;
+}
+
+pub struct SubstrateBlockNumberProvider;
+
+impl BlockNumberProvider for SubstrateBlockNumberProvider{
+	type BlockNumber = BlockNumber;
+
+	fn current_block_number() -> Self::BlockNumber {
+		System::block_number()
+	}
+}
+
+parameter_types! {
+	// No of max calls a user can do in particular session.
+	pub const MaxCalls: u32 = 1;
+	// Length of the session.
+	pub const FeelessSessionLength: BlockNumber = 500;
+}
+
+/// Configure the pallet-feeless.
+impl pallet_feeless::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type MaxCalls = MaxCalls;
+	type SessionLength = FeelessSessionLength;
 }
