@@ -1,0 +1,5 @@
+1. [Hardware Requirements](./hardware.md)
+2. [Operating System Concerns](./os.md)
+3. [Installing Rust](./rust.md)
+4. [Running Integration Test](integration_test.md)
+5. [Upgrading To New Substrate Version](./upgrade-substrate.md)

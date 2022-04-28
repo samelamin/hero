@@ -1,5 +1,8 @@
 # Paid-chain
 
+## Code In Depth Documentations
+For more detailed documentations about the code itself, [click here](./docs)
+
 Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts.
 
 
@@ -29,7 +32,7 @@ the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `
 
 4.) Clone Polkadot `cd $HOME && git clone https://github.com/PAIDNetwork/polkadot.git`
 
-5.) checkout correct polkadot version `cd polkadot && git checkout release-v0.9.17`
+5.) checkout correct polkadot version `cd polkadot && git checkout release-v0.9.18`
 
 6.) build relay chain image `docker build -f Dockerfile.relay -t paidnetwork/relay .`
 
@@ -62,7 +65,7 @@ $ cd polkadot
 ```
 * Checkout the latest working commit:
 ```bash
-$ git checkout v0.9.17
+$ git checkout v0.9.18
 ```
 * Build the relay chain:
 ```bash
@@ -127,11 +130,11 @@ $ ./target/release/polkadot --bob \
 ## Obtain Wasm runtime validation function and parachain genesis state
 
 ```bash
-$ ./target/release/parachain-collator export-genesis-wasm --chain rococo-local > para-2000-wasm
+./target/release/parachain-collator export-genesis-wasm --chain rococo-local > para-2000-wasm
 ```
 
 ```bash
-$ ./target/release/parachain-collator export-genesis-state --chain rococo-local > para-2000-genesis
+./target/release/parachain-collator export-genesis-state --chain rococo-local > para-2000-genesis
 ```
 
 ## Obtain relay chain spec
@@ -149,7 +152,6 @@ $ ./target/release/parachain-collator --alice \
 --collator \
 --force-authoring \
 --chain rococo-local \
---parachain-id 2000 \
 --base-path /tmp/parachain/alice \
 --port 40333 \
 --ws-port 8844 \

@@ -1,8 +1,8 @@
 use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
 use paid_chain_runtime::{
-	AccountId, AuraId, EVMConfig, EthereumConfig, GenesisAccount, GenesisConfig, Signature,
-	SudoConfig, EXISTENTIAL_DEPOSIT,
+	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig, GenesisAccount,
+	GenesisConfig, Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
 };
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
@@ -20,6 +20,7 @@ pub type ChainSpec = sc_service::GenericChainSpec<paid_chain_runtime::GenesisCon
 
 /// The default XCM version to set in genesis config.
 const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
+const CROWDLOAN_FUND_POT: u128 = 30_000_000;
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_public_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -111,6 +112,7 @@ pub fn development_config() -> ChainSpec {
 				],
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				1000.into(),
+				CROWDLOAN_FUND_POT,
 			)
 		},
 		Vec::new(),
@@ -162,6 +164,7 @@ pub fn rococo_live_config(para_id: ParaId) -> ChainSpec {
 				],
 				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
 				para_id,
+				CROWDLOAN_FUND_POT,
 			)
 		},
 		// Bootnodes
@@ -223,6 +226,7 @@ pub fn local_testnet_config() -> ChainSpec {
 				],
 				get_account_id_from_seed::<sr25519::Public>("Alice"),
 				2000.into(),
+				CROWDLOAN_FUND_POT,
 			)
 		},
 		// Bootnodes
@@ -287,8 +291,8 @@ pub fn rococo_local_config(para_id: ParaId) -> ChainSpec {
 				],
 				// get_account_id_from_seed::<sr25519::Public>("Alice"),
 				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
-				para_id,
-				//30_000_000,
+        para_id,
+				CROWDLOAN_FUND_POT,
 			)
 		},
 		// Bootnodes
@@ -313,6 +317,7 @@ fn testnet_genesis(
 	endowed_accounts: Vec<AccountId>,
 	root_key: AccountId,
 	id: ParaId,
+	crowdloan_fund_pot: Balance,
 ) -> GenesisConfig {
 	GenesisConfig {
 		system: paid_chain_runtime::SystemConfig {
@@ -373,5 +378,6 @@ fn testnet_genesis(
 			// Assign network admin rights.
 			key: Some(root_key),
 		},
+		crowdloan_rewards: CrowdloanRewardsConfig { funded_amount: crowdloan_fund_pot },
 	}
 }

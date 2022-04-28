@@ -11,8 +11,9 @@ use sp_version::NativeVersion;
 use codec::{Decode, Encode};
 use smallvec::smallvec;
 use sp_core::H160;
+
 use sp_runtime::{
-	impl_opaque_keys,
+  impl_opaque_keys,
 	traits::{Dispatchable, PostDispatchInfoOf},
 	transaction_validity::{TransactionValidity, TransactionValidityError},
 };
@@ -20,11 +21,10 @@ use sp_runtime::{
 use sp_std::prelude::*;
 
 use frame_support::{
-	construct_runtime,
-	weights::{
-		constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients,
-		WeightToFeePolynomial,
-	},
+  construct_runtime,
+  weights::{
+    constants::ExtrinsicBaseWeight, WeightToFeeCoefficient, WeightToFeeCoefficients, WeightToFeePolynomial,
+  },
 };
 
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -97,7 +97,6 @@ pub fn native_version() -> NativeVersion {
 	NativeVersion { runtime_version: VERSION, can_author_with: Default::default() }
 }
 
-/// This module contains the implementations of pallets to the runtime
 pub mod runtime_pallet_impl;
 pub use runtime_pallet_impl::*;
 
@@ -148,7 +147,6 @@ impl fp_self_contained::SelfContainedCall for Call {
 	}
 }
 
-
 // Create the runtime by composing the FRAME pallets that were previously configured.
 construct_runtime!(
 	pub enum Runtime where
@@ -185,11 +183,9 @@ construct_runtime!(
 		// Frontier support pallets
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
+    CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
-		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>}  = 48,
-
-		// Template
-		TemplatePallet: pallet_template::{Pallet, Call, Storage, Event<T>}  = 40,
+    Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>}  = 48,
 	}
 );
 

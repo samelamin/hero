@@ -17,8 +17,11 @@ archives
 .DS_Store
 .idea
 .vscode
-run.sh
-run-recipes.sh
+zmain.sh
+zarchives.sh
+zrun.sh
+zfrontier.sh
+zrecipes.sh
 rococo-local-parachain-2000-raw.json
 rococo-local-parachain-plain.json
 para-2000-genesis

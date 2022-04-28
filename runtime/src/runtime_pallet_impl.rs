@@ -19,7 +19,7 @@ use frame_support::{
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
-	EnsureRoot,
+	EnsureRoot, EnsureSigned
 };
 
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
@@ -62,8 +62,7 @@ use crate::{
 use sp_core::U256;
 
 // Import the template pallet.
-pub use pallet_template;
-
+pub use pallet_crowdloan_rewards;
 pub use pallet_erc721;
 
 /// We assume that ~5% of the block weight is consumed by `on_initialize` handlers. This is
@@ -331,6 +330,32 @@ impl pallet_erc721::Config for Runtime {
 }
 
 parameter_types! {
+	pub const MinimumReward: Balance = 0;
+	pub const Initialized: bool = false;
+	pub const InitializationPayment: Perbill = Perbill::from_percent(30);
+	pub const MaxInitContributorsBatchSizes: u32 = 500;
+	pub const RelaySignaturesThreshold: Perbill = Perbill::from_percent(100);
+  pub const TestSigantureNetworkIdentifier: &'static [u8] = b"test-";
+}
+impl pallet_crowdloan_rewards::Config for Runtime {
+	type Event = Event;
+	type Initialized = Initialized;
+	type InitializationPayment = InitializationPayment;
+	type MaxInitContributors = MaxInitContributorsBatchSizes;
+	type MinimumReward = MinimumReward;
+	type RewardCurrency = Balances;
+	type RelayChainAccountId = AccountId;
+	type RewardAddressChangeOrigin = EnsureSigned<Self::AccountId>;
+	type RewardAddressRelayVoteThreshold = RelaySignaturesThreshold;
+	type RewardAddressAssociateOrigin = EnsureSigned<Self::AccountId>;
+	type SignatureNetworkIdentifier = TestSigantureNetworkIdentifier;
+	type VestingBlockNumber = BlockNumber;
+	type VestingBlockProvider =
+		cumulus_pallet_parachain_system::RelaychainBlockNumberProvider<Self>;
+	type WeightInfo = pallet_crowdloan_rewards::weights::SubstrateWeight<Runtime>;
+}
+
+parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
 	pub const RelayNetwork: NetworkId = NetworkId::Any;
 	pub RelayChainOrigin: Origin = cumulus_pallet_xcm::Origin::Relay.into();
@@ -538,10 +563,7 @@ impl pallet_collator_selection::Config for Runtime {
 	type WeightInfo = ();
 }
 
-impl pallet_template::Config for Runtime {
-	type Event = Event;
-}
-
+// pallet-feeless
 pub struct SubstrateBlockNumberProvider;
 
 impl BlockNumberProvider for SubstrateBlockNumberProvider{

@@ -1,5 +1,5 @@
-use std::{collections::BTreeMap, sync::Arc, sync::Mutex, time::Duration};
 use fc_rpc_core::types::FeeHistoryCache;
+use std::{collections::BTreeMap, sync::Arc, sync::Mutex, time::Duration};
 // Local Runtime Types
 pub use paid_chain_runtime::{opaque::Block, AccountId, Balance, Hash, Index as Nonce, RuntimeApi};
 
