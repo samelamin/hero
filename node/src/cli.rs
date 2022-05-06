@@ -50,10 +50,9 @@ pub struct ExportGenesisStateCommand {
 	pub output: Option<PathBuf>,
 
 	/// Id of the parachain this state is for.
-    ///
-    /// Default: 2000
-    #[clap(long)]
-    pub parachain_id: Option<u32>,
+	/// Default: 2000
+	#[clap(long)]
+	pub parachain_id: Option<u32>,
 
 	/// Write output in binary. Default is to write in hex.
 	#[clap(short, long)]
@@ -83,21 +82,21 @@ pub struct ExportGenesisWasmCommand {
 #[allow(missing_docs)]
 #[derive(Debug, Parser)]
 pub struct RunCmd {
-    #[allow(missing_docs)]
-    #[clap(flatten)]
-    pub base: cumulus_client_cli::RunCmd,
+	#[allow(missing_docs)]
+	#[clap(flatten)]
+	pub base: cumulus_client_cli::RunCmd,
 
-    /// Id of the parachain this collator collates for.
-    #[clap(long)]
-    pub parachain_id: Option<u32>,
+	/// Id of the parachain this collator collates for.
+	#[clap(long)]
+	pub parachain_id: Option<u32>,
 }
 
 impl std::ops::Deref for RunCmd {
-    type Target = cumulus_client_cli::RunCmd;
+	type Target = cumulus_client_cli::RunCmd;
 
-    fn deref(&self) -> &Self::Target {
-        &self.base
-    }
+	fn deref(&self) -> &Self::Target {
+		&self.base
+	}
 }
 
 #[derive(Debug, Parser)]

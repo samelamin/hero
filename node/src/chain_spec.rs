@@ -1,7 +1,7 @@
 use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
 use paid_chain_runtime::{
-	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig, GenesisAccount,
+	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig, 
 	GenesisConfig, Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
 };
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
@@ -15,15 +15,16 @@ use sp_runtime::{
 };
 use std::str::FromStr;
 
-/// Specialized `ChainSpec` for the normal parachain runtime.
-pub type ChainSpec = sc_service::GenericChainSpec<paid_chain_runtime::GenesisConfig, Extensions>;
+/// Specialized `ChainSpec`. This is a specialization of the general Substrate ChainSpec type.
+pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 
 /// The default XCM version to set in genesis config.
 const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
 const CROWDLOAN_FUND_POT: u128 = 30_000_000;
 
-/// Helper function to generate a crypto pair from seed
-pub fn get_public_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
+/// Generate a crypto pair from seed. 
+// previous name: get_public_from_seed()
+pub fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
 	TPublic::Pair::from_string(&format!("//{}", seed), None)
 		.expect("static values are valid; qed")
 		.public()
@@ -49,22 +50,20 @@ impl Extensions {
 type AccountPublic = <Signature as Verify>::Signer;
 
 /// Generate collator keys from seed.
-///
 /// This function's return type must always match the session keys of the chain in tuple format.
 pub fn get_collator_keys_from_seed(seed: &str) -> AuraId {
-	get_public_from_seed::<AuraId>(seed)
+	get_from_seed::<AuraId>(seed)
 }
 
-/// Helper function to generate an account ID from seed
+/// Generate an account ID from seed.
 pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
 where
 	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
 {
-	AccountPublic::from(get_public_from_seed::<TPublic>(seed)).into_account()
+	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
 }
 
 /// Generate the session keys from individual elements.
-///
 /// The input must be a tuple of individual keys (a single arg for now since we have just one key).
 pub fn template_session_keys(keys: AuraId) -> paid_chain_runtime::SessionKeys {
 	paid_chain_runtime::SessionKeys { aura: keys }
@@ -291,7 +290,7 @@ pub fn rococo_local_config(para_id: ParaId) -> ChainSpec {
 				],
 				// get_account_id_from_seed::<sr25519::Public>("Alice"),
 				AccountId32::from_str("5G47n2VFdP65KUpd63aHVdkiGKqx197Bfep2srS4Qe6t24Gw").unwrap(),
-        para_id,
+				para_id,
 				CROWDLOAN_FUND_POT,
 			)
 		},
@@ -361,7 +360,7 @@ fn testnet_genesis(
 				const PREFUNDS_AMOUNT: &str = "0xffffffffffffffffffffffffffffffff"; // 3.4 * 10^39
 				accounts.insert(
 					H160::from_slice(&hex!("6Be02d1d3665660d22FF9624b7BE0551ee1Ac91b")),
-					GenesisAccount {
+					fp_evm::GenesisAccount {
 						// Using a larger number, so I can tell the accounts apart by balance.
 						nonce: U256::zero(),
 						balance: U256::from_str(&PREFUNDS_AMOUNT)

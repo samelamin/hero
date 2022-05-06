@@ -1,4 +1,4 @@
-// Copyright 2019-2020 PureStake Inc.
+// Copyright 2019-2021 PureStake Inc.
 // This file is part of Moonbeam.
 
 // Moonbeam is free software: you can redistribute it and/or modify
@@ -61,14 +61,14 @@ parameter_types! {
 }
 
 impl cumulus_pallet_parachain_system::Config for Test {
-	type SelfParaId = ParachainId;
 	type Event = Event;
+	type OnSystemEvent = ();
+	type SelfParaId = ParachainId;
+	type DmpMessageHandler = ();
+	type ReservedDmpWeight = ();
 	type OutboundXcmpMessageSource = ();
 	type XcmpMessageHandler = ();
 	type ReservedXcmpWeight = ();
-	type DmpMessageHandler = ();
-	type ReservedDmpWeight = ();
-	type OnSystemEvent = ();
 }
 
 parameter_types! {

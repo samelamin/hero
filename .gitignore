@@ -22,7 +22,13 @@ zarchives.sh
 zrun.sh
 zfrontier.sh
 zrecipes.sh
-rococo-local-parachain-2000-raw.json
+zrococo.sh
 rococo-local-parachain-plain.json
-para-2000-genesis
-para-2000-wasm
+rococo-remote-parachain-plain.json
+rococo-local-parachain-2000-raw.json
+rococo-remote-parachain-????-raw.json
+para-????-genesis
+para-????-wasm
+
+zombienet-linux
+zombienet/00*
