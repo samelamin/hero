@@ -4,6 +4,8 @@ on:
   pull_request:
     types: [opened, synchronize]
     branches: [main]
+  push:
+    branches: [main]
 
 env:
   GCP_PROJECT_ID: "paid-network-202104"
