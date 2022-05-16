@@ -216,8 +216,8 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		// Todo: Add Correct Weights
-		#[pallet::weight(0)]
+
+		#[pallet::weight(10_000 + T::DbWeight::get().reads(1))]
 		pub fn balance_of(origin: OriginFor<T>, owner: T::AccountId) -> DispatchResult {
 			ensure_signed(origin)?;
 
@@ -231,8 +231,8 @@ pub mod pallet {
 			Ok(())
 		}
 
-		// Todo: Add Correct Weights
-		#[pallet::weight(0)]
+
+		#[pallet::weight(10_000 + T::DbWeight::get().reads(1))]
 		pub fn owner_of(origin: OriginFor<T>, token: TokenId<T>) -> DispatchResult {
 			ensure_signed(origin)?;
 
@@ -245,8 +245,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		// Todo: Add Correct Weights
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(8,6))]
 		pub fn transfer_from(
 			origin: OriginFor<T>,
 			to: T::AccountId,
@@ -271,7 +270,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(5,4))]
 		pub fn mint(
 			origin: OriginFor<T>,
 			for_: T::AccountId,
@@ -286,7 +285,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(7,6))]
 		pub fn burn(origin: OriginFor<T>, token: TokenId<T>) -> DispatchResult {
 			let for_ = ensure_signed(origin)?;
 			let token_owner = Self::_owner_of(&token)?;
@@ -307,7 +306,7 @@ pub mod pallet {
 		}
 
 		/// ERC721 getApproved => custodian_of
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads(1))]
 		pub fn custodian_of(origin: OriginFor<T>, token: TokenId<T>) -> DispatchResult {
 			ensure_signed(origin)?;
 
@@ -321,7 +320,7 @@ pub mod pallet {
 		}
 
 		/// ERC721 approve => set_custodian
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
 		pub fn set_custodian(
 			origin: OriginFor<T>,
 			custodian: T::AccountId,
@@ -339,7 +338,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(8,6))]
 		pub fn custodian_transfer(
 			origin: OriginFor<T>,
 			to: T::AccountId,
@@ -350,7 +349,6 @@ pub mod pallet {
 			let from = Self::_owner_of(&token)?;
 
 			ensure!(who == custodian, Error::<T>::InvalidCustodian);
-
 			Self::_transfer(&from, &to, &token)?;
 			Self::_remove_custodian(&token)?;
 
@@ -363,7 +361,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(0)]
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(7,6))]
 		pub fn custodian_burn(
 			origin: OriginFor<T>,
 			token: TokenId<T>
