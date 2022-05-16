@@ -19,7 +19,6 @@ pub mod pallet {
 		Parameter,
 		weights::{Pays, GetDispatchInfo},
 		traits::Get,
-		sp_runtime::traits::BlockNumberProvider,
 	};
 	use frame_system::pallet_prelude::*;
 	use scale_info::prelude::boxed::Box;
@@ -27,6 +26,7 @@ pub mod pallet {
 
 	#[pallet::pallet]
 	#[pallet::generate_store(pub (super) trait Store)]
+	#[pallet::without_storage_info]
 	pub struct Pallet<T>(PhantomData<T>);
 
 	/// Configure the pallet by specifying the parameters and types on which it depends.
@@ -42,16 +42,25 @@ pub mod pallet {
 		#[pallet::constant]
 		type MaxCalls: Get<u32>;
 
-		/// The length of a session in no of blocks.
-		#[pallet::constant]
-		type SessionLength: Get<<Self as frame_system::Config>::BlockNumber>;
 	}
 
 	#[pallet::error]
 	pub enum Error<T> {
 		/// An account cannot make more Calls than 'MaxCalls'.
 		ExceedMaxCalls,
+
+		/// Already a super user.
+		AlreadySuperUser,
+
+		/// Not a super user.
+		NotSuperUser,
+
+		/// When the feeless count is more than the max count permited.
+		FeelessTxnCountLimitExceeds,
 	}
+
+	/// feeless txn count.
+	pub type FeelessCount = u32;
 
 	#[pallet::event]
 	#[pallet::generate_deposit(pub (super) fn deposit_event)]
@@ -63,6 +72,12 @@ pub mod pallet {
 			/// Feeless code result.
 			feeless_result: DispatchResult,
 		},
+
+		/// Member added as super user.
+		MemberAdded,
+
+		/// Member removed from super user.
+		MemberRemoved,
 	}
 
 	#[pallet::storage]
@@ -70,6 +85,10 @@ pub mod pallet {
 	/// Track how many calls each user has done for the latest session
 	pub(super) type Tracker<T: Config> = StorageMap<_, Twox64Concat, T::AccountId, FeelessInfo<T::BlockNumber>, ValueQuery>;
 
+	#[pallet::storage]
+	#[pallet::getter(fn superusers)]
+	/// List of Super users.
+	pub type SuperUsers<T: Config> = StorageMap<_, Blake2_128, T::AccountId, FeelessCount>;
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
@@ -84,21 +103,17 @@ pub mod pallet {
 			let sender = ensure_signed(origin.clone())?;
 
 			// Get the relevant storage data.
-			let max_calls = T::MaxCalls::get();
+			let max_calls: u32 = T::MaxCalls::get();
 			let mut feeless_info = Tracker::<T>::get(&sender);
-			let current_blocknumber: T::BlockNumber = frame_system::Pallet::<T>::current_block_number();
-			let session_length = T::SessionLength::get();
 
-			// Calculate the current session.
-			let current_session = current_blocknumber / session_length;
+			// Checking whether the sender is a super user or not.
+			let feeless_count: FeelessCount = SuperUsers::<T>::get(&sender).ok_or(Error::<T>::NotSuperUser)?;
 
-			// If this is a new session for the user, reset their count.
-			if feeless_info.last_user_session < current_session {
-				feeless_info.user_calls = 0;
-			}
+			// The feeless transaction count should be less than MaxCalls permited.
+			ensure!(feeless_count <= max_calls, Error::<T>::FeelessTxnCountLimitExceeds);
 
 			// Checking whether the account is eligible for feeless payment.
-			ensure!(feeless_info.user_calls < max_calls , Error::<T>::ExceedMaxCalls);
+			ensure!(feeless_info.user_calls < feeless_count , Error::<T>::ExceedMaxCalls);
 
 			// Update the tracker count.
 			feeless_info.user_calls = feeless_info.user_calls.saturating_add(1);
@@ -121,6 +136,38 @@ pub mod pallet {
 
 			// Making the tx feeless.
 			Ok(Pays::No.into())
+		}
+
+		/// Add a member to Super User.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn add_super_user(origin: OriginFor<T>, who: T::AccountId, feeless_count: u32) -> DispatchResult {
+			ensure_root(origin.clone())?;
+
+			ensure!(
+				!SuperUsers::<T>::contains_key(&who),
+				Error::<T>::AlreadySuperUser
+			);
+
+			SuperUsers::<T>::insert(&who, feeless_count);
+
+			Self::deposit_event(Event::MemberAdded);
+			Ok(())
+		}
+
+		/// Remove a member from Super User.
+		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(1,1))]
+		pub fn remove_super_user(origin: OriginFor<T>, who: T::AccountId) -> DispatchResult {
+			ensure_root(origin.clone())?;
+
+			ensure!(
+				SuperUsers::<T>::contains_key(&who),
+				Error::<T>::NotSuperUser
+			);
+
+			SuperUsers::<T>::remove(&who);
+
+			Self::deposit_event(Event::MemberRemoved);
+			Ok(())
 		}
 	}
 }

@@ -12,7 +12,6 @@ use sp_runtime::{
 use pallet_balances::{Call as BalancesCall };
 pub use crate::pallet::*;
 
-pub type BlockNumber = u32;
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
 
@@ -33,7 +32,6 @@ parameter_types! {
 	pub const BlockHashCount: u64 = 250;
 	pub const SS58Prefix: u8 = 42;
 	pub const MaxCalls: u32 = 1;
-	pub const SessionLength: BlockNumber = 1000;
 }
 
 impl system::Config for Test {
@@ -67,7 +65,6 @@ impl pallet_feeless::Config for Test {
 	type Event = Event;
 	type Call = Call;
 	type MaxCalls = MaxCalls;
-	type SessionLength =  SessionLength;
 }
 
 impl pallet_balances::Config for Test {

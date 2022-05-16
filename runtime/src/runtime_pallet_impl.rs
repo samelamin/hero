@@ -417,9 +417,7 @@ impl BlockNumberProvider for SubstrateBlockNumberProvider{
 
 parameter_types! {
 	// No of max calls a user can do in particular session.
-	pub const MaxCalls: u32 = 1;
-	// Length of the session.
-	pub const FeelessSessionLength: BlockNumber = 500;
+	pub const MaxCalls: u32 = 5;
 }
 
 /// Configure the pallet-feeless.
@@ -427,5 +425,4 @@ impl pallet_feeless::Config for Runtime {
 	type Event = Event;
 	type Call = Call;
 	type MaxCalls = MaxCalls;
-	type SessionLength = FeelessSessionLength;
 }
