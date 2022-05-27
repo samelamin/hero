@@ -49,7 +49,7 @@ i.e.(Sudo key)
 
 Follow instructions on [Cumulus Tutorial](https://docs.substrate.io/tutorials/v3/cumulus/connect-parachain/) for registering your parachain on the local relay chain. Remember the paraid is 2000
 
-## Installation Paid Development
+# Installation Paid Development
 The first thing you will need to do is prepare the system for Substrate development.
 
 Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) for development environment setup.
@@ -57,137 +57,195 @@ Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) f
 ## Download and install Polkadot
 * Clone repo:
 ```bash
-$ git clone https://github.com/PAIDNetwork/polkadot.git
+git clone https://github.com/PAIDNetwork/polkadot.git
 ```
 * Change to polkadot directory:
 ```bash
-$ cd polkadot
+cd polkadot
 ```
 * Checkout the latest working commit:
 ```bash
-$ git checkout v0.9.18
+git checkout v0.9.19
 ```
 * Build the relay chain:
 ```bash
-$ cargo build --release
+cargo build --release
 ```
 * Check if the build succeeded:
 ```bash
-$ ./target/release/polkadot --help
+./target/release/polkadot --help
 ```
 
 ## Download and install paid-collator
 * Clone repo:
 ```bash
-$ git clone git@github.com:PAIDNetwork/paid-chain.git
+git clone git@github.com:PAIDNetwork/paid-chain.git
 ```
 * Change directory:
 ```bash
-$ cd paid-chain
+cd paid-chain
 ```
 * Build paid parachain collator:
 ```bash
-$ cargo build --release
+cargo build --release
 ```
 * Check if build succeeded:
 ```bash
-$ ./target/release/parachain-collator --help
+./target/release/parachain-collator --help
 ```
-## Start Local Relay Chain Validators
+## Start Local __Relay Chain Validators__
 * Open 2 Seperate Terminals via <kbd>cmd+t</kbd> (for Mac) & <kbd>ctrl+t</kbd> (for Win, Linux machine) in the `PAIDNetwork/polkadot` cloned repo.
 
-* In terminal-1,
+<!-- reference ( https://github.com/paritytech/cumulus ) -->
 
-Start Alice:
+## Generate a __raw relay chain spec__
 ```bash
-$ ./target/release/polkadot --alice \
---validator \
---base-path /tmp/relay/alice \
---chain rococo-local \
---port 30333 \
---ws-port 9944
+./target/release/polkadot build-spec --chain rococo-local \
+--disable-default-bootnode --raw > rococo-local-cfde.json
 ```
 
-Copy Alices Local Node Identity which looks something like this in Alices terminal output:
+## Validators
+* we start 2 validators to run
+
+### Alice
+* In __terminal-1__ _(polkadot repo)_
+```bash
+./target/release/polkadot --alice --tmp --validator \
+--chain rococo-local-cfde.json \
+--port 30333 --ws-port 9944
+```
+<!--
+# (changes from 0.9.18 to 0.9.19 :: 
+# --base-path <path> ==> --tmp
+# --chain rococo-local ==> --chain rococo-local-cfde.json (it gets explicitly generated before use)
+#
+# done to avoid epoch change issues (https://ink.substrate.io/getting-started/troubleshooting/)
+# )
+-->
+
+### Bob
+* In __terminal-2__ _(polkadot repo)_
+```bash
+./target/release/polkadot --bob --tmp --validator \
+--chain rococo-local-cfde.json \
+--port 30334 --ws-port 9945
+```
+
+* __If the above fails__ you can supply `--bootnodes <path>` passing identity of Alice to Bob explicitly
+
+Copy Alice's __Local Node Identity__ which looks something like this in Alice's __terminal-1__ output:
 ```bash
 Local node identity is: 12D3KooWEwPTb5sQamy43HuqTc9doUyVwUZs7dNUrJEPJ48pc9Yr
 ```
-& paste in place of `<Alices local node identity from above>` for Bob in terminal-2
 
-* In terminal-2,
-
-Start Bob:
+and paste in place of `<Alices local node identity from above>` for Bob in __terminal-2__
 ```bash
-$ ./target/release/polkadot --bob \
---validator \
---base-path /tmp/relay-bob \
---chain rococo-local \
---bootnodes /ip4/127.0.0.1/tcp/30333/p2p/<Alices local node identity from above> \
---port 30334 \
---ws-port 9945
+./target/release/polkadot --bob --tmp --validator \
+--chain rococo-local-cfde.json \
+--port 30334 --ws-port 9945 \
+--bootnodes /ip4/127.0.0.1/tcp/30333/p2p/<Alices local node identity from above>
 ```
+<!-- bootnodes should be last to make editing the local node identity at the end easy -->
 
-## Obtain Wasm runtime validation function and parachain genesis state
-
+## Copy __relay chain spec__ for prachain
+It was generated earlier inside of the Polkadot repo.  
+Copy it into __root__ of the `paid-chain` repo. _(example in `bash` called from polkadot repo)_
 ```bash
-./target/release/parachain-collator export-genesis-wasm --chain rococo-local > para-2000-wasm
+cp rococo-local-cfde.json ../paid-chain/rococo-local-cfde.json
 ```
 
+____  
+
+You can now __leave the relay chain to run__.  
+Continue buy setting up a __third terminal__, running in the `paid-chain` repo.
+____  
+## Build __collator spec__ and __raw chain spec__  
+## => Obtain __wasm runtime__ validation function and parachain __genesis state__
+* Required to pass to `sudoScheduleParaInitialize` later for registration _(paid-chain repo)_:
+* __terminal-3__ _(paid chain repo)_
+<!-- Assumes that `rococo-local` is in `node/chan_spec.rs` as the relay you registered with -->
 ```bash
-./target/release/parachain-collator export-genesis-state --chain rococo-local > para-2000-genesis
+./target/release/parachain-collator build-spec \
+--disable-default-bootnode > rococo-local-parachain-plain.json \
+&& \
+./target/release/parachain-collator build-spec --chain rococo-local-parachain-plain.json \
+--raw --disable-default-bootnode > parachain-raw.json \
+&& \
+./target/release/parachain-collator export-genesis-wasm \
+--chain parachain-raw.json > para-wasm \
+&& \
+./target/release/parachain-collator export-genesis-state \
+--chain parachain-raw.json > para-genesis
 ```
 
-## Obtain relay chain spec
-* Now, go to the `polkadot` repo, generate `relay-chain-spec.json` via running this command 
-```
-$ ./target/release/polkadot build-spec --chain rococo-local --disable-default-bootnode --raw > relay-chain-spec.json
-```
- & then copy into root of the `paid-chain` repo.
 
-## Start parachain collator
+## Start __parachain collator__
 
-* Start Paid Parachain:
+* Start Paid Parachain in __terminal-3__ _(paid-chain repo)_:
 ```bash
-$ ./target/release/parachain-collator --alice \
---collator \
---force-authoring \
---chain rococo-local \
---base-path /tmp/parachain/alice \
---port 40333 \
---ws-port 8844 \
---rpc-port 6969 \
---rpc-cors all \
+./target/release/parachain-collator --alice \
+--tmp --collator --force-authoring \
+--chain parachain-raw.json \
+--port 40333     --ws-port 8844 \
+--rpc-port 6969  --rpc-cors all \
 -- \
 --execution wasm \
---chain relay-chain-spec.json \
---port 30343 \
---ws-port 9977
+--chain rococo-local-cfde.json \
+--port 30343     --ws-port 9977
 ```
+<!-- 
+* optionaly add another collator _Bob (Collator 2)_
+```bash
+./target/release/parachain-collator --collator --bob --force-authoring --tmp \
+--port 40336 --ws-port 9947 \
+-- \
+--execution wasm --chain rococo-local-cfde.json --port 30336
+``` 
+-->
 
-## Register parathread/parachain
+<!--
+* optionally add a _Full Node_
+```
+./target/release/parachain-collator --tmp \
+--port 40337 --ws-port 9948 \
+-- \
+--execution wasm --chain rococo-local-cfde.json --port 30337
+``` 
+-->
 
-* Start polkadot js apps:
+____  
+From this point we can __leave all the terminals running__, proceede to the __web browser__  
+__( https://polkadot.js.org/apps/#/explorer )__
+____  
+
+## Register __parathread/parachain__
+
+* Start __polkadot.js__ apps: 
 ```
 https://polkadot.js.org/apps/#/explorer
 #click drop down arrow on the top left by "Rococo Local Testnet"
 #select Local Node 127.0.0.1:9944
 ```
 
-* Navigate the ui to register a parathread id
+* Navigate the ui to register a __parathread id__:
 ```
 Network -> Parachains -> Parathreads -> ParaId(with a plus sign)
-#click sign and submit
+# click sign and submit, note the id number (the first currently defaults to 2000)
 ```
+<!-- 
+for reference ( https://docs.substrate.io/how-to-guides/v3/parachains/connect/ ) 
+-->
 
 * Register the parathread id on your relay chain
 
-On polkadot.js app do the following:
+On __polkadot.js__ app do the following:
 ```
 Developer -> Sudo -> (under submit the following change) paraSudoWrapper ->
 (on the right drop down) sudoScheduleParaInitialize(id, genesis)
-#click file upload for both genesisHead and validationCode fields
-#upload para-2000-genesis && para-2000-wasm in their respective field.
-#change parachain bool to 'yes'
+# assign the id that was registered earlier
+# click file upload for both genesisHead and validationCode fields
+# upload para-genesis && para-wasm in their respective fields.
+# change parachain bool to 'yes'
 ```
 * You will need to wait 2 minutes for your parachain to be accepted by the relay chain validators.
 check this in:

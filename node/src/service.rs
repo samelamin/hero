@@ -39,6 +39,7 @@ use polkadot_service::CollatorPair;
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
 use futures::StreamExt;
 
+
 /// Native executor instance.
 pub struct PaidChainRuntimeExecutor;
 
@@ -68,7 +69,7 @@ pub fn frontier_database_dir(config: &Configuration) -> std::path::PathBuf {
 
 pub fn open_frontier_backend(config: &Configuration) -> Result<Arc<fc_db::Backend<Block>>, String> {
 	Ok(Arc::new(fc_db::Backend::<Block>::new(&fc_db::DatabaseSettings {
-		source: fc_db::DatabaseSettingsSrc::RocksDb {
+		source: fc_db::DatabaseSource::RocksDb {
 			path: frontier_database_dir(&config),
 			cache_size: 0,
 		},

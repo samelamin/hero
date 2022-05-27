@@ -12,8 +12,8 @@ use frame_support::{
 	parameter_types,
 	traits::{Everything, FindAuthor},
 	weights::{
-		constants::{BlockExecutionWeight, ExtrinsicBaseWeight, WEIGHT_PER_SECOND},
-		DispatchClass, Weight,
+		constants::{/* BlockExecutionWeight, ExtrinsicBaseWeight, */ WEIGHT_PER_SECOND},
+		DispatchClass, Weight, ConstantMultiplier
 	},
 	ConsensusEngineId, PalletId,
 };
@@ -29,7 +29,8 @@ pub use sp_runtime::{MultiAddress, Perbill, Permill};
 pub use sp_runtime::BuildStorage;
 
 // Polkadot Imports
-use polkadot_runtime_common::{BlockHashCount, RocksDbWeight, SlowAdjustingFeeUpdate};
+use polkadot_runtime_common::{BlockHashCount, SlowAdjustingFeeUpdate};
+use super::weights::{  BlockExecutionWeight, ExtrinsicBaseWeight,  RocksDbWeight };
 
 // XCM Imports
 use xcm::latest::prelude::*;
@@ -198,8 +199,9 @@ parameter_types! {
 
 impl pallet_transaction_payment::Config for Runtime {
 	type OnChargeTransaction = pallet_transaction_payment::CurrencyAdapter<Balances, ()>;
-	type TransactionByteFee = TransactionByteFee;
+//	type TransactionByteFee = TransactionByteFee;
 	type WeightToFee = WeightToFee;
+    type LengthToFee = ConstantMultiplier<Balance, TransactionByteFee>;
 	type FeeMultiplierUpdate = SlowAdjustingFeeUpdate<Self>;
 	type OperationalFeeMultiplier = OperationalFeeMultiplier;
 }

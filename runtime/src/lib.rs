@@ -27,6 +27,7 @@ use frame_support::{
 };
 
 pub use sp_consensus_aura::sr25519::AuthorityId as AuraId;
+pub mod weights;
 pub mod xcm_config;
 pub use xcm_config::*;
 
