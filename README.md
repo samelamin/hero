@@ -98,7 +98,7 @@ cargo build --release
 
 <!-- reference ( https://github.com/paritytech/cumulus ) -->
 
-## Generate a __raw relay chain spec__
+## Generate a __raw relay chain spec__ _(polkadot repo)_
 ```bash
 ./target/release/polkadot build-spec --chain rococo-local \
 --disable-default-bootnode --raw > rococo-local-cfde.json
@@ -157,7 +157,7 @@ cp rococo-local-cfde.json ../paid-chain/rococo-local-cfde.json
 ____  
 
 You can now __leave the relay chain to run__.  
-Continue buy setting up a __third terminal__, running in the `paid-chain` repo.
+Continue by setting up a __third terminal__, running in the `paid-chain` repo.
 ____  
 ## Build __collator spec__ and __raw chain spec__  
 ## => Obtain __wasm runtime__ validation function and parachain __genesis state__

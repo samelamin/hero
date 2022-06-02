@@ -24,13 +24,11 @@ mod tests;
 
 #[frame_support::pallet]
 pub mod pallet {
-	use codec::FullCodec;
 	use frame_support::{
-        sp_runtime::traits::{Hash, Zero},
-		sp_std::{vec::Vec, fmt::Debug, cmp::Eq},
-        dispatch::{DispatchResultWithPostInfo, DispatchResult},
-        traits::{Currency, ExistenceRequirement, Randomness, StorageVersion},
-		Hashable,
+        sp_runtime::traits::Hash,
+		sp_std::vec::Vec,
+        dispatch::DispatchResult,
+        traits::StorageVersion,
         pallet_prelude::*
     };
 	use frame_system::pallet_prelude::*;
