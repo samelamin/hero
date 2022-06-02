@@ -1,7 +1,7 @@
 use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
 use paid_chain_runtime::{
-	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig, 
+	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig,
 	GenesisConfig, Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
 };
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
@@ -20,7 +20,6 @@ pub type ChainSpec = sc_service::GenericChainSpec<GenesisConfig, Extensions>;
 /// The default XCM version to set in genesis config.
 const SAFE_XCM_VERSION: u32 = xcm::prelude::XCM_VERSION;
 const CROWDLOAN_FUND_POT: u128 = 30_000_000;
-
 
 /// Helper function to generate a crypto pair from seed
 pub fn get_public_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
@@ -377,5 +376,10 @@ fn testnet_genesis(
 			key: Some(root_key),
 		},
 		crowdloan_rewards: CrowdloanRewardsConfig { funded_amount: crowdloan_fund_pot },
+		council: Default::default(),
+		technical_committee: Default::default(),
+		democracy: Default::default(),
+		treasury: Default::default(),
+
 	}
 }

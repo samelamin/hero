@@ -180,6 +180,11 @@ construct_runtime!(
 		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
 		CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>} = 48,
+		Council: pallet_collective::<Instance1>,
+		TechnicalCommittee: pallet_collective::<Instance2>,
+		Democracy: pallet_democracy,
+		Scheduler: pallet_scheduler,
+		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
 	}
 );
 

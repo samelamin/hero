@@ -1,4 +1,4 @@
-FROM gcr.io/paid-network-202104/rust as builder
+FROM gcr.io/paid-network-202104/rust:2004ubuntu220530 as builder
 ARG PROFILE=release
 
 WORKDIR /builds/collator
