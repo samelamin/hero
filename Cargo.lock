@@ -5578,6 +5578,7 @@ dependencies = [
  "pallet-feeless",
  "pallet-scheduler",
  "pallet-session",
+ "pallet-smart-agreement",
  "pallet-sudo",
  "pallet-template",
  "pallet-timestamp",
@@ -6444,6 +6445,21 @@ dependencies = [
  "sp-runtime",
  "sp-session",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-smart-agreement"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
 ]
 
 [[package]]

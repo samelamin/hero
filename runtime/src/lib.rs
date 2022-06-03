@@ -177,9 +177,14 @@ construct_runtime!(
 		// Frontier support pallets
 		EVM: pallet_evm::{Pallet, Call, Storage, Config, Event<T>} = 45,
 		Ethereum: pallet_ethereum::{Pallet, Call, Storage, Event, Config, Origin} = 46,
+
+		// Hero Pallets
 		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
 		CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>} = 48,
+		SmartAgreement: pallet_smart_agreement::{Pallet, Call, Storage, Event<T>} = 49,
+
+		// Governance Pallets
 		Council: pallet_collective::<Instance1>,
 		TechnicalCommittee: pallet_collective::<Instance2>,
 		Democracy: pallet_democracy,

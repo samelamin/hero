@@ -52,9 +52,9 @@ use crate::{
 };
 use sp_core::U256;
 
-// Import the template pallet.
 pub use pallet_crowdloan_rewards;
 pub use pallet_erc721;
+pub use pallet_smart_agreement;
 
 /// We assume that ~5% of the block weight is consumed by `on_initialize` handlers. This is
 /// used to limit the maximal weight of a single extrinsic.
@@ -318,6 +318,17 @@ impl pallet_erc721::Config for Runtime {
 	type TokenLimit = NftTokenLimit;
 	type TokenLimitForAccount = NftTokenLimitForUser;
 	type TokenCreator = frame_system::EnsureRoot<Self::AccountId>;
+}
+
+parameter_types! {
+	pub const AgreementLimit: u128 = 500;
+	pub const AgreementLimitForUser: u64 = 30;
+}
+
+impl pallet_smart_agreement::Config for Runtime {
+	type Event = Event;
+	type MaxAgreements = AgreementLimit;
+	type MaxAgreementsForUser = AgreementLimitForUser;
 }
 
 parameter_types! {

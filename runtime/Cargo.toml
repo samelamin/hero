@@ -25,10 +25,11 @@ smallvec = "1.6.1"
 zeroize = "1.4.3"
 
 # Local Dependencies
-pallet-template =          { path = "../pallets/template",          default-features = false }
-pallet-crowdloan-rewards = { path = "../pallets/crowdloan-rewards", default-features = false }
-pallet-erc721 =            { path = "../pallets/erc721",            default-features = false }
-pallet-feeless =           { path = "../pallets/feeless",           default-features = false }
+pallet-template =          	{ path = "../pallets/template",          default-features = false }
+pallet-crowdloan-rewards = 	{ path = "../pallets/crowdloan-rewards", default-features = false }
+pallet-erc721 = 			{ path = "../pallets/erc721", default-features = false }
+pallet-feeless = 			{ path = "../pallets/feeless", default-features = false }
+pallet-smart-agreement = 	{ path = "../pallets/smart_agreement", default-features = false }
 
 # Substrate FRAME Dependencies
 frame-benchmarking =           { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.20", optional = true }
