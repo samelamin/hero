@@ -40,7 +40,7 @@ use pallet_ethereum::Transaction as EthereumTransaction;
 /// Common type aliases that are public
 /// the type aliases that are common to many pallets are collected here
 // this should be reserved for type aliases only
-// It needs to be public because other crates in the workpace expect to be able to use these types
+// It needs to be public because other crates in the workspace expect to be able to use these types
 pub mod type_alias;
 pub use type_alias::opaque; // this needs to be imported separately to preserve code that uses it.
 pub use type_alias::{Index,*};

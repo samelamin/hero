@@ -22,7 +22,7 @@
 ##### Merge supporting code with tne new version
 * .github/ : new workflow are added
 * .dockerignore: not to be added as it is not needed
-* .editconfig : merge 
+* .editconfig : merge
 * .gitignore: merge
 * .rustfmt.toml: merge
 
@@ -32,7 +32,7 @@
 save a backup snapshot of this repo: rebuild0
 
 ---
-### Merge /Cargo.toml 
+### Merge /Cargo.toml
 [note] it is important to add Cargo.lock from the compiled code of parachain template, then let Rust to compile your code with that file!
 
 * add dependencies from Frontier repo: pallet-evm, pallet-ethereum, pallet-evm-precompile-simple, pallet-evm-precompile-sha3fips, pallet-evm-precompile-modexp, fp-self-contained, fp-rpc, fp-storage, fp-evm
@@ -184,12 +184,12 @@ save a backup snapshot of this repo: rebuild7
 ---
 ### in node/src/command.rs
 ```
-PaidChainRuntimeExecutor
+HeroRuntimeExecutor
 
   "rococo-local" => Box::new(chain_spec::rococo_local_config()),
   "rococo-live" => Box::new(chain_spec::rococo_live_config()),
 
-"Paid-chain Parachain"
+"Hero Parachain"
 
 service.rs: PaidChainRuntimeExecutor
 ```
@@ -228,4 +228,4 @@ save a backup snapshot of this repo: rebuild10
 
 #### Fix pallets/pallets/erc721 test
 
-save a backup snapshot of this repo: rebuild11 
+save a backup snapshot of this repo: rebuild11

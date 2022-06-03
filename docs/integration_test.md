@@ -6,8 +6,8 @@ This testing steps are based on the [Cumulus tutorial](https://docs.substrate.io
 #### Software versioning
 This steps have been tested on:
 * [Polkadot official repository](https://github.com/paritytech/polkadot), branch = polkadot-v0.9.18
-* This Paidchain repository, branch = polkadot-v0.9.18
-* Polkadot-JS Apps v0.112.2-37. It is generally expected that the [hosted Polkadot-JS Apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer) should work. 
+* This Hero repository, branch = polkadot-v0.9.18
+* Polkadot-JS Apps v0.112.2-37. It is generally expected that the [hosted Polkadot-JS Apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer) should work.
 
 > NOTE: Exact Versions Matter
 You must use the exact versions set forth in this document to ensure that you do not run into conflicts.
@@ -33,10 +33,10 @@ Check if the help page prints to ensure the node is built correctly:
 If the help page is printed, you have succeeded in building a Polkadot node.
 
 ---
-#### Building the Paidchain node
+#### Building the Hero node
 
-Clone this Paidchain
-`git clone git@github.com:PAIDNetwork/paid-chain.git`
+Clone this Hero
+`git clone git@github.com:PAIDNetwork/hero.git`
 
 Switch into the parachain template directory
 `cd substrate-parachain-template`
@@ -48,7 +48,7 @@ Build the parachain template collator
 `cargo build --release`
 
 Check if the help page prints to ensure the node is built correctly
-`./target/release/parachain-collator --help`
+`./target/release/hero --help`
 
 this will take 15 to 60 mins to complete.
 If the help page is printed, you have succeeded in building a Cumulus-based parachain collator.
@@ -105,7 +105,7 @@ Under the Network > Parachains > click on Parathreads tab and use the "+ ParaId 
 Go to your parachain
 // Assumes that `rococo-local` is in `node/chan_spec.rs` as the relay you registered with
 ```
-./target/release/parachain-collator build-spec --disable-default-bootnode > rococo-local-parachain-plain.json
+./target/release/hero build-spec --disable-default-bootnode > rococo-local-parachain-plain.json
 ```
 
 Open rococo-local-parachain-plain.json and modify two fields:
@@ -123,7 +123,7 @@ Open rococo-local-parachain-plain.json and modify two fields:
 
 Then generate a raw chain spec derived from your modified plain chain spec:
 ```
-./target/release/parachain-collator build-spec --chain rococo-local-parachain-plain.json --raw --disable-default-bootnode > rococo-local-parachain-2000-raw.json
+./target/release/hero build-spec --chain rococo-local-parachain-plain.json --raw --disable-default-bootnode > rococo-local-parachain-2000-raw.json
 ```
 
 
@@ -131,9 +131,9 @@ Then generate a raw chain spec derived from your modified plain chain spec:
 ####  Generate Wasm runtime validation and genesis state
 in parachain folder:
 ```
-./target/release/parachain-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
+./target/release/hero export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm
 
-./target/release/parachain-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
+./target/release/hero export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
 ```
 
 
@@ -142,7 +142,7 @@ in parachain folder:
 Assume rococo-local-parachain-2000-raw.json is iniside your parachain project folder, and rococo-custom-2-raw.json is inside your relay chain project folder
 
 ```
-./target/release/parachain-collator \
+./target/release/hero \
 --alice \
 --collator \
 --force-authoring \

@@ -1,15 +1,15 @@
-# Paid-chain
+# HERO
 
 ## Code In Depth Documentations
 For more detailed documentations about the code itself, [click here](./docs)
 
-Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidity smart contracts.
+Hero is Polkadot parachain on which we can deploy and use solidity smart contracts.
 
 
-## Running a PaidChain Collator
+## Running a Hero Collator
 1.) First things first is to [install docker](https://www.docker.com/products/docker-desktop) for your particular platform.
 
-2.) clone Paidchain repository `git clone https://github.com/PAIDNetwork/paid-chain.git && cd paid-chain`
+2.) clone Hero repository `git clone https://github.com/PAIDNetwork/hero.git && cd hero`
 
 3.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .`
 
@@ -22,11 +22,11 @@ Tha Paid-chain is Polkadot parachain on which we can deploy and use Paid solidit
 You now should beable to view your collator via [polkadotjs](https://polkadot.js.org/apps/#/explorer) switch your network and under
 the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `Switch` at the top.
 
-## Paid Dev Environment Docker
+## Hero Dev Environment Docker
 
-1.) Clone paid-chain `git clone https://github.com/PAIDNetwork/paid-chain.git && cd paid-chain`
+1.) Clone hero `git clone https://github.com/PAIDNetwork/hero.git && cd hero`
 
-2.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .` 
+2.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .`
 
 3.) build collator image `docker build -t paidnetwork/collator .`
 
@@ -36,20 +36,20 @@ the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `
 
 6.) build relay chain image `docker build -f Dockerfile.relay -t paidnetwork/relay .`
 
-7.) Run containers via docker compose `cd $HOME/paid-chain && docker-compose -f docker-compose-relay.yaml up -d`
+7.) Run containers via docker compose `cd $HOME/hero && docker-compose -f docker-compose-relay.yaml up -d`
 
 You now should beable to view your collator via [polkadotjs](https://polkadot.js.org/apps/#/explorer) switch your network and under
-the `Develoment tab` click `Custom` and paste `ws://localhost:8844` then click `Switch` at the top. For the relay chain 
+the `Develoment tab` click `Custom` and paste `ws://localhost:8844` then click `Switch` at the top. For the relay chain
 connect to `ws://localhost:9944`
 
-Note** the chainspec which is being used for the parachain is "rococo-local" please reference paid-chain/node/src/chain_spec.rs for more
+Note** the chainspec which is being used for the parachain is "rococo-local" please reference hero/node/src/chain_spec.rs for more
 details on the exact configuration. If you would like to change simply make an edit to the docker-compose or upgrade the chain_spec.rs
 i.e.(Sudo key)
 
 
 Follow instructions on [Cumulus Tutorial](https://docs.substrate.io/tutorials/v3/cumulus/connect-parachain/) for registering your parachain on the local relay chain. Remember the paraid is 2000
 
-# Installation Paid Development
+# Installation Hero Development
 The first thing you will need to do is prepare the system for Substrate development.
 
 Follow this [link](https://docs.substrate.io/v3/getting-started/installation/) for development environment setup.
@@ -76,22 +76,22 @@ cargo build --release
 ./target/release/polkadot --help
 ```
 
-## Download and install paid-collator
+## Download and install hero
 * Clone repo:
 ```bash
-git clone git@github.com:PAIDNetwork/paid-chain.git
+git clone git@github.com:PAIDNetwork/hero.git
 ```
 * Change directory:
 ```bash
-cd paid-chain
+cd hero
 ```
-* Build paid parachain collator:
+* Build hero parachain collator:
 ```bash
 cargo build --release
 ```
 * Check if build succeeded:
 ```bash
-./target/release/parachain-collator --help
+./target/release/hero --help
 ```
 ## Start Local __Relay Chain Validators__
 * Open 2 Seperate Terminals via <kbd>cmd+t</kbd> (for Mac) & <kbd>ctrl+t</kbd> (for Win, Linux machine) in the `PAIDNetwork/polkadot` cloned repo.
@@ -115,7 +115,7 @@ cargo build --release
 --port 30333 --ws-port 9944
 ```
 <!--
-# (changes from 0.9.18 to 0.9.19 :: 
+# (changes from 0.9.18 to 0.9.19 ::
 # --base-path <path> ==> --tmp
 # --chain rococo-local ==> --chain rococo-local-cfde.json (it gets explicitly generated before use)
 #
@@ -147,43 +147,43 @@ and paste in place of `<Alices local node identity from above>` for Bob in __ter
 ```
 <!-- bootnodes should be last to make editing the local node identity at the end easy -->
 
-## Copy __relay chain spec__ for prachain
-It was generated earlier inside of the Polkadot repo.  
-Copy it into __root__ of the `paid-chain` repo. _(example in `bash` called from polkadot repo)_
+## Copy __relay chain spec__ for parachain
+It was generated earlier inside of the Polkadot repo.
+Copy it into __root__ of the `hero` repo. _(example in `bash` called from polkadot repo)_
 ```bash
-cp rococo-local-cfde.json ../paid-chain/rococo-local-cfde.json
+cp rococo-local-cfde.json ../hero/rococo-local-cfde.json
 ```
 
-____  
+____
 
-You can now __leave the relay chain to run__.  
-Continue by setting up a __third terminal__, running in the `paid-chain` repo.
-____  
-## Build __collator spec__ and __raw chain spec__  
+You can now __leave the relay chain to run__.
+Continue by setting up a __third terminal__, running in the `hero` repo.
+____
+## Build __collator spec__ and __raw chain spec__
 ## => Obtain __wasm runtime__ validation function and parachain __genesis state__
-* Required to pass to `sudoScheduleParaInitialize` later for registration _(paid-chain repo)_:
-* __terminal-3__ _(paid chain repo)_
+* Required to pass to `sudoScheduleParaInitialize` later for registration _(hero repo)_:
+* __terminal-3__ _(hero repo)_
 <!-- Assumes that `rococo-local` is in `node/chan_spec.rs` as the relay you registered with -->
 ```bash
-./target/release/parachain-collator build-spec \
+./target/release/hero build-spec \
 --disable-default-bootnode > rococo-local-parachain-plain.json \
 && \
-./target/release/parachain-collator build-spec --chain rococo-local-parachain-plain.json \
+./target/release/hero build-spec --chain rococo-local-parachain-plain.json \
 --raw --disable-default-bootnode > parachain-raw.json \
 && \
-./target/release/parachain-collator export-genesis-wasm \
+./target/release/hero export-genesis-wasm \
 --chain parachain-raw.json > para-wasm \
 && \
-./target/release/parachain-collator export-genesis-state \
+./target/release/hero export-genesis-state \
 --chain parachain-raw.json > para-genesis
 ```
 
 
 ## Start __parachain collator__
 
-* Start Paid Parachain in __terminal-3__ _(paid-chain repo)_:
+* Start Hero Parachain in __terminal-3__ _(hero repo)_:
 ```bash
-./target/release/parachain-collator --alice \
+./target/release/hero --alice \
 --tmp --collator --force-authoring \
 --chain parachain-raw.json \
 --port 40333     --ws-port 8844 \
@@ -193,34 +193,34 @@ ____
 --chain rococo-local-cfde.json \
 --port 30343     --ws-port 9977
 ```
-<!-- 
+<!--
 * optionaly add another collator _Bob (Collator 2)_
 ```bash
-./target/release/parachain-collator --collator --bob --force-authoring --tmp \
+./target/release/hero --collator --bob --force-authoring --tmp \
 --port 40336 --ws-port 9947 \
 -- \
 --execution wasm --chain rococo-local-cfde.json --port 30336
-``` 
+```
 -->
 
 <!--
 * optionally add a _Full Node_
 ```
-./target/release/parachain-collator --tmp \
+./target/release/hero --tmp \
 --port 40337 --ws-port 9948 \
 -- \
 --execution wasm --chain rococo-local-cfde.json --port 30337
-``` 
+```
 -->
 
-____  
-From this point we can __leave all the terminals running__, proceede to the __web browser__  
+____
+From this point we can __leave all the terminals running__, proceede to the __web browser__
 __( https://polkadot.js.org/apps/#/explorer )__
-____  
+____
 
 ## Register __parathread/parachain__
 
-* Start __polkadot.js__ apps: 
+* Start __polkadot.js__ apps:
 ```
 https://polkadot.js.org/apps/#/explorer
 #click drop down arrow on the top left by "Rococo Local Testnet"
@@ -232,8 +232,8 @@ https://polkadot.js.org/apps/#/explorer
 Network -> Parachains -> Parathreads -> ParaId(with a plus sign)
 # click sign and submit, note the id number (the first currently defaults to 2000)
 ```
-<!-- 
-for reference ( https://docs.substrate.io/how-to-guides/v3/parachains/connect/ ) 
+<!--
+for reference ( https://docs.substrate.io/how-to-guides/v3/parachains/connect/ )
 -->
 
 * Register the parathread id on your relay chain
@@ -248,14 +248,14 @@ Developer -> Sudo -> (under submit the following change) paraSudoWrapper ->
 # change parachain bool to 'yes'
 ```
 * You will need to wait 2 minutes for your parachain to be accepted by the relay chain validators.
-check this in:
+  check this in:
 ```
 Network -> Parachains -> Overview
 ```
 
 # Complete!
-You should see that your collator is collating and you can swap to interact with your paid collator
-on the top left corner!! 
+You should see that your collator is collating and you can swap to interact with your hero collator
+on the top left corner!!
 Create a custom endpoint:
 ```
 ws://127.0.0.1:8844

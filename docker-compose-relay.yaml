@@ -10,7 +10,7 @@ services:
       - "6969:6969"
       - "8844:8844"
       - "9977:9977"
-    command: bash -c "apt-get install -y wget; nohup ./target/release/parachain-collator --alice --collator --force-authoring --chain rococo-local --unsafe-ws-external --parachain-id 2000 --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --rpc-port 6969 --rpc-cors all -- --execution wasm --chain res/dev/rococo-custom-2-raw.json --port 30343 --ws-port 9977 > collator.out 2>&1; tail -f /dev/null"
+    command: bash -c "apt-get install -y wget; nohup ./target/release/hero --alice --collator --force-authoring --chain rococo-local --unsafe-ws-external --parachain-id 2000 --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --rpc-port 6969 --rpc-cors all -- --execution wasm --chain res/dev/rococo-custom-2-raw.json --port 30343 --ws-port 9977 > collator.out 2>&1; tail -f /dev/null"
     depends_on:
       - charlie-relay
   alice-relay:

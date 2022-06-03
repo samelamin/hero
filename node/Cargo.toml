@@ -1,17 +1,17 @@
 [package]
-name = "paid-chain"
+name = "hero"
 version = "0.0.1"
 authors = ["PAID Network DevHub <https://github.com/PAIDNetwork>"]
 build = "build.rs"
-description = "Paid Chain is a Polkadot parachain on which can deploy solidity smart contracts."
+description = "Hero is a Polkadot parachain on which can deploy solidity smart contracts."
 edition = "2021"
 homepage = "https://paidnetwork.com/"
 license = "Unlicense"
 publish = false
-repository = "https://github.com/PAIDNetwork/paid-chain"
+repository = "https://github.com/PAIDNetwork/hero"
 
 [[bin]]
-name = "parachain-collator"
+name = "hero"
 path = "src/main.rs"
 
 [dependencies]
@@ -31,7 +31,7 @@ jsonrpc-core = "18.0.0"
 jsonrpc-pubsub = "18.0.0"
 
 # Local Parachain Runtime
-paid-chain-runtime = { path = "../runtime" }
+hero-runtime = { path = "../runtime" }
 
 # Substrate Dependencies
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.20" }
@@ -111,7 +111,7 @@ substrate-build-script-utils = { git = "https://github.com/paritytech/substrate"
 
 [features]
 runtime-benchmarks = [
-	"paid-chain-runtime/runtime-benchmarks",
+	"hero-runtime/runtime-benchmarks",
 	"polkadot-cli/runtime-benchmarks",
 ]
-try-runtime = ["paid-chain-runtime/try-runtime"]
+try-runtime = ["hero-runtime/try-runtime"]

@@ -7,7 +7,7 @@
 
 use std::{sync::Arc, collections::BTreeMap};
 
-use paid_chain_runtime::{opaque::Block, AccountId, Balance, Hash, Index};
+use hero_runtime::{opaque::Block, AccountId, Balance, Hash, Index};
 use sc_client_api::backend::{Backend, StateBackend, StorageProvider, AuxStore};
 
 // Imports to support Ethereum RPC.
@@ -144,7 +144,7 @@ where
 		client.clone(),
 		pool.clone(),
 		graph,
-		Some(paid_chain_runtime::TransactionConverter),
+		Some(hero_runtime::TransactionConverter),
 		network.clone(),
 		signers,
 		overrides.clone(),

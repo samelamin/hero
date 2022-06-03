@@ -1,5 +1,5 @@
 /*
-	Paid-Chain
+	Hero
 	Pallet which provides api for Nfts.
 	@author: Andrew Burger
 	@email: andrew@master.ventures

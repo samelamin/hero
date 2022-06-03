@@ -1,13 +1,13 @@
 use crate::{
 	chain_spec,
 	cli::{Cli, RelayChainCli, Subcommand},
-	service::{new_partial, PaidChainRuntimeExecutor},
+	service::{new_partial, HeroRuntimeExecutor},
 };
 use codec::Encode;
 use cumulus_client_service::genesis::generate_genesis_block;
 use cumulus_primitives_core::ParaId;
 use log::info;
-use paid_chain_runtime::{Block, RuntimeApi};
+use hero_runtime::{Block, RuntimeApi};
 use polkadot_parachain::primitives::AccountIdConversion;
 use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
@@ -39,7 +39,7 @@ fn load_spec(
 
 impl SubstrateCli for Cli {
 	fn impl_name() -> String {
-		"Paid-chain Parachain".into()
+		"Hero".into()
 	}
 
 	fn impl_version() -> String {
@@ -47,10 +47,10 @@ impl SubstrateCli for Cli {
 	}
 
 	fn description() -> String {
-		"Paid-chain Parachain\n\nThe command-line arguments provided first will be \
+		"Hero Parachain\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relay chain node.\n\n\
-		parachain-collator <parachain-args> -- <relay-chain-args>"
+		hero <parachain-args> -- <relay-chain-args>"
 			.into()
 	}
 
@@ -71,13 +71,13 @@ impl SubstrateCli for Cli {
 	}
 
 	fn native_runtime_version(_: &Box<dyn ChainSpec>) -> &'static RuntimeVersion {
-		&paid_chain_runtime::VERSION
+		&hero_runtime::VERSION
 	}
 }
 
 impl SubstrateCli for RelayChainCli {
 	fn impl_name() -> String {
-		"Paid-chain Parachain".into()
+		"Hero".into()
 	}
 
 	fn impl_version() -> String {
@@ -85,10 +85,10 @@ impl SubstrateCli for RelayChainCli {
 	}
 
 	fn description() -> String {
-		"Paid-chain Parachain\n\nThe command-line arguments provided first will be \
+		"Hero Parachain\n\nThe command-line arguments provided first will be \
 		passed to the parachain node, while the arguments provided after -- will be passed \
 		to the relay chain node.\n\n\
-		parachain-collator <parachain-args> -- <relay-chain-args>"
+		hero <parachain-args> -- <relay-chain-args>"
 			.into()
 	}
 
@@ -129,7 +129,7 @@ macro_rules! construct_async_run {
 		runner.async_run(|$config| {
 			let $components = new_partial::<
 				RuntimeApi,
-				PaidChainRuntimeExecutor,
+				HeroRuntimeExecutor,
 				_
 			>(
 				&$config,
@@ -184,7 +184,7 @@ pub fn run() -> Result<()> {
 					&polkadot_cli,
 					config.tokio_handle.clone(),
 				)
-				.map_err(|err| format!("Relay chain argument error: {}", err))?;
+					.map_err(|err| format!("Relay chain argument error: {}", err))?;
 
 				cmd.run(config, polkadot_config)
 			})
@@ -244,25 +244,25 @@ pub fn run() -> Result<()> {
 		},
 		Some(Subcommand::Benchmark(cmd)) => {
 			let runner = cli.create_runner(cmd)?;
-            use frame_benchmarking_cli::BenchmarkCmd;
-    		match cmd {
+			use frame_benchmarking_cli::BenchmarkCmd;
+			match cmd {
 				BenchmarkCmd::Pallet(cmd) =>
 					if cfg!(feature = "runtime-benchmarks") {
-						runner.sync_run(|config| cmd.run::<Block, PaidChainRuntimeExecutor>(config))
+						runner.sync_run(|config| cmd.run::<Block, HeroRuntimeExecutor>(config))
 					} else {
 						Err("Benchmarking wasn't enabled when building the node. \
 					You can enable it with `--features runtime-benchmarks`."
 							.into())
 					},
 				BenchmarkCmd::Block(cmd) => runner.sync_run(|config| {
-					let partials = new_partial::<RuntimeApi, PaidChainRuntimeExecutor, _>(
+					let partials = new_partial::<RuntimeApi, HeroRuntimeExecutor, _>(
 						&config,
 						crate::service::parachain_build_import_queue,
 					)?;
 					cmd.run(partials.client)
 				}),
 				BenchmarkCmd::Storage(cmd) => runner.sync_run(|config| {
-					let partials = new_partial::<RuntimeApi, PaidChainRuntimeExecutor, _>(
+					let partials = new_partial::<RuntimeApi, HeroRuntimeExecutor, _>(
 						&config,
 						crate::service::parachain_build_import_queue,
 					)?;
@@ -286,7 +286,7 @@ pub fn run() -> Result<()> {
 						.map_err(|e| format!("Error: {:?}", e))?;
 
 				runner.async_run(|config| {
-					Ok((cmd.run::<Block, PaidChainRuntimeExecutor>(config), task_manager))
+					Ok((cmd.run::<Block, HeroRuntimeExecutor>(config), task_manager))
 				})
 			} else {
 				Err("Try-runtime must be enabled by `--features try-runtime`.".into())
@@ -407,8 +407,8 @@ impl CliConfiguration<Self> for RelayChainCli {
 		_logger_hook: F,
 		_config: &sc_service::Configuration,
 	) -> Result<()>
-	where
-		F: FnOnce(&mut sc_cli::LoggerBuilder, &sc_service::Configuration),
+		where
+			F: FnOnce(&mut sc_cli::LoggerBuilder, &sc_service::Configuration),
 	{
 		unreachable!("PolkadotCli is never initialized; qed");
 	}

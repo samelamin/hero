@@ -1,4 +1,4 @@
-//! Substrate Parachain Node Template CLI
+//! HERO Cli
 
 #![warn(missing_docs)]
 

@@ -10,7 +10,7 @@ services:
       - "6969:6969"
       - "8844:8844"
       - "9977:9977"
-    command: bash -c "apt-get install -y wget; wget -O paid-testnet.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/paid-testnet.json; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/parachain-collator --alice --collator --force-authoring --chain paid-testnet.json --unsafe-ws-external --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --rpc-port 6969 --rpc-cors all -- --execution wasm --chain rococo-private-relay.json --port 30343 --ws-port 9977 > collator.out 2>&1; tail -f /dev/null" 
+    command: bash -c "apt-get install -y wget; wget -O paid-testnet.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/paid-testnet.json; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/hero --alice --collator --force-authoring --chain paid-testnet.json --unsafe-ws-external --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --rpc-port 6969 --rpc-cors all -- --execution wasm --chain rococo-private-relay.json --port 30343 --ws-port 9977 > collator.out 2>&1; tail -f /dev/null"
     depends_on:
       - charlie-relay
   alice-relay:

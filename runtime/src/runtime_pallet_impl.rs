@@ -251,9 +251,9 @@ impl FeeCalculator for FixedGasPrice {
 pub const GAS_PER_SECOND: u64 = 40_000_000;
 pub const WEIGHT_PER_GAS: u64 = WEIGHT_PER_SECOND / GAS_PER_SECOND;
 
-pub struct PaidGasWeightMapping;
+pub struct HeroGasWeightMapping;
 
-impl pallet_evm::GasWeightMapping for PaidGasWeightMapping {
+impl pallet_evm::GasWeightMapping for HeroGasWeightMapping {
 	fn gas_to_weight(gas: u64) -> Weight {
 		gas.saturating_mul(WEIGHT_PER_GAS)
 	}
@@ -290,7 +290,7 @@ impl pallet_evm::Config for Runtime {
 	type AddressMapping = HashedAddressMapping<BlakeTwo256>;
 
 	type FeeCalculator = FixedGasPrice;
-	type GasWeightMapping = PaidGasWeightMapping;
+	type GasWeightMapping = HeroGasWeightMapping;
 
 	/// To handle fee deduction for EVM transactions.
 	type OnChargeTransaction = pallet_evm::EVMCurrencyAdapter<Balances, ()>;

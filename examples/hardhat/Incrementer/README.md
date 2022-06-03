@@ -34,24 +34,24 @@ $ npx hardhat run deployment/hardhat/deploy.ts --network localhost
 
 ### Deploying contracts to Testnet
 #### Testnet - Paid Chain
-* Run the Paid Chain as per this [repo url](https://github.com/PAIDNetwork/paid-chain#build--run).
+* Run the Paid Chain as per this [repo url](https://github.com/PAIDNetwork/hero#build--run).
 ```
-$ git clone https://github.com/PAIDNetwork/paid-chain.git
-$ cd paid-chain
+$ git clone https://github.com/PAIDNetwork/hero.git
+$ cd hero
 $ cargo build --release
 
 // to resume a chain
-$ ./target/release/paid-chain --dev --tmp
+$ ./target/release/hero --dev --tmp
 
 OR
 
 // to start a fresh chain
-$ ./target/release/paid-chain --dev
+$ ./target/release/hero --dev
 ```
 * Setup Metamask wallet & get Faucets for development
 	1. Add Metamask extension into browser
 	2. Follow this [documentation](https://masterventures.slab.com/posts/paid-chain-test-document-v5iivb3t)
-	3. Now, you have 
+	3. Now, you have
 		+ __Faucet__: for smart contract deployment & testing
 		+ __Chain URL__: for connecting to the network
 * Environment variables

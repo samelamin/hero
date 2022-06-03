@@ -22,8 +22,8 @@ use sp_version::RuntimeVersion;
 // this must be here because RUNTIME_API_VERSIONS is private
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
-	spec_name: create_runtime_str!("paid-chain"),
-	impl_name: create_runtime_str!("paid-chain"),
+	spec_name: create_runtime_str!("hero"),
+	impl_name: create_runtime_str!("hero"),
 	authoring_version: 1,
 	spec_version: 1,
 	impl_version: 1,
@@ -196,7 +196,7 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				nonce,
 				access_list.unwrap_or_default(),
-                true, 
+                true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|err| err.into())
 		}
@@ -229,7 +229,7 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				nonce,
 				access_list.unwrap_or_default(),
-                true, 
+                true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|err| err.into())
 		}
@@ -268,7 +268,7 @@ impl_runtime_apis! {
 		}
 
 		fn elasticity() -> Option<Permill> {
-			Some(Permill::zero()) // temp until paid parachain is functional
+			Some(Permill::zero()) // TODO temp until hero is functional
 		}
 	}
 
@@ -283,7 +283,7 @@ impl_runtime_apis! {
 	#[cfg(feature = "try-runtime")]
 	impl frame_try_runtime::TryRuntime<Block> for Runtime {
 		fn on_runtime_upgrade() -> (Weight, Weight) {
-			log::info!("try-runtime::on_runtime_upgrade parachain-template.");
+			log::info!("try-runtime::on_runtime_upgrade hero.");
 			let weight = Executive::try_runtime_upgrade().unwrap();
 			(weight, RuntimeBlockWeights::get().max_block)
 		}

@@ -1,6 +1,7 @@
 use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
-use paid_chain_runtime::{
+
+use hero_runtime::{
 	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig,
 	GenesisConfig, Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
 };
@@ -63,8 +64,8 @@ where
 
 /// Generate the session keys from individual elements.
 /// The input must be a tuple of individual keys (a single arg for now since we have just one key).
-pub fn template_session_keys(keys: AuraId) -> paid_chain_runtime::SessionKeys {
-	paid_chain_runtime::SessionKeys { aura: keys }
+pub fn template_session_keys(keys: AuraId) -> hero_runtime::SessionKeys {
+	hero_runtime::SessionKeys { aura: keys }
 }
 
 pub fn development_config() -> ChainSpec {
@@ -133,9 +134,9 @@ pub fn rococo_live_config(para_id: ParaId) -> ChainSpec {
 
 	ChainSpec::from_genesis(
 		// Name
-		"Paid Chain Testnet",
+		"Hero Testnet",
 		// ID
-		"paid_testnet",
+		"hero_testnet",
 		ChainType::Live,
 		move || {
 			testnet_genesis(
@@ -169,7 +170,7 @@ pub fn rococo_live_config(para_id: ParaId) -> ChainSpec {
 		// Telemetry
 		None,
 		// Protocol ID
-		Some("paid"),
+		Some("hero"),
 		None,
 		// Properties
 		Some(properties),
@@ -253,9 +254,9 @@ pub fn rococo_local_config(para_id: ParaId) -> ChainSpec {
 
 	ChainSpec::from_genesis(
 		// Name
-		"Paid Chain Testnet",
+		"Hero Testnet",
 		// ID
-		"paid_testnet",
+		"hero_testnet",
 		ChainType::Local,
 		move || {
 			testnet_genesis(
@@ -297,7 +298,7 @@ pub fn rococo_local_config(para_id: ParaId) -> ChainSpec {
 		// Telemetry
 		None,
 		// Protocol ID
-		Some("paid"),
+		Some("hero"),
 		None,
 		// Properties
 		Some(properties),
@@ -317,21 +318,21 @@ fn testnet_genesis(
 	crowdloan_fund_pot: Balance,
 ) -> GenesisConfig {
 	GenesisConfig {
-		system: paid_chain_runtime::SystemConfig {
-			code: paid_chain_runtime::WASM_BINARY
+		system: hero_runtime::SystemConfig {
+			code: hero_runtime::WASM_BINARY
 				.expect("WASM binary was not build, please build it!")
 				.to_vec(),
 		},
-		balances: paid_chain_runtime::BalancesConfig {
+		balances: hero_runtime::BalancesConfig {
 			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
 		},
-		parachain_info: paid_chain_runtime::ParachainInfoConfig { parachain_id: id },
-		collator_selection: paid_chain_runtime::CollatorSelectionConfig {
+		parachain_info: hero_runtime::ParachainInfoConfig { parachain_id: id },
+		collator_selection: hero_runtime::CollatorSelectionConfig {
 			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
 			candidacy_bond: EXISTENTIAL_DEPOSIT * 16,
 			..Default::default()
 		},
-		session: paid_chain_runtime::SessionConfig {
+		session: hero_runtime::SessionConfig {
 			keys: invulnerables
 				.into_iter()
 				.map(|(acc, aura)| {
@@ -348,7 +349,7 @@ fn testnet_genesis(
 		aura: Default::default(),
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
-		polkadot_xcm: paid_chain_runtime::PolkadotXcmConfig {
+		polkadot_xcm: hero_runtime::PolkadotXcmConfig {
 			safe_xcm_version: Some(SAFE_XCM_VERSION),
 		},
 		evm: EVMConfig {
