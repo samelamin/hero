@@ -51,7 +51,7 @@
 //! * **ReadingRelayState**
 //!
 //! The most elegant, but most complex solution would be for the para to read the contributions
-//! directly from the relay state. Blocked by https://github.com/paritytech/cumulus/issues/320 so
+//! directly from the relay state. Blocked by https://github.com/ClarkeRemy/cumulus-mod/issues/320 so
 //! I won't pursue it further right now. I can't decide whether that would really add security /
 //! trustlessness, or is just a sexy blockchain thing to do. Contributors can always audit the
 //! democracy proposal and make sure their contribution is in it, so in that sense reading relay state
