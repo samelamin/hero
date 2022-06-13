@@ -116,7 +116,7 @@ where
 	}
 }
 
-// See issue #5233 (https://github.com/ClarkeRemy/cumulus-mod/blob/polkadot-v0.9.19/parachain-template/runtime/src/xcm_config.rs)
+// See issue #5233 (https://github.com/paritytech/cumulus/blob/polkadot-v0.9.19/parachain-template/runtime/src/xcm_config.rs)
 pub struct DenyReserveTransferToRelayChain;
 impl ShouldExecute for DenyReserveTransferToRelayChain {
 	fn should_execute<Call>(

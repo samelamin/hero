@@ -11,7 +11,7 @@ use sp_core::H160;
 
 use sp_runtime::{
   impl_opaque_keys,
-	traits::{Dispatchable, PostDispatchInfoOf},
+	traits::{Dispatchable, PostDispatchInfoOf,DispatchInfoOf},
 	transaction_validity::{TransactionValidity, TransactionValidityError},
 };
 #[cfg(feature = "std")]
@@ -111,9 +111,14 @@ impl fp_self_contained::SelfContainedCall for Call {
 		}
 	}
 
-	fn validate_self_contained(&self, info: &Self::SignedInfo) -> Option<TransactionValidity> {
+	fn validate_self_contained(
+		&self,
+		info: &Self::SignedInfo,
+		dispatch_info: &DispatchInfoOf<Call>,
+		len: usize,
+	) -> Option<TransactionValidity> {
 		match self {
-			Call::Ethereum(call) => call.validate_self_contained(info),
+			Call::Ethereum(call) => call.validate_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}

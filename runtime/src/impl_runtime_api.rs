@@ -145,11 +145,12 @@ impl_runtime_apis! {
 		}
 
 		fn account_basic(address: H160) -> EVMAccount {
-			EVM::account_basic(&address)
+			let (address_, _weight) = EVM::account_basic(&address);
+			address_
 		}
 
 		fn gas_price() -> U256 {
-			<Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price()
+			<Runtime as pallet_evm::Config>::FeeCalculator::min_gas_price().0
 		}
 
 		fn account_code_at(address: H160) -> Vec<u8> {
@@ -198,7 +199,8 @@ impl_runtime_apis! {
 				access_list.unwrap_or_default(),
                 true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+			).map_err(|_err| sp_runtime::DispatchError::Other("Failed to create `Runner` from `pallet_evm::Error<Runtime>`")
+			)
 		}
 
 		fn create(
@@ -231,7 +233,9 @@ impl_runtime_apis! {
 				access_list.unwrap_or_default(),
                 true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
-			).map_err(|err| err.into())
+			).map_err(|_err|
+				sp_runtime::DispatchError::Other("Failed to create `Runner` from `pallet_evm::Error<Runtime>`")
+			)
 		}
 
 		fn current_transaction_statuses() -> Option<Vec<TransactionStatus>> {

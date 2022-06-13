@@ -93,6 +93,29 @@ cargo build --release
 ```bash
 ./target/release/hero --help
 ```
+___
+
+__WARNING:__
+
+If you are developing Hero, it is __imperative__ that you use `cargo build --release` first and be __wary__ of `cargo check`.
+__Type checking depends__ on the __WASM binary__ that is built before compile time _(in a `build.rs`)_.
+Attempting to `cargo check` from a clean slate __will fail__ 
+ - _( eg: this will fail `cargo clean && cargo update && cargo check` )_
+
+If you are having issues with updating dependancies (a common one is having 2 versions of `sp-io`), 
+consider clearing the cargo's cache and rebuilding clean.
+
+* First have a utility to delete cargo's cache, I recommend `cargo-cache`.
+```
+cargo install cargo-cache
+```
+* Then clean the cache, clean the target directory, update the `Cargo.lock`, and rebuild
+```
+cargo cache -a && cargo clean && cargo update && cargo build --release
+```
+
+___
+
 ## Start Local __Relay Chain Validators__
 * Open 2 Seperate Terminals via <kbd>cmd+t</kbd> (for Mac) & <kbd>ctrl+t</kbd> (for Win, Linux machine) in the `PAIDNetwork/polkadot` cloned repo.
 

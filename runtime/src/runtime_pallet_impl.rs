@@ -239,8 +239,11 @@ parameter_types! {
 pub struct FixedGasPrice;
 
 impl FeeCalculator for FixedGasPrice {
-	fn min_gas_price() -> U256 {
-		(1 * currency::GIGAWEI * currency::SUPPLY_FACTOR).into()
+	fn min_gas_price() -> (U256, Weight) {
+		(
+			(1 * currency::GIGAWEI * currency::SUPPLY_FACTOR).into(), 
+			1 // this number is currently arbitrary, but non-zero, requires benchmarking
+		)
 	}
 }
 

@@ -1,6 +1,5 @@
 //! Service and ServiceFactory implementation. Specialized wrapper over substrate service.
 
-use fc_rpc_core::types::FeeHistoryCache;
 use std::{collections::BTreeMap, sync::Arc, sync::Mutex, time::Duration};
 
 use cumulus_client_cli::CollatorOptions;
@@ -37,6 +36,7 @@ use substrate_prometheus_endpoint::Registry;
 use polkadot_service::CollatorPair;
 // Frontier Imports
 use fc_mapping_sync::{MappingSyncWorker, SyncStrategy};
+use fc_rpc_core::types::{FeeHistoryCache, FilterPool};
 use futures::StreamExt;
 
 
@@ -199,16 +199,17 @@ async fn build_relay_chain_interface(
 	telemetry_worker_handle: Option<TelemetryWorkerHandle>,
 	task_manager: &mut TaskManager,
 	collator_options: CollatorOptions,
+	hwbench: Option<sc_sysinfo::HwBench>,
 ) -> RelayChainResult<(Arc<(dyn RelayChainInterface + 'static)>, Option<CollatorPair>)> {
 	match collator_options.relay_chain_rpc_url {
-		Some(relay_chain_url) => {
-			Ok((Arc::new(RelayChainRPCInterface::new(relay_chain_url).await?) as Arc<_>, None))
-		},
+		Some(relay_chain_url) =>
+			Ok((Arc::new(RelayChainRPCInterface::new(relay_chain_url).await?) as Arc<_>, None)),
 		None => build_inprocess_relay_chain(
 			polkadot_config,
 			parachain_config,
 			telemetry_worker_handle,
 			task_manager,
+			hwbench,
 		),
 	}
 }
@@ -225,6 +226,7 @@ async fn start_node_impl<RuntimeApi, Executor, RB, BIQ, BIC>(
 	_rpc_ext_builder: RB,
 	build_import_queue: BIQ,
 	build_consensus: BIC,
+	hwbench: Option<sc_sysinfo::HwBench>,
 ) -> sc_service::error::Result<(
 	TaskManager,
 	Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<Executor>>>,
@@ -251,7 +253,7 @@ async fn start_node_impl<RuntimeApi, Executor, RB, BIQ, BIC>(
 		Executor: sc_executor::NativeExecutionDispatch + 'static,
 		RB: Fn(
 			Arc<TFullClient<Block, RuntimeApi, Executor>>,
-		) -> Result<jsonrpc_core::IoHandler<sc_rpc::Metadata>, sc_service::Error>
+		) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>
 		+ Send
 		+ 'static,
 		BIQ: FnOnce(
@@ -302,22 +304,23 @@ async fn start_node_impl<RuntimeApi, Executor, RB, BIQ, BIC>(
 		telemetry_worker_handle,
 		&mut task_manager,
 		collator_options.clone(),
+		hwbench.clone(),
 	)
-		.await
-		.map_err(|e| match e {
-			RelayChainError::ServiceError(polkadot_service::Error::Sub(x)) => x,
-			s => s.to_string().into(),
-		})?;
+	.await
+	.map_err(|e| match e {
+		RelayChainError::ServiceError(polkadot_service::Error::Sub(x)) => x,
+		s => s.to_string().into(),
+	})?;
 
 	let block_announce_validator = BlockAnnounceValidator::new(relay_chain_interface.clone(), id);
 
-	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 	let force_authoring = parachain_config.force_authoring;
 	let validator = parachain_config.role.is_authority();
 	let prometheus_registry = parachain_config.prometheus_registry().cloned();
 	let transaction_pool = params.transaction_pool.clone();
 	let overrides = crate::rpc::overrides_handle(client.clone());
 	let import_queue = cumulus_client_service::SharedImportQueue::new(params.import_queue);
+ 
 	let (network, system_rpc_tx, start_network) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &parachain_config,
@@ -350,63 +353,58 @@ async fn start_node_impl<RuntimeApi, Executor, RB, BIQ, BIC>(
 			.for_each(|()| futures::future::ready(())),
 	);
 
-	task_manager.spawn_essential_handle().spawn(
-		"frontier-mapping-sync-worker",
-		None,
-		MappingSyncWorker::new(
-			client.import_notification_stream(),
-			Duration::new(6, 0),
-			client.clone(),
-			backend.clone(),
-			frontier_backend.clone(),
-			RETRY_TIMES,
-			SYNC_FROM,
-			SyncStrategy::Parachain,
-		)
-			.for_each(|()| futures::future::ready(())),
-	);
 
-	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCache::new(
+	let block_data_cache = Arc::new(fc_rpc::EthBlockDataCacheTask::new(
 		task_manager.spawn_handle(),
-		overrides.clone(),
+		overrides.clone(),		
 		50,
 		50,
+		prometheus_registry.clone(),
 	));
 
+	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
+	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
 	let rpc_extensions_builder = {
 		let client = client.clone();
-		let transaction_pool = transaction_pool.clone();
+		let pool = transaction_pool.clone();
+		let is_authority = is_authority;
 		let network = network.clone();
+		let filter_pool = filter_pool.clone();
 		let frontier_backend = frontier_backend.clone();
-		let fee_history_limit = 65; // temporary hard-coded PLEASE DELETE ASAP(Work towards implementing this as an input)
+		let overrides = overrides.clone();
+		let fee_history_cache = fee_history_cache.clone();
+		let transaction_pool = transaction_pool.clone();
 
-		Box::new(move |deny_unsafe, _| {
+		Box::new(move |deny_unsafe, subscription_task_executor| {
 			let deps = crate::rpc::FullDeps {
 				client: client.clone(),
-				pool: transaction_pool.clone(),
+				pool: pool.clone(),
 				graph: transaction_pool.pool().clone(),
 				deny_unsafe,
-				network: network.clone(),
 				is_authority,
+				enable_dev_signer : true, // Frontier cli
+				network: network.clone(),
+				filter_pool: filter_pool.clone(),
 				backend: frontier_backend.clone(),
-				fee_history_limit,
+				max_past_logs: 20_000, // Frontier cli
 				fee_history_cache: fee_history_cache.clone(),
+				fee_history_cache_limit: 20_000, // Frontier cli
 				overrides: overrides.clone(),
 				block_data_cache: block_data_cache.clone(),
 			};
 
-			Ok(crate::rpc::create_full(deps))
+			crate::rpc::create_full(deps, subscription_task_executor).map_err(Into::into)
 		})
 	};
 
-	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-		rpc_extensions_builder,
-		client: client.clone(),
-		transaction_pool: transaction_pool.clone(),
-		task_manager: &mut task_manager,
+	let _rpc_handlers = sc_service::spawn_tasks(sc_service::SpawnTasksParams {
 		config: parachain_config,
-		keystore: params.keystore_container.sync_keystore(),
+		client: client.clone(),
 		backend: backend.clone(),
+		task_manager: &mut task_manager,
+		keystore: params.keystore_container.sync_keystore(),
+		transaction_pool: transaction_pool.clone(),
+		rpc_builder: rpc_extensions_builder,
 		network: network.clone(),
 		system_rpc_tx,
 		telemetry: telemetry.as_mut(),
@@ -521,6 +519,7 @@ pub async fn start_parachain_node(
 	polkadot_config: Configuration,
 	collator_options: CollatorOptions,
 	id: ParaId,
+	hwbench: Option<sc_sysinfo::HwBench>,
 ) -> sc_service::error::Result<(
 	TaskManager,
 	Arc<TFullClient<Block, RuntimeApi, NativeElseWasmExecutor<HeroRuntimeExecutor>>>,
@@ -530,7 +529,7 @@ pub async fn start_parachain_node(
 		polkadot_config,
 		collator_options,
 		id,
-		|_| Ok(Default::default()),
+		|_| Ok(jsonrpsee::RpcModule::new(())),
 		parachain_build_import_queue,
 		|client,
 		 prometheus_registry,
@@ -595,6 +594,7 @@ pub async fn start_parachain_node(
 				},
 			))
 		},
+		hwbench,
 	)
 		.await
 }

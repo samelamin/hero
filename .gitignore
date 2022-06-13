@@ -29,6 +29,11 @@ rococo-local-parachain-2000-raw.json
 rococo-remote-parachain-????-raw.json
 para-????-genesis
 para-????-wasm
+para-genesis
+para-wasm
+parachain-raw.json
+rococo-local-cfde.json
+
 
 zombienet-linux
 zombienet/00*

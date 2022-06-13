@@ -9,22 +9,21 @@ members = [
 ]
 
 
-[patch."https://github.com/paritytech/frontier"]
-pallet-evm =                     { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-pallet-ethereum =                { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-pallet-evm-precompile-simple =   { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-pallet-evm-precompile-sha3fips = { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-pallet-evm-precompile-modexp =   { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
+# [patch."https://github.com/paritytech/frontier"] # Sometines this patch template will be required (depending on the version of polkadot)
+# pallet-evm =                     { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# pallet-ethereum =                { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# pallet-evm-precompile-simple =   { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# pallet-evm-precompile-sha3fips = { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# pallet-evm-precompile-modexp =   { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
 
-fp-self-contained =              { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fp-rpc =                         { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fp-storage =                     { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fp-evm =                         { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-#fp-consensus = { git = "https://github.com/Clarke/frontier-mod", branch = "polkadot-v0.9.21" }
+# fp-self-contained =              { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fp-rpc =                         { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fp-storage =                     { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fp-evm =                         { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fp-consensus =                   { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
 
-fc-db =                          { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fc-mapping-sync =                { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fc-rpc =                         { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-fc-rpc-core =                    { git = "https://github.com/ClarkeRemy/frontier-mod", branch = "polkadot-v0.9.21" }
-
+# fc-db =                          { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fc-mapping-sync =                { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fc-rpc =                         { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
+# fc-rpc-core =                    { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.22" }
 
