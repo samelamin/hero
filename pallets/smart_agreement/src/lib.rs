@@ -18,11 +18,8 @@ mod benchmarking;
 pub mod pallet {
 	use crate::{AgreementInfo, AgreementType};
 	use frame_support::{
-		dispatch::DispatchResultWithPostInfo,
-		pallet_prelude::*,
-		sp_runtime::traits::Hash,
-		sp_std::vec::Vec,
-		traits::{StorageVersion},
+		dispatch::DispatchResultWithPostInfo, pallet_prelude::*, sp_runtime::traits::Hash,
+		sp_std::vec::Vec, traits::StorageVersion,
 	};
 	use frame_system::pallet_prelude::*;
 
@@ -79,7 +76,7 @@ pub mod pallet {
 		},
 		AgreementCreatorRemoved {
 			creator: T::AccountId,
-		}
+		},
 	}
 
 	#[pallet::error]
@@ -116,9 +113,7 @@ pub mod pallet {
 			);
 
 			AgreementCreator::<T>::insert(&creator, true);
-			Self::deposit_event(Event::NewAgreementCreator {
-				creator,
-			});
+			Self::deposit_event(Event::NewAgreementCreator { creator });
 			Ok(())
 		}
 
@@ -135,9 +130,7 @@ pub mod pallet {
 
 			AgreementCreator::<T>::remove(&creator);
 
-			Self::deposit_event(Event::AgreementCreatorRemoved {
-				creator,
-			});
+			Self::deposit_event(Event::AgreementCreatorRemoved { creator });
 			Ok(())
 		}
 
@@ -148,7 +141,7 @@ pub mod pallet {
 			party_a: T::AccountId,
 			party_b: T::AccountId,
 			agreement_type: AgreementType,
-			seed_bytes: Vec<u8>
+			seed_bytes: Vec<u8>,
 		) -> DispatchResultWithPostInfo {
 			let creator = ensure_signed(origin)?;
 
@@ -175,7 +168,7 @@ pub mod pallet {
 			party_a: &T::AccountId,
 			party_b: &T::AccountId,
 			agreement_type: &AgreementType,
-			seed_bytes: &Vec<u8>
+			seed_bytes: &Vec<u8>,
 		) -> Result<AgreementId<T>, DispatchError> {
 			let agreement_id = T::Hashing::hash_of(&seed_bytes);
 
@@ -202,12 +195,15 @@ pub mod pallet {
 			AgreementCountForUser::<T>::mutate(&party_a, |count| *count = count.saturating_add(1));
 			AgreementCountForUser::<T>::mutate(&party_b, |count| *count = count.saturating_add(1));
 
-			InfoForAgreement::<T>::insert(agreement_id, AgreementInfo {
-				party_a: party_a.clone(),
-				party_b: party_b.clone(),
-				agreement_id: agreement_id.clone(),
-				agreement_type: agreement_type.clone(),
-			});
+			InfoForAgreement::<T>::insert(
+				agreement_id,
+				AgreementInfo {
+					party_a: party_a.clone(),
+					party_b: party_b.clone(),
+					agreement_id: agreement_id.clone(),
+					agreement_type: agreement_type.clone(),
+				},
+			);
 			Ok(agreement_id)
 		}
 	}

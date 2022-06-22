@@ -25,12 +25,9 @@ mod tests;
 #[frame_support::pallet]
 pub mod pallet {
 	use frame_support::{
-        sp_runtime::traits::Hash,
-		sp_std::vec::Vec,
-        dispatch::DispatchResult,
-        traits::StorageVersion,
-        pallet_prelude::*
-    };
+		dispatch::DispatchResult, pallet_prelude::*, sp_runtime::traits::Hash, sp_std::vec::Vec,
+		traits::StorageVersion,
+	};
 	use frame_system::pallet_prelude::*;
 
 	#[pallet::config]
@@ -56,8 +53,8 @@ pub mod pallet {
 	pub struct Pallet<T>(_);
 
 	// Errors.
-    #[pallet::error]
-    pub enum Error<T> {
+	#[pallet::error]
+	pub enum Error<T> {
 		/// Attempted to mint a duplicate Token
 		DuplicateToken,
 		/// Attempted to burn a Token which doesnt exist or Query an incorrect TokenID
@@ -73,7 +70,7 @@ pub mod pallet {
 		TokenLimitExceeded,
 		/// This custodian does not have any ownership of this token.
 		TokenDoesntExistForCustodian,
-    }
+	}
 
 	/// Custom Alias for a token id
 	pub type TokenId<T> = <T as frame_system::Config>::Hash;
@@ -82,10 +79,9 @@ pub mod pallet {
 	pub type BytesToHash = Vec<u8>;
 
 	// Events.
-    #[pallet::event]
-    #[pallet::generate_deposit(pub(super) fn deposit_event)]
-    pub enum Event<T: Config>
-	{
+	#[pallet::event]
+	#[pallet::generate_deposit(pub(super) fn deposit_event)]
+	pub enum Event<T: Config> {
 		/// Token is created and distributed to the account
 		Minted {
 			token: TokenId<T>,
@@ -99,10 +95,10 @@ pub mod pallet {
 		},
 
 		/// @dev This emits when the approved address for an NFT is changed or
-    	///  reaffirmed. The zero address indicates there is no approved address.
-    	///  When a Transfer event emits, this also indicates that the approved
-    	///  address for that NFT (if any) is reset to none.
-    	Approval {
+		///  reaffirmed. The zero address indicates there is no approved address.
+		///  When a Transfer event emits, this also indicates that the approved
+		///  address for that NFT (if any) is reset to none.
+		Approval {
 			owner: T::AccountId,
 			approved: T::AccountId,
 			token: TokenId<T>,
@@ -137,7 +133,7 @@ pub mod pallet {
 		},
 
 		/// @dev This emits when an operator is enabled or disabled for an owner.
-    	///  The operator can manage all NFTs of the owner.
+		///  The operator can manage all NFTs of the owner.
 		ApprovalForAll {
 			owner: T::AccountId,
 			operator: T::AccountId,
@@ -154,7 +150,7 @@ pub mod pallet {
 			token: TokenId<T>,
 			owner: T::AccountId,
 		},
-    }
+	}
 
 	//Todo: Check whether ValueQuery or OptionQuery is better..
 
@@ -170,7 +166,8 @@ pub mod pallet {
 
 	#[pallet::storage]
 	#[pallet::getter(fn token_count_for_account)]
-	pub type TokenCountForAccount<T: Config> = StorageMap<_, Blake2_128, T::AccountId, u64, ValueQuery>;
+	pub type TokenCountForAccount<T: Config> =
+		StorageMap<_, Blake2_128, T::AccountId, u64, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn account_for_token)]
@@ -180,7 +177,8 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn tokens_for_account)]
 	/// A mapping from a Account to a list of TokenIds of this type which are owned by this Account.
-	pub type TokensForAccount<T: Config> = StorageMap<_, Blake2_128, T::AccountId, Vec<TokenId<T>>, ValueQuery>;
+	pub type TokensForAccount<T: Config> =
+		StorageMap<_, Blake2_128, T::AccountId, Vec<TokenId<T>>, ValueQuery>;
 
 	#[pallet::storage]
 	#[pallet::getter(fn custodian_for_token)]
@@ -195,7 +193,7 @@ pub mod pallet {
 	#[cfg(feature = "std")]
 	impl<T: Config> Default for GenesisConfig<T> {
 		fn default() -> Self {
-			Self { balances: vec![] }// Todo: fill with with (`Alice account_id`, `Some ref to MutantApes`)
+			Self { balances: vec![] } // Todo: fill with with (`Alice account_id`, `Some ref to MutantApes`)
 		}
 	}
 
@@ -214,21 +212,16 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-
 		#[pallet::weight(10_000 + T::DbWeight::get().reads(1))]
 		pub fn balance_of(origin: OriginFor<T>, owner: T::AccountId) -> DispatchResult {
 			ensure_signed(origin)?;
 
 			let token_count = Self::token_count_for_account(&owner);
 
-			Self::deposit_event(Event::TokenCountFor {
-				owner,
-				token_count,
-			});
+			Self::deposit_event(Event::TokenCountFor { owner, token_count });
 
 			Ok(())
 		}
-
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads(1))]
 		pub fn owner_of(origin: OriginFor<T>, token: TokenId<T>) -> DispatchResult {
@@ -236,10 +229,7 @@ pub mod pallet {
 
 			let owner = Self::_owner_of(&token)?;
 
-			Self::deposit_event(Event::TokenOwner {
-				owner,
-				token,
-			});
+			Self::deposit_event(Event::TokenOwner { owner, token });
 			Ok(())
 		}
 
@@ -247,7 +237,7 @@ pub mod pallet {
 		pub fn transfer_from(
 			origin: OriginFor<T>,
 			to: T::AccountId,
-			token: TokenId<T>
+			token: TokenId<T>,
 		) -> DispatchResult {
 			let from = ensure_signed(origin)?;
 			let token_owner = Self::_owner_of(&token)?;
@@ -260,11 +250,7 @@ pub mod pallet {
 				Err(_) => {},
 			}
 
-			Self::deposit_event(Event::Transferred {
-				from,
-				to,
-				token,
-			});
+			Self::deposit_event(Event::Transferred { from, to, token });
 			Ok(())
 		}
 
@@ -272,14 +258,11 @@ pub mod pallet {
 		pub fn mint(
 			origin: OriginFor<T>,
 			for_: T::AccountId,
-			bytes_to_be_hashed: BytesToHash
+			bytes_to_be_hashed: BytesToHash,
 		) -> DispatchResult {
 			T::TokenCreator::ensure_origin(origin)?;
 			let token = Self::_mint(&for_, bytes_to_be_hashed.clone())?;
-			Self::deposit_event(Event::Minted {
-				token,
-				owner: for_,
-			});
+			Self::deposit_event(Event::Minted { token, owner: for_ });
 			Ok(())
 		}
 
@@ -296,10 +279,7 @@ pub mod pallet {
 				Err(_) => {},
 			}
 
-			Self::deposit_event(Event::Burned {
-				owner: for_,
-				token,
-			});
+			Self::deposit_event(Event::Burned { owner: for_, token });
 			Ok(())
 		}
 
@@ -310,10 +290,7 @@ pub mod pallet {
 
 			let custodian = Self::_custodian_of(&token)?;
 
-			Self::deposit_event(Event::Custodian {
-				custodian,
-				token,
-			});
+			Self::deposit_event(Event::Custodian { custodian, token });
 			Ok(())
 		}
 
@@ -322,17 +299,13 @@ pub mod pallet {
 		pub fn set_custodian(
 			origin: OriginFor<T>,
 			custodian: T::AccountId,
-			token: TokenId<T>
+			token: TokenId<T>,
 		) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 			let owner = Self::_owner_of(&token)?;
 			ensure!(who == owner, Error::<T>::InvalidTokenOwner);
 			Self::_set_custodian(&custodian, &token)?;
-			Self::deposit_event(Event::Approval {
-				owner,
-				approved: custodian,
-				token
-			});
+			Self::deposit_event(Event::Approval { owner, approved: custodian, token });
 			Ok(())
 		}
 
@@ -340,7 +313,7 @@ pub mod pallet {
 		pub fn custodian_transfer(
 			origin: OriginFor<T>,
 			to: T::AccountId,
-			token: TokenId<T>
+			token: TokenId<T>,
 		) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 			let custodian = Self::_custodian_of(&token)?;
@@ -350,31 +323,19 @@ pub mod pallet {
 			Self::_transfer(&from, &to, &token)?;
 			Self::_remove_custodian(&token)?;
 
-			Self::deposit_event(Event::CustodialTransfer {
-				custodian,
-				from,
-				to,
-				token
-			});
+			Self::deposit_event(Event::CustodialTransfer { custodian, from, to, token });
 			Ok(())
 		}
 
 		#[pallet::weight(10_000 + T::DbWeight::get().reads_writes(7,6))]
-		pub fn custodian_burn(
-			origin: OriginFor<T>,
-			token: TokenId<T>
-		) -> DispatchResult {
+		pub fn custodian_burn(origin: OriginFor<T>, token: TokenId<T>) -> DispatchResult {
 			let who = ensure_signed(origin)?;
 			let custodian = Self::_custodian_of(&token)?;
 			ensure!(who == custodian, Error::<T>::InvalidCustodian);
 			let for_ = Self::_owner_of(&token)?;
 			Self::_burn(&for_, &token)?;
 			Self::_remove_custodian(&token)?;
-			Self::deposit_event(Event::<T>::CustodialBurn {
-				custodian,
-				owner: for_,
-				token,
-			});
+			Self::deposit_event(Event::<T>::CustodialBurn { custodian, owner: for_, token });
 			Ok(())
 		}
 
@@ -388,14 +349,13 @@ pub mod pallet {
 
 		// READ-ONLY Instrics
 		pub fn _owner_of(token: &TokenId<T>) -> Result<T::AccountId, DispatchError> {
-			let owner = AccountForToken::<T>::get(&token)
-							.ok_or(Error::<T>::TokenDoesntExist)?;
+			let owner = AccountForToken::<T>::get(&token).ok_or(Error::<T>::TokenDoesntExist)?;
 			Ok(owner)
 		}
 
 		pub fn _custodian_of(token: &TokenId<T>) -> Result<T::AccountId, DispatchError> {
 			let custodian = CustodianForToken::<T>::get(&token)
-								.ok_or(Error::<T>::TokenDoesntExistForCustodian)?;
+				.ok_or(Error::<T>::TokenDoesntExistForCustodian)?;
 			Ok(custodian)
 		}
 
@@ -408,24 +368,21 @@ pub mod pallet {
 		}
 
 		// READ and WRITE Instrinsics MUST BE PRIVATE!
-		fn _mint(for_: &T::AccountId, bytes_to_be_hashed: BytesToHash) -> Result<TokenId<T>, DispatchError> {
+		fn _mint(
+			for_: &T::AccountId,
+			bytes_to_be_hashed: BytesToHash,
+		) -> Result<TokenId<T>, DispatchError> {
 			let token_id = T::Hashing::hash_of(&bytes_to_be_hashed);
 
-			ensure!(
-				!AccountForToken::<T>::contains_key(&token_id),
-				Error::<T>::DuplicateToken
-			);
-			ensure!(
-				Self::total_supply() < Self::_max_tokens(),
-				Error::<T>::TokenLimitExceeded
-			);
+			ensure!(!AccountForToken::<T>::contains_key(&token_id), Error::<T>::DuplicateToken);
+			ensure!(Self::total_supply() < Self::_max_tokens(), Error::<T>::TokenLimitExceeded);
 			ensure!(
 				Self::token_count_for_account(&for_) < Self::_max_tokens_for_account(),
 				Error::<T>::TokenLimitForAccountExceeded
 			);
 
-			TotalSupply::<T>::mutate(|count| *count = count.saturating_add(1) );
-			TokenCountForAccount::<T>::mutate(for_, |count| *count = count.saturating_add(1) );
+			TotalSupply::<T>::mutate(|count| *count = count.saturating_add(1));
+			TokenCountForAccount::<T>::mutate(for_, |count| *count = count.saturating_add(1));
 			TokensForAccount::<T>::mutate(for_, |tokens| {
 				match tokens.binary_search(&token_id) {
 					/* The token_id should not be found because it is unique and new
@@ -443,13 +400,12 @@ pub mod pallet {
 
 		fn _burn(for_: &T::AccountId, token: &TokenId<T>) -> DispatchResult {
 			let for_tokens = Self::tokens_for_account(&for_);
-			let pos = for_tokens.binary_search(&token)
-					.map_err(|_| Error::<T>::TokenDoesntExist)?;
-			TokensForAccount::<T>::mutate(for_, |tokens| tokens.remove(pos) );
+			let pos = for_tokens.binary_search(&token).map_err(|_| Error::<T>::TokenDoesntExist)?;
+			TokensForAccount::<T>::mutate(for_, |tokens| tokens.remove(pos));
 
-			TokenCountForAccount::<T>::mutate(for_, |count| *count = count.saturating_sub(1) );
-			TotalSupply::<T>::mutate(|count| *count = count.saturating_sub(1) );
-			TotalBurned::<T>::mutate(|count| *count = count.saturating_add(1) );
+			TokenCountForAccount::<T>::mutate(for_, |count| *count = count.saturating_sub(1));
+			TotalSupply::<T>::mutate(|count| *count = count.saturating_sub(1));
+			TotalBurned::<T>::mutate(|count| *count = count.saturating_add(1));
 			AccountForToken::<T>::remove(token);
 
 			Ok(())
@@ -462,12 +418,11 @@ pub mod pallet {
 			);
 
 			let from_tokens = Self::tokens_for_account(&from);
-			let pos = from_tokens.binary_search(&token)
-					.map_err(|_| Error::<T>::TokenDoesntExist)?;
-			TokensForAccount::<T>::mutate(from, |tokens| tokens.remove(pos) );
+			let pos =
+				from_tokens.binary_search(&token).map_err(|_| Error::<T>::TokenDoesntExist)?;
+			TokensForAccount::<T>::mutate(from, |tokens| tokens.remove(pos));
 
-			TokenCountForAccount::<T>::mutate(from,
-				|count| *count = count.saturating_sub(1) );
+			TokenCountForAccount::<T>::mutate(from, |count| *count = count.saturating_sub(1));
 			TokensForAccount::<T>::mutate(to, |tokens| {
 				match tokens.binary_search(&token) {
 					/* The token_id should not be found because it is unique and new
@@ -478,8 +433,7 @@ pub mod pallet {
 					Err(pos) => tokens.insert(pos, token.clone()),
 				}
 			});
-			TokenCountForAccount::<T>::mutate(to,
-				|count| *count = count.saturating_add(1) );
+			TokenCountForAccount::<T>::mutate(to, |count| *count = count.saturating_add(1));
 			AccountForToken::<T>::insert(&token, &to);
 
 			Ok(())

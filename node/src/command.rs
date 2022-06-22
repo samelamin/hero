@@ -6,9 +6,8 @@ use crate::{
 use codec::Encode;
 use cumulus_client_service::genesis::generate_genesis_block;
 use cumulus_primitives_core::ParaId;
-use log::info;
 use hero_runtime::{Block, RuntimeApi};
-use polkadot_parachain::primitives::AccountIdConversion;
+use log::info;
 use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
 	NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
@@ -18,7 +17,7 @@ use sc_service::{
 	TaskManager,
 };
 use sp_core::hexdisplay::HexDisplay;
-use sp_runtime::traits::Block as BlockT;
+use sp_runtime::traits::{AccountIdConversion, Block as BlockT};
 use std::{io::Write, net::SocketAddr};
 
 const DEFAULT_PARA_ID: u32 = 2000;
@@ -184,7 +183,7 @@ pub fn run() -> Result<()> {
 					&polkadot_cli,
 					config.tokio_handle.clone(),
 				)
-					.map_err(|err| format!("Relay chain argument error: {}", err))?;
+				.map_err(|err| format!("Relay chain argument error: {}", err))?;
 
 				cmd.run(config, polkadot_config)
 			})
@@ -272,10 +271,9 @@ pub fn run() -> Result<()> {
 					cmd.run(config, partials.client.clone(), db, storage)
 				}),
 				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
-				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| cmd.run(
-					&config, 
-					frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone() 
-				)),
+				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| {
+					cmd.run(&config, frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone())
+				}),
 			}
 		},
 		Some(Subcommand::TryRuntime(cmd)) => {
@@ -300,7 +298,6 @@ pub fn run() -> Result<()> {
 			let collator_options = cli.run.collator_options();
 
 			runner.run_node_until_exit(|config| async move {
-
 				let para_id = chain_spec::Extensions::try_get(&*config.chain_spec)
 					.map(|e| e.para_id)
 					.ok_or_else(|| "Could not find parachain ID in chain-spec.")?;
@@ -323,7 +320,10 @@ pub fn run() -> Result<()> {
 				);
 
 				let parachain_account =
-					AccountIdConversion::<polkadot_primitives::v2::AccountId>::into_account(&id);
+					AccountIdConversion::<polkadot_primitives::v2::AccountId>::try_into_account(
+						&id,
+					)
+					.unwrap();
 
 				let state_version =
 					RelayChainCli::native_runtime_version(&config.chain_spec).state_version();
@@ -341,10 +341,16 @@ pub fn run() -> Result<()> {
 				info!("Parachain genesis state: {}", genesis_state);
 				info!("Is collating: {}", if config.role.is_authority() { "yes" } else { "no" });
 
-				crate::service::start_parachain_node(config, polkadot_config, collator_options, id, hwbench)
-					.await
-					.map(|r| r.0)
-					.map_err(Into::into)
+				crate::service::start_parachain_node(
+					config,
+					polkadot_config,
+					collator_options,
+					id,
+					hwbench,
+				)
+				.await
+				.map(|r| r.0)
+				.map_err(Into::into)
 			})
 		},
 	}
@@ -419,8 +425,8 @@ impl CliConfiguration<Self> for RelayChainCli {
 		_logger_hook: F,
 		_config: &sc_service::Configuration,
 	) -> Result<()>
-		where
-			F: FnOnce(&mut sc_cli::LoggerBuilder, &sc_service::Configuration),
+	where
+		F: FnOnce(&mut sc_cli::LoggerBuilder, &sc_service::Configuration),
 	{
 		unreachable!("PolkadotCli is never initialized; qed");
 	}

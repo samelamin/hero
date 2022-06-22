@@ -5,10 +5,13 @@
 
 #![warn(missing_docs)]
 
-use std::{sync::Arc, collections::BTreeMap};
+use std::{collections::BTreeMap, sync::Arc};
 
 use hero_runtime::{opaque::Block, AccountId, Balance, Hash, Index};
-use sc_client_api::{backend::{Backend, StateBackend, StorageProvider, AuxStore}, client::BlockchainEvents,};
+use sc_client_api::{
+	backend::{AuxStore, Backend, StateBackend, StorageProvider},
+	client::BlockchainEvents,
+};
 
 // Imports to support Ethereum RPC.
 use fc_rpc::{
@@ -26,7 +29,6 @@ use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
-
 
 /// Full client dependencies
 pub struct FullDeps<C, P, A: ChainApi> {
@@ -123,9 +125,9 @@ where
 		Eth, EthApiServer, EthDevSigner, EthFilter, EthFilterApiServer, EthPubSub,
 		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
 	};
-	use pallet_transaction_payment_rpc::{TransactionPaymentApiServer, TransactionPaymentRpc};
+	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	// use substrate_frame_rpc_system::{FullSystem, SystemApi};
-	use substrate_frame_rpc_system::{SystemApiServer, SystemRpc};
+	use substrate_frame_rpc_system::{System, SystemApiServer};
 
 	let mut io = jsonrpsee::RpcModule::new(());
 	let FullDeps {
@@ -145,8 +147,8 @@ where
 		block_data_cache,
 	} = deps;
 
-	io.merge(SystemRpc::new(Arc::clone(&client), Arc::clone(&pool), deny_unsafe).into_rpc())?;
-	io.merge(TransactionPaymentRpc::new(Arc::clone(&client)).into_rpc())?;
+	io.merge(System::new(Arc::clone(&client), Arc::clone(&pool), deny_unsafe).into_rpc())?;
+	io.merge(TransactionPayment::new(Arc::clone(&client)).into_rpc())?;
 
 	let mut signers = Vec::new();
 	if enable_dev_signer {

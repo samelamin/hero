@@ -17,8 +17,10 @@
 //! Unit testing
 
 use crate::*;
-use frame_support::dispatch::{DispatchError, Dispatchable};
-use frame_support::{assert_noop, assert_ok};
+use frame_support::{
+	assert_noop, assert_ok,
+	dispatch::{DispatchError, Dispatchable},
+};
 use mock::*;
 use parity_scale_codec::Encode;
 use sp_core::Pair;
@@ -598,7 +600,11 @@ fn initialize_new_addresses_with_batch() {
 			pallet_utility::Event::BatchCompleted,
 			pallet_utility::Event::BatchInterrupted {
 				index: 0,
-				error: DispatchError::Module(ModuleError { index: 2, error: [8, 0, 0, 0], message: None }),
+				error: DispatchError::Module(ModuleError {
+					index: 2,
+					error: [8, 0, 0, 0],
+					message: None,
+				}),
 			},
 		];
 		assert_eq!(batch_events(), expected);

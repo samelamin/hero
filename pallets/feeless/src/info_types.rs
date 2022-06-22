@@ -1,8 +1,8 @@
-use scale_info::TypeInfo;
 use codec::{Decode, Encode, MaxEncodedLen};
+use frame_support::sp_runtime::RuntimeDebug;
+use scale_info::TypeInfo;
 #[cfg(feature = "std")]
 use serde::{Deserialize, Serialize};
-use frame_support::sp_runtime::{RuntimeDebug};
 
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
 #[derive(
@@ -10,5 +10,5 @@ use frame_support::sp_runtime::{RuntimeDebug};
 )]
 pub struct FeelessInfo<BlockNumber> {
 	pub last_user_session: BlockNumber,
-    pub user_calls: u32,
+	pub user_calls: u32,
 }

@@ -2,13 +2,13 @@ use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
 
 use hero_runtime::{
-	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig,
-	GenesisConfig, Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
+	AccountId, AuraId, Balance, CrowdloanRewardsConfig, EVMConfig, EthereumConfig, GenesisConfig,
+	Signature, SudoConfig, EXISTENTIAL_DEPOSIT,
 };
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
-use sp_core::{H160, U256, sr25519, Pair, Public};
+use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
 	AccountId32,
@@ -349,9 +349,7 @@ fn testnet_genesis(
 		aura: Default::default(),
 		aura_ext: Default::default(),
 		parachain_system: Default::default(),
-		polkadot_xcm: hero_runtime::PolkadotXcmConfig {
-			safe_xcm_version: Some(SAFE_XCM_VERSION),
-		},
+		polkadot_xcm: hero_runtime::PolkadotXcmConfig { safe_xcm_version: Some(SAFE_XCM_VERSION) },
 		evm: EVMConfig {
 			accounts: {
 				// Prefund the "Gerald" account
@@ -381,6 +379,5 @@ fn testnet_genesis(
 		technical_committee: Default::default(),
 		democracy: Default::default(),
 		treasury: Default::default(),
-
 	}
 }

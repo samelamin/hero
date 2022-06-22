@@ -4,14 +4,11 @@ use super::{
 };
 use core::marker::PhantomData;
 use frame_support::{
-    log,
-	match_types, parameter_types,
+	log, match_types, parameter_types,
 	traits::{Everything, Nothing},
-	weights::{
-    constants::{WEIGHT_PER_SECOND},
-    Weight
-  },
+	weights::{constants::WEIGHT_PER_SECOND, Weight},
 };
+use frame_system::EnsureRoot;
 use pallet_xcm::XcmPassthrough;
 use polkadot_parachain::primitives::Sibling;
 use polkadot_runtime_common::impls::ToAuthor;
@@ -23,8 +20,7 @@ use xcm_builder::{
 	SignedAccountId32AsNative, SignedToAccountId32, SovereignSignedViaLocation, TakeWeightCredit,
 	UsingComponents,
 };
-use xcm_executor::{ traits::ShouldExecute, XcmExecutor };
-use frame_system::EnsureRoot;
+use xcm_executor::{traits::ShouldExecute, XcmExecutor};
 
 parameter_types! {
 	pub const RelayLocation: MultiLocation = MultiLocation::parent();
@@ -236,7 +232,7 @@ impl cumulus_pallet_xcmp_queue::Config for Runtime {
 	type ExecuteOverweightOrigin = EnsureRoot<AccountId>;
 	type ControllerOrigin = EnsureRoot<AccountId>;
 	type ControllerOriginConverter = XcmOriginToTransactDispatchOrigin;
-  type WeightInfo = ();
+	type WeightInfo = ();
 }
 
 impl cumulus_pallet_dmp_queue::Config for Runtime {

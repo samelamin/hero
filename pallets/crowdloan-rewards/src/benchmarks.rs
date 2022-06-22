@@ -37,8 +37,7 @@ use sp_core::{
 	ed25519,
 };
 use sp_runtime::{traits::One, MultiSignature};
-use sp_std::vec;
-use sp_std::vec::Vec;
+use sp_std::{vec, vec::Vec};
 use sp_trie::StorageProof;
 // This is a fake proof that emulates a storage proof inserted as the validation data
 // We avoid using the sproof builder here because it generates an issue when compiling without std

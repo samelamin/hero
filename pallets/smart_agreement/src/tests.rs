@@ -1,9 +1,8 @@
-use crate::{mock::*, Error};
-use crate::info_types::AgreementType;
+use crate::{info_types::AgreementType, mock::*, Error};
 use frame_support::{assert_noop, assert_ok, Hashable};
 use sp_core::H256;
 
-const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId 	 = 1;
+const TEST_ACCOUNT: <Test as frame_system::Config>::AccountId = 1;
 const PARTY_A_ACCOUNT: <Test as frame_system::Config>::AccountId = 2;
 const PARTY_B_ACCOUNT: <Test as frame_system::Config>::AccountId = 3;
 
@@ -85,13 +84,16 @@ fn create_agreement() {
 #[test]
 fn create_agreement_not_certified_agreement_creator() {
 	new_test_ext().execute_with(|| {
-		assert_noop!(SmartAgreement::create_agreement(
-			Origin::signed(TEST_ACCOUNT),
-			PARTY_A_ACCOUNT,
-			PARTY_B_ACCOUNT,
-			AgreementType::ServiceAgreement,
-			Vec::<u8>::default()),
-		Error::<Test>::NotCertifiedAgreementCreator);
+		assert_noop!(
+			SmartAgreement::create_agreement(
+				Origin::signed(TEST_ACCOUNT),
+				PARTY_A_ACCOUNT,
+				PARTY_B_ACCOUNT,
+				AgreementType::ServiceAgreement,
+				Vec::<u8>::default()
+			),
+			Error::<Test>::NotCertifiedAgreementCreator
+		);
 	});
 }
 
@@ -106,13 +108,16 @@ fn create_agreement_agreement_already_exists() {
 			AgreementType::ServiceAgreement,
 			Vec::<u8>::default()
 		));
-		assert_noop!(SmartAgreement::create_agreement(
-			Origin::signed(TEST_ACCOUNT),
-			PARTY_A_ACCOUNT,
-			PARTY_B_ACCOUNT,
-			AgreementType::ServiceAgreement,
-			Vec::<u8>::default()),
-		Error::<Test>::AgreementAlreadyExists);
+		assert_noop!(
+			SmartAgreement::create_agreement(
+				Origin::signed(TEST_ACCOUNT),
+				PARTY_A_ACCOUNT,
+				PARTY_B_ACCOUNT,
+				AgreementType::ServiceAgreement,
+				Vec::<u8>::default()
+			),
+			Error::<Test>::AgreementAlreadyExists
+		);
 	});
 }
 
@@ -143,13 +148,16 @@ fn create_agreement_max_agreements_exceeded() {
 			AgreementType::ServiceAgreement,
 			vec![2]
 		));
-		assert_noop!(SmartAgreement::create_agreement(
-			Origin::signed(TEST_ACCOUNT),
-			PARTY_A2_ACCOUNT,
-			PARTY_B2_ACCOUNT,
-			AgreementType::ServiceAgreement,
-			vec![3]),
-		Error::<Test>::MaxAgreementsExceeded);
+		assert_noop!(
+			SmartAgreement::create_agreement(
+				Origin::signed(TEST_ACCOUNT),
+				PARTY_A2_ACCOUNT,
+				PARTY_B2_ACCOUNT,
+				AgreementType::ServiceAgreement,
+				vec![3]
+			),
+			Error::<Test>::MaxAgreementsExceeded
+		);
 	});
 }
 
@@ -157,26 +165,29 @@ fn create_agreement_max_agreements_exceeded() {
 fn create_agreement_max_agreements_exceeded_for_user() {
 	new_test_ext().execute_with(|| {
 		assert_ok!(SmartAgreement::add_agreement_creator(Origin::root(), TEST_ACCOUNT));
-			assert_ok!(SmartAgreement::create_agreement(
+		assert_ok!(SmartAgreement::create_agreement(
+			Origin::signed(TEST_ACCOUNT),
+			PARTY_A_ACCOUNT,
+			PARTY_B_ACCOUNT,
+			AgreementType::ServiceAgreement,
+			Vec::<u8>::default()
+		));
+		assert_ok!(SmartAgreement::create_agreement(
+			Origin::signed(TEST_ACCOUNT),
+			PARTY_A_ACCOUNT,
+			PARTY_B_ACCOUNT,
+			AgreementType::ServiceAgreement,
+			vec![1]
+		));
+		assert_noop!(
+			SmartAgreement::create_agreement(
 				Origin::signed(TEST_ACCOUNT),
 				PARTY_A_ACCOUNT,
 				PARTY_B_ACCOUNT,
 				AgreementType::ServiceAgreement,
-				Vec::<u8>::default()
-			));
-			assert_ok!(SmartAgreement::create_agreement(
-				Origin::signed(TEST_ACCOUNT),
-				PARTY_A_ACCOUNT,
-				PARTY_B_ACCOUNT,
-				AgreementType::ServiceAgreement,
-				vec![1]
-			));
-			assert_noop!(SmartAgreement::create_agreement(
-				Origin::signed(TEST_ACCOUNT),
-				PARTY_A_ACCOUNT,
-				PARTY_B_ACCOUNT,
-				AgreementType::ServiceAgreement,
-				vec![2]),
-			Error::<Test>::MaxAgreementsForUserExceeded);
+				vec![2]
+			),
+			Error::<Test>::MaxAgreementsForUserExceeded
+		);
 	});
 }

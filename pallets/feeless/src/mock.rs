@@ -1,16 +1,16 @@
 use crate as pallet_feeless;
+pub use crate::pallet::*;
 use frame_support::{
 	parameter_types,
-	traits::{Everything, ConstU64, }
+	traits::{ConstU64, Everything},
 };
 use frame_system as system;
+use pallet_balances::Call as BalancesCall;
 use sp_core::H256;
 use sp_runtime::{
 	testing::Header,
 	traits::{BlakeTwo256, IdentityLookup},
 };
-use pallet_balances::{Call as BalancesCall };
-pub use crate::pallet::*;
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
@@ -83,6 +83,6 @@ impl pallet_balances::Config for Test {
 pub fn new_test_ext() -> sp_io::TestExternalities {
 	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }
-pub fn call_transfer(dest: u64, value : u64) -> Call{
-	Call::Balances(BalancesCall::transfer{dest, value})
+pub fn call_transfer(dest: u64, value: u64) -> Call {
+	Call::Balances(BalancesCall::transfer { dest, value })
 }

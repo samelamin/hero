@@ -70,14 +70,11 @@ parameter_types! {
 
 impl pallet_erc721::Config for Test {
 	type Event = Event;
-    type TokenCreator = frame_system::EnsureRoot<Self::AccountId>;
-    type TokenLimit = MAX_TOKENS;
-    type TokenLimitForAccount = MAX_TOKENS_PER_ACCOUNT;
+	type TokenCreator = frame_system::EnsureRoot<Self::AccountId>;
+	type TokenLimit = MAX_TOKENS;
+	type TokenLimitForAccount = MAX_TOKENS_PER_ACCOUNT;
 }
 
 pub fn new_test_ext() -> sp_io::TestExternalities {
-    system::GenesisConfig::default()
-        .build_storage::<Test>()
-        .unwrap()
-        .into()
+	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
 }

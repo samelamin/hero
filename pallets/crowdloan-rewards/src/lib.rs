@@ -74,22 +74,21 @@ pub mod weights;
 pub mod pallet {
 
 	use crate::weights::WeightInfo;
-	use frame_support::traits::WithdrawReasons;
 	use frame_support::{
 		pallet_prelude::*,
-		traits::{Currency, ExistenceRequirement::AllowDeath},
+		traits::{Currency, ExistenceRequirement::AllowDeath, WithdrawReasons},
 		PalletId,
 	};
 	use frame_system::pallet_prelude::*;
 	use log::info; //, trace, warn
 	use sp_core::crypto::AccountId32;
-	use sp_runtime::traits::{
-		AccountIdConversion, AtLeast32BitUnsigned, BlockNumberProvider, Saturating, Verify,
+	use sp_runtime::{
+		traits::{
+			AccountIdConversion, AtLeast32BitUnsigned, BlockNumberProvider, Saturating, Verify,
+		},
+		MultiSignature, Perbill,
 	};
-	use sp_runtime::{MultiSignature, Perbill};
-	use sp_std::collections::btree_map::BTreeMap;
-	use sp_std::vec;
-	use sp_std::vec::Vec;
+	use sp_std::{collections::btree_map::BTreeMap, vec, vec::Vec};
 
 	#[pallet::pallet]
 	#[pallet::without_storage_info]
@@ -228,7 +227,7 @@ pub mod pallet {
 			let first_payment = T::InitializationPayment::get() * reward_info.total_reward;
 
 			T::RewardCurrency::transfer(
-				&PALLET_ID.into_account(),
+				&PALLET_ID.into_account_truncating(),
 				&reward_account,
 				first_payment,
 				AllowDeath,
@@ -333,8 +332,8 @@ pub mod pallet {
 				// Pallet is configured with a zero vesting period.
 				info.total_reward - first_paid
 			} else {
-				(info.total_reward - first_paid).saturating_mul(payable_period.into())
-					/ period.into()
+				(info.total_reward - first_paid).saturating_mul(payable_period.into()) /
+					period.into()
 			}; // integer "/" division only produces integer quotients.
 
 			// If the period is bigger than whats missing to pay, then return whats missing to pay
@@ -349,7 +348,7 @@ pub mod pallet {
 
 			// This pallet controls an amount of funds and transfers them to each of the contributors
 			T::RewardCurrency::transfer(
-				&PALLET_ID.into_account(),
+				&PALLET_ID.into_account_truncating(),
 				&payee,
 				payable_amount,
 				AllowDeath,
@@ -423,7 +422,7 @@ pub mod pallet {
 
 			// Burn the difference
 			let imbalance = T::RewardCurrency::withdraw(
-				&PALLET_ID.into_account(),
+				&PALLET_ID.into_account_truncating(),
 				reward_difference,
 				WithdrawReasons::TRANSFER,
 				AllowDeath,
@@ -478,8 +477,8 @@ pub mod pallet {
 				info!("relay_account: {:?}", relay_account);
 				info!("native_account: {:?}", native_account);
 				info!("reward: {:?}", reward);
-				if ClaimedRelayChainIds::<T>::get(&relay_account).is_some()
-					|| UnassociatedContributions::<T>::get(&relay_account).is_some()
+				if ClaimedRelayChainIds::<T>::get(&relay_account).is_some() ||
+					UnassociatedContributions::<T>::get(&relay_account).is_some()
 				{
 					// Dont fail as this is supposed to be called with batch calls and we
 					// dont want to stall the rest of the contributions
@@ -488,7 +487,7 @@ pub mod pallet {
 						native_account.clone(),
 						*reward,
 					));
-					continue;
+					continue
 				}
 
 				if *reward < T::MinimumReward::get() {
@@ -499,14 +498,14 @@ pub mod pallet {
 						native_account.clone(),
 						*reward,
 					));
-					continue;
+					continue
 				}
 
 				// If we have a native_account, we make the payment
 				let initial_payment = if let Some(native_account) = native_account {
 					let first_payment = T::InitializationPayment::get() * (*reward);
 					T::RewardCurrency::transfer(
-						&PALLET_ID.into_account(),
+						&PALLET_ID.into_account_truncating(),
 						&native_account,
 						first_payment,
 						AllowDeath,
@@ -542,10 +541,10 @@ pub mod pallet {
 						AccountsPayable::<T>::insert(
 							native_account,
 							RewardInfo {
-								total_reward: inserted_reward_info.total_reward
-									+ reward_info.total_reward,
-								claimed_reward: inserted_reward_info.claimed_reward
-									+ reward_info.claimed_reward,
+								total_reward: inserted_reward_info.total_reward +
+									reward_info.total_reward,
+								claimed_reward: inserted_reward_info.claimed_reward +
+									reward_info.claimed_reward,
 								contributed_relay_addresses: inserted_reward_info
 									.contributed_relay_addresses,
 							},
@@ -569,7 +568,7 @@ pub mod pallet {
 	impl<T: Config> Pallet<T> {
 		/// The account ID that holds the Crowdloan's funds
 		pub fn account_id() -> T::AccountId {
-			PALLET_ID.into_account()
+			PALLET_ID.into_account_truncating()
 		}
 		/// The Account Id's balance
 		pub fn pot() -> BalanceOf<T> {
