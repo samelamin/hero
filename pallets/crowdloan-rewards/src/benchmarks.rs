@@ -14,7 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with Moonbeam.  If not, see <http://www.gnu.org/licenses/>.
 
-#![cfg(feature = "runtime-benchmarks")]
+#![cfg(feature = "nada")]
+
 
 use crate::{BalanceOf, Call, Pallet, WRAPPED_BYTES_POSTFIX, WRAPPED_BYTES_PREFIX};
 use cumulus_pallet_parachain_system::Pallet as RelayPallet;

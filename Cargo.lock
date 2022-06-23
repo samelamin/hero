@@ -3409,7 +3409,6 @@ dependencies = [
  "pallet-session",
  "pallet-smart-agreement",
  "pallet-sudo",
- "pallet-template",
  "pallet-timestamp",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",

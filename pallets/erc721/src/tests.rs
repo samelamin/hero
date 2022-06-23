@@ -6,7 +6,7 @@
 	@insipiration: Dan Forbes put together a great nft pallet
 		using Frame v1 and was a great reference thankyou!
 */
-use crate::{mock::*, Error, Event};
+use crate::{mock::*, Error};
 use frame_support::{assert_noop, assert_ok, Hashable};
 use sp_core::H256;
 

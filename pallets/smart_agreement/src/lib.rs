@@ -11,7 +11,7 @@ mod mock;
 #[cfg(test)]
 mod tests;
 
-#[cfg(feature = "runtime-benchmarks")]
+#[cfg(any(test, feature = "runtime-benchmarks"))]
 mod benchmarking;
 
 #[frame_support::pallet]
@@ -39,7 +39,7 @@ pub mod pallet {
 	#[pallet::generate_store(pub(super) trait Store)]
 	#[pallet::storage_version(STORAGE_VERSION)]
 	#[pallet::without_storage_info]
-	pub struct Pallet<T>(_);
+	pub struct Pallet<T>(PhantomData<T>);
 
 	pub type AgreementId<T> = <T as frame_system::Config>::Hash;
 
