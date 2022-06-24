@@ -229,3 +229,121 @@ save a backup snapshot of this repo: rebuild10
 #### Fix pallets/pallets/erc721 test
 
 save a backup snapshot of this repo: rebuild11
+
+___
+_(added by Remy Clarke 2022/06/24)_
+# Upgrading to new version of __Polkadot__
+Hero chain is regularly updated to be up-to-dated with the __relay chain of Polkadot__.
+Unfortunately, the upgrade process is not always as simple as updating a single dependancy.
+The following are steps to help the next engineer upgrade the to future versions of Polkadot.
+
+## __Patching external dependancies__ that depend on Polkadot
+
+For now Patching only concerns Hero's __paritytech/Frontier__ dependancy. However the following pattern might be required in the future for other dependancies _(for example Cumulus)_.
+
+The `Cargo.toml` at the __workspace root directory__ has a patch mapping the 
+source of the dependancy _( this would be specified in `Cargo.toml` for each crate in the workspace; NOTE the branch itself may not be used, but it must be a valid branch else it will fail  .. see below )_
+```toml
+# .../hero/node/Cargo.toml
+# Frontier
+fp-rpc = { git = "https://github.com/paritytech/frontier", branch = "master" }
+( ... )
+```
+
+to our patched forked version with a specific branch _( we will define the patch name .. see below )_
+
+```toml
+# .../hero/Cargo.toml
+[patch."https://github.com/paritytech/frontier"] 
+pallet-evm = { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.24" }
+( ... )
+```
+
+### Preparing the __patch__
+To make the patch first __clone the fork__ _( in this case our current fork )_
+```bash
+git clone git@github.com:PAIDNetwork/frontier.git
+```
+move into the repo, then add a __remote of the upstream repo__
+```bash 
+cd frontier/ && git remote add upstream https://github.com/paritytech/frontier
+```
+__Fetch upstream__ changes 
+_( name the remote `upstream` in the previous command)_
+```bash
+git fetch upstream
+```
+You should now see new branches to patch from in your terminal : here is an example 
+```bash
+( ... )
+From https://github.com/paritytech/frontier
+ * [new branch]        dependabot/cargo/clap-3.2.2 -> upstream/dependabot/cargo/clap-3.2.2
+ * [new branch]        dependabot/cargo/jsonrpsee-0.14.0 -> upstream/dependabot/cargo/jsonrpsee-0.14.0
+ * [new branch]        gh-pages         -> upstream/gh-pages
+ * [new branch]        legacy           -> upstream/legacy
+ * [new branch]        master           -> upstream/master
+ * [new branch]        polkadot-v0.9.19 -> upstream/polkadot-v0.9.19
+ * [new branch]        polkadot-v0.9.22 -> upstream/polkadot-v0.9.22
+ * [new branch]        sp-transact-delegatecall -> upstream/sp-transact-delegatecall
+```
+__Checkout the most recent branch from upstream__ to patch that has an explicit 
+polkadot version _( where possible )_
+_( in this case we will show patching from branch `polkadot-v0.9.22` )_
+```
+git checkout polkadot-v0.9.22
+```bash
+Checkout the new patch branch
+```bash
+git checkout -b patch-polkadot-v0.9.24
+```
+
+### Update all the dependanies
+__Carefully search and replace dependancies__ with the correct branch  
+__Double check!__
+```toml
+# here the branch needs a bump in version
+sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.22", default-features = false }
+# to
+sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.24", default-features = false }
+```
+
+Make the apropriate fixes where needed, and __compile the code__ to update `Cargo.lock`
+```bash
+cargo update && cargo build --release
+```
+
+After making your changes you can finally push
+```bash
+git push --set-upstream origin patch-polkadot-v0.9.24
+```
+A pull request is not required, so long as a branch exists you can use it to patch.
+
+## Updating the Polkadot dependancies on Hero internally
+Search and replace dependancies to  update Polkadot to new release version  the rest to the new Polkadot branch.
+```toml
+# Polkadot dependancies have ` branch = "release-v<VERSION>" `
+polkadot-cli =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.24" }
+# Things that depend on polkadot have ` branch = "polkadot-v<VERSION> `
+frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+```
+
+
+Many dependancies will change the apis so you will need to fix any 
+breaking code.
+
+Check the two __templates__ at the most apropriate branch ( __paritytech/Frontier__ and __paritytech/Cumulus__) for other dependancy changes and changes in the runtime and node. 
+here are links to the master branches:
+_( https://github.com/paritytech/frontier/tree/master/template )_
+_( https://github.com/paritytech/cumulus/tree/master/parachain-template )_
+
+__Upgrade up to compatability.__ 
+_( Remember they are still just templates, prioitize the Cumulus template as it is a propper parachain )_
+
+If you are getting errors saying that multiple versions of a dependancy conflicts, try rebuilding from scratch
+```bash
+cargo clean && cargo update && cargo build --release
+```
+
+Remember that the __`runtime` module can compile separately__ so get it compiling before trying to compile the `node` module.
+
+Once the Hero compiles be sure to run the __test suite__ with `cargo test`

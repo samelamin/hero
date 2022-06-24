@@ -63,9 +63,9 @@ git clone https://github.com/PAIDNetwork/polkadot.git
 ```bash
 cd polkadot
 ```
-* Checkout the latest working commit:
+* Checkout the latest working commits:
 ```bash
-git checkout v0.9.19
+git checkout release-v0.9.24
 ```
 * Build the relay chain:
 ```bash
