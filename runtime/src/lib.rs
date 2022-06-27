@@ -21,6 +21,7 @@ use sp_runtime::{
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, Perbill, Percent, Permill,
 };
+pub use parachain_staking::{InflationInfo, Range};
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -31,7 +32,7 @@ use sp_std::{marker::PhantomData, prelude::*};
 
 use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{ConstU32, EnsureOneOf, EqualPrivilegeOnly, Everything, FindAuthor},
+	traits::{ConstU32, EnsureOneOf, EqualPrivilegeOnly, Everything, FindAuthor,ConstU128},
 	weights::{
 		constants::{ExtrinsicBaseWeight, WEIGHT_PER_SECOND},
 		ConstantMultiplier, DispatchClass, Weight, WeightToFeeCoefficient, WeightToFeeCoefficients,
@@ -671,6 +672,57 @@ impl pallet_democracy::Config for Runtime {
 	type MaxProposals = MaxProposals;
 }
 
+//Configure the parachain-staking pallet.
+parameter_types! {
+	/// Default fixed percent a collator takes off the top of due rewards
+	pub const DefaultCollatorCommission: Perbill = Perbill::from_percent(20);
+	/// Default percent of inflation set aside for parachain bond every round
+	pub const DefaultParachainBondReservePercent: Percent = Percent::from_percent(30);
+}
+
+impl parachain_staking::Config for Runtime {
+	type Event = Event;
+	type Currency = Balances;
+	type MonetaryGovernanceOrigin = EnsureRoot<AccountId>;
+	/// Minimum round length is 2 minutes (10 * 12 second block times)
+	type MinBlocksPerRound = ConstU32<10>;
+	/// Blocks per round
+	type DefaultBlocksPerRound = ConstU32<{ 6 * HOURS }>;
+	/// Rounds before the collator leaving the candidates request can be executed
+	type LeaveCandidatesDelay = ConstU32<{ 4 * 7 }>;
+	/// Rounds before the candidate bond increase/decrease can be executed
+	type CandidateBondLessDelay = ConstU32<{ 4 * 7 }>;
+	/// Rounds before the delegator exit can be executed
+	type LeaveDelegatorsDelay = ConstU32<{ 4 * 7 }>;
+	/// Rounds before the delegator revocation can be executed
+	type RevokeDelegationDelay = ConstU32<{ 4 * 7 }>;
+	/// Rounds before the delegator bond increase/decrease can be executed
+	type DelegationBondLessDelay = ConstU32<{ 4 * 7 }>;
+	/// Rounds before the reward is paid
+	type RewardPaymentDelay = ConstU32<2>;
+	/// Minimum collators selected per round, default at genesis and minimum forever after
+	type MinSelectedCandidates = ConstU32<8>;
+	/// Maximum top delegations per candidate
+	type MaxTopDelegationsPerCandidate = ConstU32<300>;
+	/// Maximum bottom delegations per candidate
+	type MaxBottomDelegationsPerCandidate = ConstU32<50>;
+	/// Maximum delegations per delegator
+	type MaxDelegationsPerDelegator = ConstU32<100>;
+	type DefaultCollatorCommission = DefaultCollatorCommission;
+	type DefaultParachainBondReservePercent = DefaultParachainBondReservePercent;
+	/// Minimum stake required to become a collator
+	type MinCollatorStk = ConstU128< 0 >;
+	/// Minimum stake required to be reserved to be a candidate
+	type MinCandidateStk = ConstU128< 0 >;
+	/// Minimum stake required to be reserved to be a delegator
+	type MinDelegation = ConstU128< 0 >;
+	/// Minimum stake required to be reserved to be a delegator
+	type MinDelegatorStk = ConstU128< 0 >;
+	type OnCollatorPayout = ();
+	type OnNewRound = ();
+	type WeightInfo = parachain_staking::weights::SubstrateWeight<Runtime>;
+}
+
 impl fp_self_contained::SelfContainedCall for Call {
 	type SignedInfo = H160;
 
@@ -772,6 +824,9 @@ construct_runtime!(
 		Democracy: pallet_democracy,
 		Scheduler: pallet_scheduler,
 		Treasury: pallet_treasury::{Pallet, Call, Storage, Config, Event<T>},
+
+		// parachain staking
+		ParachainStaking: parachain_staking::{Pallet, Call, Storage, Event<T>, Config<T>},
 	}
 );
 
@@ -816,7 +871,7 @@ impl fp_rpc::ConvertTransaction<opaque::UncheckedExtrinsic> for TransactionConve
 	}
 }
 
-// this must be here because RUNTIME_API_VERSIONS is private
+/// this must be here because RUNTIME_API_VERSIONS is private
 #[sp_version::runtime_version]
 pub const VERSION: RuntimeVersion = RuntimeVersion {
 	spec_name: create_runtime_str!("hero"),

@@ -379,5 +379,7 @@ fn testnet_genesis(
 		technical_committee: Default::default(),
 		democracy: Default::default(),
 		treasury: Default::default(),
+		parachain_staking:Default::default(),
+
 	}
 }

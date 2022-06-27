@@ -28,6 +28,8 @@ pallet-crowdloan-rewards = 	{ path = "../pallets/crowdloan-rewards", default-fea
 pallet-erc721 = 			{ path = "../pallets/erc721",            default-features = false }
 pallet-feeless = 			{ path = "../pallets/feeless",           default-features = false }
 pallet-smart-agreement = 	{ path = "../pallets/smart_agreement",   default-features = false }
+parachain-staking = 	{ path = "../pallets/parachain-staking",   default-features = false }
+
 
 # Substrate FRAME Dependencies
 frame-benchmarking =           { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24", optional = true }
@@ -124,6 +126,7 @@ std = [
 	"pallet-authorship/std",
 	"pallet-balances/std",
 	"pallet-democracy/std",
+	"parachain-staking/std",
 	"pallet-collective/std",
 	"pallet-scheduler/std",
 	"pallet-treasury/std",
