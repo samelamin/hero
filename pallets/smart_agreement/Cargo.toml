@@ -20,6 +20,7 @@ serde = { version = "1.0.137", optional = true }
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24", optional = true }
 frame-support =      { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
 frame-system =       { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-std =             { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
 
 [dev-dependencies]
 
@@ -37,6 +38,7 @@ std = [
 	"frame-benchmarking/std",
 	"frame-support/std",
 	"frame-system/std",
+	"sp-std/std",
 	"serde",
 ]
 try-runtime = [ "frame-support/try-runtime" ]

@@ -5,6 +5,8 @@ pub use info_types::{AgreementInfo, AgreementType};
 
 pub use pallet::*;
 
+mod weights;
+
 #[cfg(test)]
 mod mock;
 
@@ -22,6 +24,8 @@ pub mod pallet {
 		sp_std::vec::Vec, traits::StorageVersion,
 	};
 	use frame_system::pallet_prelude::*;
+
+	use super::weights::WeightInfo;
 
 	#[pallet::config]
 	pub trait Config: frame_system::Config {
@@ -100,7 +104,7 @@ pub mod pallet {
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		#[pallet::weight(WeightInfo::<T>::add_agreement_creator())]
 		pub fn add_agreement_creator(
 			origin: OriginFor<T>,
 			creator: T::AccountId,
@@ -117,7 +121,7 @@ pub mod pallet {
 			Ok(())
 		}
 
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		#[pallet::weight(WeightInfo::<T>::remove_agreement_creator())]
 		pub fn remove_agreement_creator(
 			origin: OriginFor<T>,
 			creator: T::AccountId,
@@ -135,7 +139,7 @@ pub mod pallet {
 		}
 
 		// Todo: Must ensure that party_a and party_b are different from each other.
-		#[pallet::weight(10_000 + T::DbWeight::get().writes(1))]
+		#[pallet::weight(WeightInfo::<T>::create_agreement(u32::MAX))]
 		pub fn create_agreement(
 			origin: OriginFor<T>,
 			party_a: T::AccountId,
