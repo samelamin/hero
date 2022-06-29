@@ -1,49 +1,38 @@
-name: Build Collator
+name: Build & Test Hero Collator
 
 on:
   pull_request:
     types: [opened, synchronize]
     branches: [main]
   push:
-    branches: [main]
 
 env:
   GCP_PROJECT_ID: "paid-network-202104"
+  ZOMBIENET_VERSION: "v1.2.36"
+  POLKADOT_VERSION: "v0.9.24"
+  K3S_VERSION: "v1.21.2-k3s1"
 
 jobs:
-  compute-image-tag:
+  build-hero-collator:
+    if: true
     runs-on: gcp-self-hosted-runner
     outputs:
-      IMAGE_TAG: ${{ env.IMAGE_TAG }}
+      IMAGE: ${{ env.IMAGE }}
 
-    steps:       
-      - uses: actions/checkout@v2
-      - name: Use Git SHA 
-        if: ${{ github.event_name == 'pull_request' }}
-        run: |
-          echo "IMAGE_TAG=${GITHUB_SHA::7}" >> $GITHUB_ENV
-
-      - name: Use latest
-        if: ${{ github.event_name == 'push' }}
-        run: echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-
-# TODO: Build Base image when dockerfile.base file changes
-  build-collator:
-    runs-on: gcp-self-hosted-runner
-    needs: [compute-image-tag]
     steps:
       - uses: actions/checkout@v2
-#       - name: Setup gcloud
-#         uses: google-github-actions/setup-gcloud@v0.6.0
-#         with:
-#           project_id: ${{ env.GCP_PROJECT_ID }}
-#           service_account_key: ${{ secrets.GCP_SA_KEY }}
-#           export_default_credentials: true
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v0.6.0
+        with:
+          project_id: ${{ env.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-#       - name: Configure Docker credentials
-#         run: gcloud auth configure-docker
+      - name: Configuring Docker credentials
+        run: gcloud auth configure-docker
 
-      - name: ⚡ Cache Cargo Artifacts & Release Target
+      - name: ⚡ Cache Cargo Artifacts & Release Target ⚡
+        if: true
         uses: actions/cache@v2
         with:
           path: |
@@ -52,17 +41,45 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           
-      - name: Build collator
+      - name: 🤖 Building Collator 🤖
+        if: true
         run: |
-          ls -a ~/
-          source ~/.cargo/env
-          cargo build --release
-      
-      
-#       - name: Tag & Publish
-#         run: |
-#           docker tag paidnetwork/collator gcr.io/${{ env.GCP_PROJECT_ID }}/collator:${{ needs.compute-image-tag.outputs.IMAGE_TAG }}
-#           docker push gcr.io/${{ env.GCP_PROJECT_ID }}/collator:${{ needs.compute-image-tag.outputs.IMAGE_TAG }}
+          source ~/.cargo/env && cargo build --release
+          IMAGE_TAG=$(target/release/hero --version | cut -d' ' -f2)
+          echo "IMAGE=gcr.io/${{ env.GCP_PROJECT_ID }}/hero-collator:$IMAGE_TAG" >> $GITHUB_ENV
 
+      - name: 🚀 Tag & Publish Image 🚀
+        if: true
+        run: |
+          docker build -f build/scripts/Dockerfile -t ${{ env.IMAGE }} .
+          docker push ${{ env.IMAGE }}
 
+  run-zombienet-tests:
+    needs: [build-hero-collator]
+    runs-on: gcp-self-hosted-runner
+    env:
+      IMAGE: ${{ needs.build-hero-collator.outputs.IMAGE }}
 
+    steps:
+      - name: Launch K3s Cluster
+        uses: debianmaster/actions-k3s@master
+        id: k3s
+        with:
+          version: ${{ env.K3S_VERSION }}
+      - run: kubectl get nodes
+
+      - name: 🧟‍♂️ Install Zombienet 🧟‍♂️
+        run: |
+          wget https://github.com/paritytech/zombienet/releases/download/${{ env.ZOMBIENET_VERSION }}/zombienet-linux
+          chmod +x ./zombienet-linux
+
+      - name: 🥷🏻 Run Zombienet Tests 🥷🏻
+        run: |
+          ./zombienet-linux -p kubernetes test zombienet_tests/smoke/simple-network.feature
+
+  cleanup:
+    if: always()
+    needs: [run-zombienet-tests]
+    runs-on: gcp-self-hosted-runner
+    steps:
+      - run: docker rm -f k3s-${{ env.K3S_VERSION }} || true
