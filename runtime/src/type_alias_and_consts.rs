@@ -123,16 +123,16 @@ pub use super::{AllPalletsWithSystem, Call, Runtime};
 		pub const KILOWEI: Balance = 1_000;
 		pub const MEGAWEI: Balance = 1_000_000;
 		pub const GIGAWEI: Balance = 1_000_000_000;
-		pub const MICROPAID: Balance = 1_000_000_000_000;
-		pub const MILLIPAID: Balance = 1_000_000_000_000_000;
-		pub const PAID: Balance = 1_000_000_000_000_000_000;
-		pub const KILOPAID: Balance = 1_000_000_000_000_000_000_000;
+		pub const MICROHERO: Balance = 1_000_000_000_000;
+		pub const MILLIHERO: Balance = 1_000_000_000_000_000;
+		pub const HERO: Balance = 1_000_000_000_000_000_000;
+		pub const KILOHERO: Balance = 1_000_000_000_000_000_000_000;
 
-		pub const TRANSACTION_BYTE_FEE: Balance = 10 * MICROPAID * SUPPLY_FACTOR;
-		pub const STORAGE_BYTE_FEE: Balance = 100 * MICROPAID * SUPPLY_FACTOR;
+		pub const TRANSACTION_BYTE_FEE: Balance = 10 * MICROHERO * SUPPLY_FACTOR;
+		pub const STORAGE_BYTE_FEE: Balance = 100 * MICROHERO * SUPPLY_FACTOR;
 
 		pub const fn deposit(items: u32, bytes: u32) -> Balance {
-			items as Balance * 100 * MILLIPAID * SUPPLY_FACTOR +
+			items as Balance * 100 * MILLIHERO * SUPPLY_FACTOR +
 				(bytes as Balance) * STORAGE_BYTE_FEE
 		}
 	}

@@ -1,9 +1,9 @@
 [package]
 name = "pallet-crowdloan-rewards"
-authors = ["Anonymous"]
+authors = ["Hero"]
 description = "Reward citizens who participated in a crowdloan to acquire a parachain slot on the backing relay chain."
 version = "0.6.0"
-license = "Unlicense"
+license = "LGPL-3.0"
 homepage = "https://substrate.io"
 repository = "https://github.com/paritytech/substrate/"
 edition = "2021"

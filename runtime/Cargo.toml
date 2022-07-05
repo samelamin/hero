@@ -31,6 +31,10 @@ pallet-smart-agreement = 	{ path = "../pallets/smart_agreement",   default-featu
 parachain-staking = 	{ path = "../pallets/parachain-staking",   default-features = false }
 
 
+pallet-bridge =           { path = "../pallets/bridge", default-features = false }
+chainbridge = { git = "https://github.com/centrifuge/chainbridge-substrate.git", default-features = false, branch = "polkadot-v0.9.24" }
+runtime-common = { path = "../runtime-common", default-features = false }
+
 # Substrate FRAME Dependencies
 frame-benchmarking =           { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24", optional = true }
 frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
@@ -141,6 +145,8 @@ std = [
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
+  "pallet-bridge/std",
+  "chainbridge/std",
 	"pallet-xcm/std",
 	"parachain-info/std",
 	"polkadot-parachain/std",
@@ -182,6 +188,7 @@ runtime-benchmarks = [
 	"xcm-builder/runtime-benchmarks",
 	"cumulus-pallet-session-benchmarking/runtime-benchmarks",
 	"cumulus-pallet-xcmp-queue/runtime-benchmarks",
+  "chainbridge/runtime-benchmarks",
 ]
 
 try-runtime = [

@@ -986,6 +986,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "chainbridge"
+version = "0.0.2"
+source = "git+https://github.com/centrifuge/chainbridge-substrate.git?branch=polkadot-v0.9.24#06016868a97d28563c4fe97fa4a10d5ff741f6d0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "scale-info",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "substrate-wasm-builder-runner",
+]
+
+[[package]]
 name = "chrono"
 version = "0.4.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3392,6 +3411,7 @@ dependencies = [
 name = "hero-runtime"
 version = "0.0.1"
 dependencies = [
+ "chainbridge",
  "cumulus-pallet-aura-ext",
  "cumulus-pallet-dmp-queue",
  "cumulus-pallet-parachain-system",
@@ -3415,6 +3435,7 @@ dependencies = [
  "pallet-aura",
  "pallet-authorship",
  "pallet-balances",
+ "pallet-bridge",
  "pallet-collator-selection",
  "pallet-collective",
  "pallet-crowdloan-rewards",
@@ -3440,6 +3461,7 @@ dependencies = [
  "parity-scale-codec",
  "polkadot-parachain",
  "polkadot-runtime-common",
+ "runtime-common",
  "scale-info",
  "serde",
  "smallvec",
@@ -5272,6 +5294,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "node-primitives"
+version = "2.0.0"
+source = "git+https://github.com/paritytech/substrate?branch=polkadot-v0.9.24#814752f60ab8cce7e2ece3ce0c1b10799b4eab28"
+dependencies = [
+ "frame-system",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-application-crypto",
+ "sp-core",
+ "sp-runtime",
+]
+
+[[package]]
 name = "nodrop"
 version = "0.1.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5666,6 +5701,26 @@ dependencies = [
  "log",
  "pallet-treasury",
  "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
+name = "pallet-bridge"
+version = "2.0.0"
+dependencies = [
+ "chainbridge",
+ "frame-support",
+ "frame-system",
+ "node-primitives",
+ "pallet-authorship",
+ "pallet-balances",
+ "pallet-timestamp",
+ "parity-scale-codec",
+ "runtime-common",
  "scale-info",
  "sp-core",
  "sp-io",
@@ -8827,6 +8882,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "runtime-common"
+version = "1.0.0"
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -11393,6 +11452,12 @@ dependencies = [
  "walkdir",
  "wasm-gc-api",
 ]
+
+[[package]]
+name = "substrate-wasm-builder-runner"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "316626afcac0219c95116e6a2518e622484c2814182bd225fbf4da4f67e27e8f"
 
 [[package]]
 name = "subtle"

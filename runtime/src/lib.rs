@@ -80,6 +80,12 @@ pub use pallet_crowdloan_rewards;
 pub use pallet_erc721;
 pub use pallet_smart_agreement;
 
+use chainbridge::ResourceId;
+pub use runtime_common::{
+  constants::{
+    NATIVE_TOKEN_TRANSFER_FEE, NFT_TOKEN_TRANSFER_FEE,
+  }
+};
 /// Common type aliases that are public
 /// the type aliases that are common to many pallets are collected here
 // this should be reserved for type aliases only
@@ -425,6 +431,46 @@ impl pallet_crowdloan_rewards::Config for Runtime {
 }
 
 parameter_types! {
+  pub const BridgePalletId: PalletId = PalletId(*b"c/bridge");
+  pub HashId: ResourceId = chainbridge::derive_resource_id(1, &sp_io::hashing::blake2_128(b"cent_nft_hash"));
+  pub NativeTokenId: ResourceId = chainbridge::derive_resource_id(1, &sp_io::hashing::blake2_128(b"xHERO"));
+  pub const NativeTokenTransferFee: u128 = NATIVE_TOKEN_TRANSFER_FEE;
+  pub const NftTransferFee: u128 = NFT_TOKEN_TRANSFER_FEE;
+}
+impl pallet_bridge::Config for Runtime {
+  type BridgePalletId = BridgePalletId;
+  type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
+  type AdminOrigin =
+    pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>;
+  type Currency = Balances;
+  type Event = Event;
+  type NativeTokenId = NativeTokenId;
+  type NativeTokenTransferFee = NativeTokenTransferFee;
+  type NftTokenTransferFee = NftTransferFee;
+  type WeightInfo = ();
+  type ResourceId = ResourceId;
+}
+
+parameter_types! {
+  pub const ChainId: chainbridge::ChainId = 1;
+  pub const ProposalLifetime: u32 = 500;
+  pub const ChainBridgePalletId: PalletId = PalletId(*b"chnbrdge");
+  pub const RelayerVoteThreshold: u32 = chainbridge::constants::DEFAULT_RELAYER_VOTE_THRESHOLD;
+}
+impl chainbridge::Config for Runtime {
+  type Event = Event;
+  /// A 75% majority of the council can update bridge settings.
+  type AdminOrigin =
+    pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>;
+  type Proposal = Call;
+  type ChainId = ChainId;
+  type PalletId = ChainBridgePalletId;
+  type ProposalLifetime = ProposalLifetime;
+  type RelayerVoteThreshold = RelayerVoteThreshold;
+  type WeightInfo = ();
+}
+
+parameter_types! {
 	pub const Period: u32 = 6 * HOURS;
 	pub const Offset: u32 = 0;
 	pub const MaxAuthorities: u32 = 100_000;
@@ -569,13 +615,13 @@ impl pallet_scheduler::Config for Runtime {
 // Configure the pallet-treasury.
 parameter_types! {
 	pub const ProposalBond: Permill = Permill::from_percent(5);
-	pub const ProposalBondMinimum: Balance = 1 * currency::MILLIPAID;
+	pub const ProposalBondMinimum: Balance = 1 * currency::MILLIHERO;
 	pub const SpendPeriod: BlockNumber = 1 * DAYS;
 	pub const Burn: Permill = Permill::from_percent(50);
 	pub const TipCountdown: BlockNumber = 1 * DAYS;
 	pub const TipFindersFee: Percent = Percent::from_percent(20);
-	pub const TipReportDepositBase: Balance = 1 * currency::MILLIPAID;
-	pub const DataDepositPerByte: Balance = 1 * currency::MICROPAID;
+	pub const TipReportDepositBase: Balance = 1 * currency::MILLIHERO;
+	pub const DataDepositPerByte: Balance = 1 * currency::MICROHERO;
 	pub const TreasuryPalletId: PalletId = PalletId(*b"py/trsry");
 	pub const MaximumReasonLength: u32 = 300;
 	pub const MaxApprovals: u32 = 100;
@@ -618,7 +664,7 @@ parameter_types! {
 	pub const EnactmentPeriod: BlockNumber = 5 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 5 * MINUTES;
 	pub const MaxProposals: u32 = 100;
-	pub const PreimageByteDeposit: Balance = 1 * currency::MILLIPAID;
+	pub const PreimageByteDeposit: Balance = 1 * currency::MILLIHERO;
 }
 
 impl pallet_democracy::Config for Runtime {
@@ -817,6 +863,9 @@ construct_runtime!(
 		CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>} = 48,
 		SmartAgreement: pallet_smart_agreement::{Pallet, Call, Storage, Event<T>} = 49,
+    Bridge: pallet_bridge::{Pallet, Call, Storage, Config<T>, Event<T>} = 43,
+    // 3rd party pallets
+    ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 150,
 
 		// Governance Pallets
 		Council: pallet_collective::<Instance1>,

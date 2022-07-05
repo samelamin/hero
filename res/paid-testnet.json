@@ -8,7 +8,7 @@
   "properties": {
     "ss58Format": 42,
     "tokenDecimals": 12,
-    "tokenSymbol": "PAID"
+    "tokenSymbol": "HERO"
   },
   "relay_chain": "rococo-private",
   "para_id": 2000,

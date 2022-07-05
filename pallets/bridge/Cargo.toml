@@ -1,0 +1,51 @@
+[package]
+name = 'pallet-bridge'
+description = 'Bridge pallet'
+authors = ['Hero']
+edition = '2021'
+homepage = 'https://paidnetwork.com'
+license = "LGPL-3.0"
+repository = 'tbd'
+version = '2.0.0'
+
+[package.metadata.docs.rs]
+targets = ['x86_64-unknown-linux-gnu']
+
+[dependencies]
+# Substrate basic primitives
+codec = { package = "parity-scale-codec", version = "3.0.0", default-features = false }
+scale-info = { version = "2.1.2", default-features = false, features = ["derive"] }
+frame-support = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+frame-system = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+pallet-balances = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-std = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+node-primitives = { git = "https://github.com/paritytech/substrate",  default-features = false , branch = "polkadot-v0.9.24" }
+         
+# chainbridge-substrate dependencies
+chainbridge = { git = "https://github.com/centrifuge/chainbridge-substrate.git", default-features = false, branch = "polkadot-v0.9.24" }
+
+[dev-dependencies]
+# Testing/mocking dependencies
+pallet-authorship = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+pallet-timestamp = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-io = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+runtime-common = { path = "../../runtime-common", default_features = false }
+
+[features]
+default = ['std']
+runtime-benchmarks = ["chainbridge/runtime-benchmarks"]
+std = [
+    'codec/std',
+    'frame-support/std',
+    'frame-system/std',
+    'node-primitives/std',
+    'pallet-balances/std',
+    'sp-core/std',
+    'sp-runtime/std',
+    'sp-std/std',
+    'chainbridge/std',
+]
