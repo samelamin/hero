@@ -2,9 +2,13 @@
   "name": "Rococo Local Testnet",
   "id": "rococo_local_testnet",
   "chainType": "Local",
-  "bootNodes": [],
+  "bootNodes": [
+    "/dns/alice_bootnode/tcp/30333/p2p/12D3KooWCe8LBw1erdLJLwhh5ReFowpqoYkZq44J4uH1RefCmkxS",
+    "/dns/bob_bootnode/tcp/30333/p2p/12D3KooWKC2FH3y5oQU217YCEvnmQK7ZW7Su2VVFZ9DnTsFnwwJj",
+    "/dns/charlie_bootnode/tcp/30333/p2p/12D3KooWL4gRR63NRAbfNmc6UnF6qsJntG6tom66bcbVGoPhp1Rd"
+  ],
   "telemetryEndpoints": null,
-  "protocolId": "dot",
+  "protocolId": "hero",
   "properties": null,
   "forkBlocks": null,
   "badBlocks": null,

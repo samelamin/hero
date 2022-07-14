@@ -1,0 +1,118 @@
+version: '3.2'
+services:
+  alice:
+    container_name: alice
+    ports:
+      - "30333:30333"
+      - "9933:9933"
+      - "9944:9944"
+      - "9615:9615"
+    image: parity/polkadot:latest
+    volumes:
+      - "rococo-data-alice:/data"
+      - "./../../res:/data/res"
+    command: |
+      --alice
+      --chain data/res/rococo-raw.json
+      --validator
+      --base-path /data
+      --port 30333
+      --ws-port 9944
+      --prometheus-external
+
+  bob:
+    container_name: bob
+    ports:
+      - "30334:30333"
+      - "9934:9933"
+      - "9945:9944"
+      - "9616:9615"
+    image: parity/polkadot:latest
+    volumes:
+      - "rococo-data-bob:/data"
+      - "./../../res:/data/res"
+    command: |
+      --bob
+      --chain data/res/rococo-raw.json
+      --validator
+      --base-path /data
+      --port 30333
+      --ws-port 9944
+
+  charlie:
+    container_name: charlie
+    ports:
+      - "30335:30333"
+      - "9935:9933"
+      - "9946:9944"
+      - "9617:9615"
+    image: parity/polkadot:latest
+    volumes:
+      - "rococo-data-charlie:/data"
+      - "./../../res:/data/res"
+    command: |
+      --charlie
+      --chain data/res/rococo-raw.json
+      --validator
+      --base-path /data
+      --port 30333
+      --ws-port 9944
+  
+  frontend:
+    container_name: frontend
+    image: jacogr/polkadot-js-apps:latest
+    ports:
+      - "80:80"
+ 
+  # https://github.com/vegasbrianc/prometheus/blob/master/docker-compose.yml
+  prometheus:
+    image: prom/prometheus:v2.36.2
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+
+  grafana:
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  rococo-data-alice:
+  rococo-data-bob:
+  rococo-data-charlie:
+  prometheus_data:
+  grafana_data:
+
+# networks:
+#   testing_net:
+#     ipam:
+#       driver: default
+#       config:
+#         - subnet: 172.28.0.0/16
+
+
+
+# services:
+#   paid-collator:
+#     container_name: paid-collator
+#     image: gcr.io/paid-network-202104/collator
+#     ports:
+#       - "30344:30344"
+#       - "40334:40334"
+#       - "6968:6968"
+#       - "8845:8845"
+#       - "9978:9978"
+#     command: bash -c "apt-get install -y wget; wget -O paid-testnet.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/paid-testnet.json; wget -O rococo-private-relay.json https://raw.githubusercontent.com/coax1d/rust_stuff/master/rococo-private-relay.json; nohup ./target/release/hero --bob --collator --force-authoring --chain paid-testnet.json --bootnodes /ip4/34.77.219.227/tcp/40333/p2p/12D3KooWGBaBcRp4DTndFAfRHCcQU3kKH9tKxtPxxUysCD7ANAk6 --unsafe-ws-external --rpc-external --allow-private-ipv4 --discover-local --rpc-methods Unsafe --base-path /tmp/parachain/alice --port 40334 --ws-port 8845 --rpc-port 6968 --rpc-cors all -- --execution wasm --chain rococo-private-relay.json --port 30344 --ws-port 9978 --bootnodes /ip4/34.77.219.227/tcp/30333/p2p/12D3KooWBkNJacodDkLqbA26CavG4aqddD1imXCRL4JewVFVZXdf --sync Fast > collator.out 2>&1; tail -f /dev/null"
+
+# 0x6a80…8551  0x28df…b9f0
