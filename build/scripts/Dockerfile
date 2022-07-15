@@ -22,6 +22,8 @@ USER hero
 EXPOSE 40333-40335 8844-8848 6965-6969 30343-30345 9977-9979
 
 CMD ["hero-collator", "--alice", "--collator", "--base-path", "/tmp/parachain/alice", \
- "--port", "40333", "--ws-port", "8844", "--", "--execution", "wasm", \ 
+ "--port", "40333", "--ws-port", "8844", "--unsafe-ws-external", "--unsafe-rpc-external", \
+ "--rpc-cors all", "--rpc-external", "--discover-local" \
+ "--", "--execution", "wasm", "--rpc-methods Unsafe", "--prometheus-external" \ 
  "--chain", "/hero/res/rococo-custom-2-raw.json", "--port", "30343",\
  "--ws-port", "9977"]
