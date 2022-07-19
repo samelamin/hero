@@ -318,7 +318,6 @@ where
 	let block_announce_validator = BlockAnnounceValidator::new(relay_chain_interface.clone(), id);
 
 	let force_authoring = parachain_config.force_authoring;
-	let validator = parachain_config.role.is_authority();
 	let prometheus_registry = parachain_config.prometheus_registry().cloned();
 	let transaction_pool = params.transaction_pool.clone();
 	let overrides = crate::rpc::overrides_handle(client.clone());
@@ -369,7 +368,6 @@ where
 	let rpc_extensions_builder = {
 		let client = client.clone();
 		let pool = transaction_pool.clone();
-		let is_authority = is_authority;
 		let network = network.clone();
 		let filter_pool = filter_pool.clone();
 		let frontier_backend = frontier_backend.clone();
@@ -419,7 +417,7 @@ where
 
 	let relay_chain_slot_duration = Duration::from_secs(6);
 
-	if validator {
+	if is_authority {
 		let parachain_consensus = build_consensus(
 			client.clone(),
 			prometheus_registry.as_ref(),

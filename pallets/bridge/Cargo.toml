@@ -33,7 +33,7 @@ pallet-timestamp = { git = "https://github.com/paritytech/substrate", default-fe
 sp-core = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
 sp-io = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
 sp-runtime = { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
-runtime-common = { path = "../../runtime-common", default_features = false }
+runtime-common = { path = "../../runtime/common", default_features = false }
 
 [features]
 default = ['std']
