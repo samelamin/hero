@@ -3446,7 +3446,6 @@ dependencies = [
  "pallet-balances",
  "pallet-collator-selection",
  "pallet-collective",
- "pallet-crowdloan-rewards",
  "pallet-democracy",
  "pallet-erc721",
  "pallet-ethereum",

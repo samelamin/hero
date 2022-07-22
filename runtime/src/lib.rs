@@ -42,7 +42,7 @@ use frame_support::{
 };
 use frame_system::{
 	limits::{BlockLength, BlockWeights},
-	EnsureRoot, EnsureSigned,
+	EnsureRoot,
 };
 
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
@@ -77,7 +77,6 @@ pub use xcm_config::*;
 
 use precompiles::FrontierPrecompiles;
 
-pub use pallet_crowdloan_rewards;
 pub use pallet_erc721;
 pub use pallet_smart_agreement;
 
@@ -399,32 +398,6 @@ impl pallet_smart_agreement::Config for Runtime {
 	type Event = Event;
 	type MaxAgreements = AgreementLimit;
 	type MaxAgreementsForUser = AgreementLimitForUser;
-}
-
-parameter_types! {
-	pub const MinimumReward: Balance = 0;
-	pub const Initialized: bool = false;
-	pub const InitializationPayment: Perbill = Perbill::from_percent(30);
-	pub const MaxInitContributorsBatchSizes: u32 = 500;
-	pub const RelaySignaturesThreshold: Perbill = Perbill::from_percent(100);
-  pub const TestSigantureNetworkIdentifier: &'static [u8] = b"test-";
-}
-impl pallet_crowdloan_rewards::Config for Runtime {
-	type Event = Event;
-	type Initialized = Initialized;
-	type InitializationPayment = InitializationPayment;
-	type MaxInitContributors = MaxInitContributorsBatchSizes;
-	type MinimumReward = MinimumReward;
-	type RewardCurrency = Balances;
-	type RelayChainAccountId = AccountId;
-	type RewardAddressChangeOrigin = EnsureSigned<Self::AccountId>;
-	type RewardAddressRelayVoteThreshold = RelaySignaturesThreshold;
-	type RewardAddressAssociateOrigin = EnsureSigned<Self::AccountId>;
-	type SignatureNetworkIdentifier = TestSigantureNetworkIdentifier;
-	type VestingBlockNumber = BlockNumber;
-	type VestingBlockProvider =
-		cumulus_pallet_parachain_system::RelaychainBlockNumberProvider<Self>;
-	type WeightInfo = pallet_crowdloan_rewards::weights::SubstrateWeight<Runtime>;
 }
 
 parameter_types! {
@@ -833,7 +806,6 @@ construct_runtime!(
 
 		// Hero Pallets
 		Erc721: pallet_erc721::{Pallet, Call, Storage, Event<T>} = 47,
-		CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>} = 48,
 		SmartAgreement: pallet_smart_agreement::{Pallet, Call, Storage, Event<T>} = 49,
 

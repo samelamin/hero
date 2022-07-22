@@ -24,14 +24,11 @@ serde = { version = "1.0.137", optional = true, features = ["derive"] }
 smallvec = "1.6.1"
 
 # Local Dependencies
-pallet-crowdloan-rewards = 	{ path = "../pallets/crowdloan-rewards", default-features = false }
 pallet-erc721 = 			{ path = "../pallets/erc721",            default-features = false }
 pallet-feeless = 			{ path = "../pallets/feeless",           default-features = false }
 pallet-smart-agreement = 	{ path = "../pallets/smart_agreement",   default-features = false }
 parachain-staking = 	{ path = "../pallets/parachain-staking",   default-features = false }
-
-
-runtime-common = { path = "../runtime/common", default-features = false }
+runtime-common = { path = "./common", default-features = false }
 
 # Substrate FRAME Dependencies
 frame-benchmarking =           { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.25", optional = true }
@@ -135,7 +132,6 @@ std = [
 	"pallet-collator-selection/std",
 	"pallet-session/std",
 	"pallet-sudo/std",
-	"pallet-crowdloan-rewards/std",
 	"pallet-erc721/std",
 	"pallet-evm/std",
 	"pallet-ethereum/std",
@@ -172,7 +168,6 @@ runtime-benchmarks = [
 	"frame-system/runtime-benchmarks",
 	"pallet-balances/runtime-benchmarks",
 	"pallet-collator-selection/runtime-benchmarks",
-	"pallet-crowdloan-rewards/runtime-benchmarks",
 	"pallet-erc721/runtime-benchmarks",
 	"pallet-timestamp/runtime-benchmarks",
 	"pallet-xcm/runtime-benchmarks",

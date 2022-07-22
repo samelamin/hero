@@ -70,7 +70,6 @@ pub mod pallet {
 		traits::{Currency, Get, Imbalance, ReservableCurrency},
 	};
 	use frame_system::pallet_prelude::*;
-	use parity_scale_codec::Decode;
 	use sp_runtime::{
 		traits::{Saturating, Zero},
 		Perbill, Percent,
