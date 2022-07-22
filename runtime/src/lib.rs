@@ -1,10 +1,11 @@
 #![cfg_attr(not(feature = "std"), no_std)]
-#![recursion_limit = "256"]// `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
+#![recursion_limit = "256"] // `construct_runtime!` does a lot of recursion and requires us to increase the limit to 256.
 
 // Make the WASM binary available.
 #[cfg(feature = "std")]
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 use codec::{Decode, Encode};
+pub use parachain_staking::{InflationInfo, Range};
 use smallvec::smallvec;
 use sp_core::{
 	crypto::{ByteArray, KeyTypeId},
@@ -21,7 +22,6 @@ use sp_runtime::{
 	transaction_validity::{TransactionSource, TransactionValidity, TransactionValidityError},
 	ApplyExtrinsicResult, Perbill, Percent, Permill,
 };
-pub use parachain_staking::{InflationInfo, Range};
 
 #[cfg(feature = "std")]
 use sp_version::NativeVersion;
@@ -32,7 +32,7 @@ use sp_std::{marker::PhantomData, prelude::*};
 
 use frame_support::{
 	construct_runtime, parameter_types,
-	traits::{ConstU32, EnsureOneOf, EqualPrivilegeOnly, Everything, FindAuthor,ConstU128},
+	traits::{ConstU128, ConstU32, EitherOfDiverse, EqualPrivilegeOnly, Everything, FindAuthor},
 	weights::{
 		constants::{ExtrinsicBaseWeight, WEIGHT_PER_SECOND},
 		ConstantMultiplier, DispatchClass, Weight, WeightToFeeCoefficient, WeightToFeeCoefficients,
@@ -45,6 +45,7 @@ use frame_system::{
 	EnsureRoot, EnsureSigned,
 };
 
+use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
 use pallet_ethereum::Transaction as EthereumTransaction;
 
 /// The version information used to identify this runtime when compiled natively.
@@ -80,12 +81,7 @@ pub use pallet_crowdloan_rewards;
 pub use pallet_erc721;
 pub use pallet_smart_agreement;
 
-use chainbridge::ResourceId;
-pub use runtime_common::{
-  constants::{
-    NATIVE_TOKEN_TRANSFER_FEE, NFT_TOKEN_TRANSFER_FEE,
-  }
-};
+pub use runtime_common::constants::NFT_TOKEN_TRANSFER_FEE;
 /// Common type aliases that are public
 /// the type aliases that are common to many pallets are collected here
 // this should be reserved for type aliases only
@@ -290,6 +286,7 @@ impl cumulus_pallet_parachain_system::Config for Runtime {
 	type OutboundXcmpMessageSource = XcmpQueue;
 	type XcmpMessageHandler = XcmpQueue;
 	type ReservedXcmpWeight = ReservedXcmpWeight;
+	type CheckAssociatedRelayNumber = RelayNumberStrictlyIncreases;
 }
 
 impl parachain_info::Config for Runtime {}
@@ -428,46 +425,6 @@ impl pallet_crowdloan_rewards::Config for Runtime {
 	type VestingBlockProvider =
 		cumulus_pallet_parachain_system::RelaychainBlockNumberProvider<Self>;
 	type WeightInfo = pallet_crowdloan_rewards::weights::SubstrateWeight<Runtime>;
-}
-
-parameter_types! {
-  pub const BridgePalletId: PalletId = PalletId(*b"c/bridge");
-  pub HashId: ResourceId = chainbridge::derive_resource_id(1, &sp_io::hashing::blake2_128(b"cent_nft_hash"));
-  pub NativeTokenId: ResourceId = chainbridge::derive_resource_id(1, &sp_io::hashing::blake2_128(b"xHERO"));
-  pub const NativeTokenTransferFee: u128 = NATIVE_TOKEN_TRANSFER_FEE;
-  pub const NftTransferFee: u128 = NFT_TOKEN_TRANSFER_FEE;
-}
-impl pallet_bridge::Config for Runtime {
-  type BridgePalletId = BridgePalletId;
-  type BridgeOrigin = chainbridge::EnsureBridge<Runtime>;
-  type AdminOrigin =
-    pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>;
-  type Currency = Balances;
-  type Event = Event;
-  type NativeTokenId = NativeTokenId;
-  type NativeTokenTransferFee = NativeTokenTransferFee;
-  type NftTokenTransferFee = NftTransferFee;
-  type WeightInfo = ();
-  type ResourceId = ResourceId;
-}
-
-parameter_types! {
-  pub const ChainId: chainbridge::ChainId = 1;
-  pub const ProposalLifetime: u32 = 500;
-  pub const ChainBridgePalletId: PalletId = PalletId(*b"chnbrdge");
-  pub const RelayerVoteThreshold: u32 = chainbridge::constants::DEFAULT_RELAYER_VOTE_THRESHOLD;
-}
-impl chainbridge::Config for Runtime {
-  type Event = Event;
-  /// A 75% majority of the council can update bridge settings.
-  type AdminOrigin =
-    pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 4>;
-  type Proposal = Call;
-  type ChainId = ChainId;
-  type PalletId = ChainBridgePalletId;
-  type ProposalLifetime = ProposalLifetime;
-  type RelayerVoteThreshold = RelayerVoteThreshold;
-  type WeightInfo = ();
 }
 
 parameter_types! {
@@ -627,14 +584,27 @@ parameter_types! {
 	pub const MaxApprovals: u32 = 100;
 }
 
+pub struct TSpendOrigin<T>(core::marker::PhantomData<T>);
+// someone needs to explain how to get the origin directly, for now this wil always fail
+impl<T: frame_system::Config>
+	frame_support::traits::EnsureOrigin<<T as frame_system::Config>::Origin> for TSpendOrigin<T>
+{
+	type Success = Balance;
+	fn try_origin(
+		o: <T as frame_system::Config>::Origin,
+	) -> Result<Self::Success, <T as frame_system::Config>::Origin> {
+		Err(o)
+	}
+}
+
 impl pallet_treasury::Config for Runtime {
 	type PalletId = TreasuryPalletId;
 	type Currency = Balances;
-	type ApproveOrigin = EnsureOneOf<
+	type ApproveOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,
 		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 3, 5>,
 	>;
-	type RejectOrigin = EnsureOneOf<
+	type RejectOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,
 		pallet_collective::EnsureProportionMoreThan<AccountId, CouncilCollective, 1, 2>,
 	>;
@@ -653,6 +623,7 @@ impl pallet_treasury::Config for Runtime {
 	type SpendFunds = ();
 	type WeightInfo = pallet_treasury::weights::SubstrateWeight<Runtime>;
 	type MaxApprovals = MaxApprovals;
+	type SpendOrigin = TSpendOrigin<Self>;
 }
 
 // Configure the pallet-democracy.
@@ -699,7 +670,7 @@ impl pallet_democracy::Config for Runtime {
 		pallet_collective::EnsureProportionAtLeast<AccountId, CouncilCollective, 2, 3>;
 	// To cancel a proposal before it has been passed, the technical committee must be unanimous or
 	// Root must agree.
-	type CancelProposalOrigin = EnsureOneOf<
+	type CancelProposalOrigin = EitherOfDiverse<
 		EnsureRoot<AccountId>,
 		pallet_collective::EnsureProportionAtLeast<AccountId, TechnicalCollective, 1, 1>,
 	>;
@@ -757,13 +728,13 @@ impl parachain_staking::Config for Runtime {
 	type DefaultCollatorCommission = DefaultCollatorCommission;
 	type DefaultParachainBondReservePercent = DefaultParachainBondReservePercent;
 	/// Minimum stake required to become a collator
-	type MinCollatorStk = ConstU128< 0 >;
+	type MinCollatorStk = ConstU128<0>;
 	/// Minimum stake required to be reserved to be a candidate
-	type MinCandidateStk = ConstU128< 0 >;
+	type MinCandidateStk = ConstU128<0>;
 	/// Minimum stake required to be reserved to be a delegator
-	type MinDelegation = ConstU128< 0 >;
+	type MinDelegation = ConstU128<0>;
 	/// Minimum stake required to be reserved to be a delegator
-	type MinDelegatorStk = ConstU128< 0 >;
+	type MinDelegatorStk = ConstU128<0>;
 	type OnCollatorPayout = ();
 	type OnNewRound = ();
 	type WeightInfo = parachain_staking::weights::SubstrateWeight<Runtime>;
@@ -801,9 +772,11 @@ impl fp_self_contained::SelfContainedCall for Call {
 	fn pre_dispatch_self_contained(
 		&self,
 		info: &Self::SignedInfo,
+		dispatch_info: &DispatchInfoOf<Call>,
+		len: usize,
 	) -> Option<Result<(), TransactionValidityError>> {
 		match self {
-			Call::Ethereum(call) => call.pre_dispatch_self_contained(info),
+			Call::Ethereum(call) => call.pre_dispatch_self_contained(info, dispatch_info, len),
 			_ => None,
 		}
 	}
@@ -863,9 +836,6 @@ construct_runtime!(
 		CrowdloanRewards: pallet_crowdloan_rewards::{Pallet, Call, Storage, Config<T>, Event<T>} = 42,
 		Feeless: pallet_feeless::{Pallet, Call, Storage, Event<T>} = 48,
 		SmartAgreement: pallet_smart_agreement::{Pallet, Call, Storage, Event<T>} = 49,
-    Bridge: pallet_bridge::{Pallet, Call, Storage, Config<T>, Event<T>} = 43,
-    // 3rd party pallets
-    ChainBridge: chainbridge::{Pallet, Call, Storage, Event<T>} = 150,
 
 		// Governance Pallets
 		Council: pallet_collective::<Instance1>,
@@ -1099,6 +1069,7 @@ impl_runtime_apis! {
 				nonce,
 				access_list.unwrap_or_default(),
 				true,
+				true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|_err| sp_runtime::DispatchError::Other("Failed to create `Runner` from `pallet_evm::Error<Runtime>`")
 			)
@@ -1132,6 +1103,7 @@ impl_runtime_apis! {
 				max_priority_fee_per_gas,
 				nonce,
 				access_list.unwrap_or_default(),
+				true,
 				true,
 				config.as_ref().unwrap_or(<Runtime as pallet_evm::Config>::config()),
 			).map_err(|_err|

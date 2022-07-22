@@ -4,8 +4,6 @@
 //! DATE: 2022-05-23, STEPS: `50`, REPEAT: 20, LOW RANGE: `[]`, HIGH RANGE: `[]`
 //! EXECUTION: Some(Wasm), WASM-EXECUTION: Compiled, CHAIN: Some("dev"), DB CACHE: 1024
 
-
-
 #![allow(unused_parens)]
 #![allow(unused_imports)]
 
@@ -84,7 +82,6 @@ pub trait WeightInfo {
 /// Weights for parachain_staking using the Substrate node and recommended hardware.
 pub struct SubstrateWeight<T>(PhantomData<T>);
 impl<T: frame_system::Config> WeightInfo for SubstrateWeight<T> {
-
 	#[rustfmt::skip]
 	fn set_staking_expectations() -> Weight {
 		(18_520_000 as Weight)

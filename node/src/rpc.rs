@@ -67,7 +67,9 @@ where
 	C: ProvideRuntimeApi<Block> + StorageProvider<Block, BE> + AuxStore,
 	C: HeaderBackend<Block> + HeaderMetadata<Block, Error = BlockChainError>,
 	C: Send + Sync + 'static,
-	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
+	C::Api: sp_api::ApiExt<Block>
+		+ fp_rpc::EthereumRuntimeRPCApi<Block>
+		+ fp_rpc::ConvertTransactionRuntimeApi<Block>,
 	BE: Backend<Block> + 'static,
 	BE::State: StateBackend<BlakeTwo256>,
 {
@@ -111,13 +113,11 @@ where
 		+ 'static,
 	C: BlockchainEvents<Block>,
 	C: StorageProvider<Block, BE>,
-	C: StorageProvider<Block, BE>,
-	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: BlockBuilder<Block>,
+	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
 	C::Api: fp_rpc::EthereumRuntimeRPCApi<Block>,
-	C::Api: fp_rpc::ConvertTransactionRuntimeApi<Block>,
 	P: TransactionPool<Block = Block> + Sync + Send + 'static,
 	A: ChainApi<Block = Block> + 'static,
 {
@@ -126,7 +126,6 @@ where
 		EthPubSubApiServer, EthSigner, Net, NetApiServer, Web3, Web3ApiServer,
 	};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
-	// use substrate_frame_rpc_system::{FullSystem, SystemApi};
 	use substrate_frame_rpc_system::{System, SystemApiServer};
 
 	let mut io = jsonrpsee::RpcModule::new(());
@@ -147,8 +146,8 @@ where
 		block_data_cache,
 	} = deps;
 
-	io.merge(System::new(Arc::clone(&client), Arc::clone(&pool), deny_unsafe).into_rpc())?;
-	io.merge(TransactionPayment::new(Arc::clone(&client)).into_rpc())?;
+	io.merge(System::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
+	io.merge(TransactionPayment::new(client.clone()).into_rpc())?;
 
 	let mut signers = Vec::new();
 	if enable_dev_signer {
@@ -203,15 +202,6 @@ where
 	io.merge(
 		EthPubSub::new(pool, client, network, subscription_task_executor, overrides).into_rpc(),
 	)?;
-
-	#[cfg(feature = "manual-seal")]
-	if let Some(command_sink) = command_sink {
-		io.merge(
-			// We provide the rpc handler with the sending end of the channel to allow the rpc
-			// send EngineCommands to the background block authorship task.
-			ManualSeal::new(command_sink).into_rpc(),
-		)?;
-	}
 
 	Ok(io)
 }

@@ -365,7 +365,7 @@ where
 
 	let filter_pool: Option<FilterPool> = Some(Arc::new(Mutex::new(BTreeMap::new())));
 	let fee_history_cache: FeeHistoryCache = Arc::new(Mutex::new(BTreeMap::new()));
-	let rpc_extensions_builder = {
+	let rpc_builder = {
 		let client = client.clone();
 		let pool = transaction_pool.clone();
 		let network = network.clone();
@@ -404,7 +404,7 @@ where
 		task_manager: &mut task_manager,
 		keystore: params.keystore_container.sync_keystore(),
 		transaction_pool: transaction_pool.clone(),
-		rpc_builder: rpc_extensions_builder,
+		rpc_builder,
 		network: network.clone(),
 		system_rpc_tx,
 		telemetry: telemetry.as_mut(),

@@ -1,6 +1,6 @@
 use crate::{info_types::AgreementType, mock::*, Error};
 use frame_support::{assert_noop, assert_ok, Hashable};
-use sp_core::{H256, sr25519::Public};
+use sp_core::{sr25519::Public, H256};
 
 #[test]
 fn add_agreement_creator() {
