@@ -119,10 +119,10 @@ pub mod currency {
 	// Provide a common factor between runtimes based on a supply of tokens.
 	pub const SUPPLY_FACTOR: Balance = 100;
 
-	pub const WEI: Balance = 1;
-	pub const KILOWEI: Balance = 1_000;
-	pub const MEGAWEI: Balance = 1_000_000;
-	pub const GIGAWEI: Balance = 1_000_000_000;
+	pub const ATTOHERO: Balance = 1;
+	pub const FEMTOHERO: Balance = 1_000;
+	pub const PICOHERO: Balance = 1_000_000;
+	pub const NANOHERO: Balance = 1_000_000_000;
 	pub const MICROHERO: Balance = 1_000_000_000_000;
 	pub const MILLIHERO: Balance = 1_000_000_000_000_000;
 	pub const HERO: Balance = 1_000_000_000_000_000_000;

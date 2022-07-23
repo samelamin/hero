@@ -307,7 +307,7 @@ pub struct FixedGasPrice;
 impl FeeCalculator for FixedGasPrice {
 	fn min_gas_price() -> (U256, Weight) {
 		(
-			(1 * currency::GIGAWEI * currency::SUPPLY_FACTOR).into(),
+			(1 * currency::NANOHERO * currency::SUPPLY_FACTOR).into(),
 			1, // this number is currently arbitrary, but non-zero, requires benchmarking
 		)
 	}
@@ -604,7 +604,7 @@ parameter_types! {
 	pub const LaunchPeriod: BlockNumber = 3 * MINUTES;
 	pub const VotingPeriod: BlockNumber = 5 * MINUTES;
 	pub const FastTrackVotingPeriod: BlockNumber = 3 * MINUTES;
-	pub const MinimumDeposit: Balance = 100 * currency::WEI;
+	pub const MinimumDeposit: Balance = 100 * currency::ATTOHERO;
 	pub const EnactmentPeriod: BlockNumber = 5 * MINUTES;
 	pub const CooloffPeriod: BlockNumber = 5 * MINUTES;
 	pub const MaxProposals: u32 = 100;
