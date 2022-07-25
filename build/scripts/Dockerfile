@@ -17,9 +17,9 @@ COPY ./target/release/hero /usr/local/bin/hero-collator
 COPY ./res               /hero/res
 
 RUN hero-collator build-spec --disable-default-bootnode > /hero/res/rococo-local-parachain-plain.json \
-	&& hero-collator build-spec --chain rococo-local-parachain-plain.json --raw --disable-default-bootnode > rococo-local-parachain-2000-raw.json \
-	&& hero-collator export-genesis-wasm --chain rococo-local-parachain-2000-raw.json > para-2000-wasm \
-	&& hero-collator export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
+	&& hero-collator build-spec --chain /hero/res/rococo-local-parachain-plain.json --raw --disable-default-bootnode > /hero/res/rococo-local-parachain-2000-raw.json \
+	&& hero-collator export-genesis-wasm --chain /hero/res/rococo-local-parachain-2000-raw.json > /hero/res/para-2000-wasm \
+	&& hero-collator export-genesis-state --chain /hero/res/rococo-local-parachain-2000-raw.json > /hero/res/para-2000-genesis
 
 # minimize attack surface && test target
 # RUN rm -rf /usr/bin /usr/sbin
