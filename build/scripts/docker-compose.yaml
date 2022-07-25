@@ -167,8 +167,8 @@ services:
       # - "9715:9615"
       # - "30343:30343"
       # - "9977:9977"
-    image: gcr.io/paid-network-202104/hero-collator:0.0.1-03c6418fef8
-    command: bash -c "hero-collator --alice --collator --force-authoring --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /ip4/192.168.1.251/tcp/30333/p2p/12D3KooWK5XxHUdA37SLp6Fu9TTyDNp14LfECJQEHeW1PzJ2nrAX"
+    image: gcr.io/paid-network-202104/hero-collator:0.0.1-01b28d48b8d
+    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /ip4/192.168.1.251/tcp/30333/p2p/12D3KooWK5XxHUdA37SLp6Fu9TTyDNp14LfECJQEHeW1PzJ2nrAX"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 volumes:
