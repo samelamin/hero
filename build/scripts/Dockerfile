@@ -35,5 +35,5 @@ CMD ["hero-collator", "--alice", "--collator", "--force-authoring", \
  "--rpc-cors", "all", "--rpc-external", "--discover-local", \
  "--rpc-methods", "Unsafe", "--prometheus-external", \
  "--", "--execution", "wasm", \ 
- "--chain", "/hero/res/rococo-raw.json", "--port", "30343",\
+ "--chain", "/hero/res/rococo-custom-2-raw.json", "--port", "30343",\
  "--ws-port", "9977"]
