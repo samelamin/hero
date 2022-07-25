@@ -1,13 +1,18 @@
 //! Scheduled requests functionality for delegators
 
-use crate::pallet::{
-	BalanceOf, CandidateInfo, Config, DelegationScheduledRequests, DelegatorState, Error, Event,
-	Pallet, Round, RoundIndex, Total,
+use crate::{
+	pallet::{
+		BalanceOf, CandidateInfo, Config, DelegationScheduledRequests, DelegatorState, Error,
+		Event, Pallet, Round, RoundIndex, Total,
+	},
+	Delegator,
 };
-use crate::Delegator;
-use frame_support::ensure;
-use frame_support::traits::{Get, ReservableCurrency};
-use frame_support::{dispatch::DispatchResultWithPostInfo, RuntimeDebug};
+use frame_support::{
+	dispatch::DispatchResultWithPostInfo,
+	ensure,
+	traits::{Get, ReservableCurrency},
+	RuntimeDebug,
+};
 use parity_scale_codec::{Decode, Encode};
 use scale_info::TypeInfo;
 use sp_runtime::traits::Saturating;
@@ -65,15 +70,11 @@ impl<T: Config> Pallet<T> {
 		let mut scheduled_requests = <DelegationScheduledRequests<T>>::get(&collator);
 
 		ensure!(
-			!scheduled_requests
-				.iter()
-				.any(|req| req.delegator == delegator),
+			!scheduled_requests.iter().any(|req| req.delegator == delegator),
 			<Error<T>>::PendingDelegationRequestAlreadyExists,
 		);
 
-		let bonded_amount = state
-			.get_bond_amount(&collator)
-			.ok_or(<Error<T>>::DelegationDNE)?;
+		let bonded_amount = state.get_bond_amount(&collator).ok_or(<Error<T>>::DelegationDNE)?;
 		let now = <Round<T>>::get().current;
 		let when = now.saturating_add(T::RevokeDelegationDelay::get());
 		scheduled_requests.push(ScheduledRequest {
@@ -104,33 +105,20 @@ impl<T: Config> Pallet<T> {
 		let mut scheduled_requests = <DelegationScheduledRequests<T>>::get(&collator);
 
 		ensure!(
-			!scheduled_requests
-				.iter()
-				.any(|req| req.delegator == delegator),
+			!scheduled_requests.iter().any(|req| req.delegator == delegator),
 			<Error<T>>::PendingDelegationRequestAlreadyExists,
 		);
 
-		let bonded_amount = state
-			.get_bond_amount(&collator)
-			.ok_or(<Error<T>>::DelegationDNE)?;
-		ensure!(
-			bonded_amount > decrease_amount,
-			<Error<T>>::DelegatorBondBelowMin
-		);
+		let bonded_amount = state.get_bond_amount(&collator).ok_or(<Error<T>>::DelegationDNE)?;
+		ensure!(bonded_amount > decrease_amount, <Error<T>>::DelegatorBondBelowMin);
 		let new_amount: BalanceOf<T> = (bonded_amount - decrease_amount).into();
-		ensure!(
-			new_amount >= T::MinDelegation::get(),
-			<Error<T>>::DelegationBelowMin
-		);
+		ensure!(new_amount >= T::MinDelegation::get(), <Error<T>>::DelegationBelowMin);
 
 		// Net Total is total after pending orders are executed
 		let net_total = state.total.saturating_sub(state.less_total);
 		// Net Total is always >= MinDelegatorStk
 		let max_subtracted_amount = net_total.saturating_sub(T::MinDelegatorStk::get().into());
-		ensure!(
-			decrease_amount <= max_subtracted_amount,
-			<Error<T>>::DelegatorBondBelowMin
-		);
+		ensure!(decrease_amount <= max_subtracted_amount, <Error<T>>::DelegatorBondBelowMin);
 
 		let now = <Round<T>>::get().current;
 		let when = now.saturating_add(T::RevokeDelegationDelay::get());
@@ -180,9 +168,7 @@ impl<T: Config> Pallet<T> {
 		state: &mut Delegator<T::AccountId, BalanceOf<T>>,
 		scheduled_requests: &mut Vec<ScheduledRequest<T::AccountId, BalanceOf<T>>>,
 	) -> Option<ScheduledRequest<T::AccountId, BalanceOf<T>>> {
-		let request_idx = scheduled_requests
-			.iter()
-			.position(|req| &req.delegator == delegator)?;
+		let request_idx = scheduled_requests.iter().position(|req| &req.delegator == delegator)?;
 
 		let request = scheduled_requests.remove(request_idx);
 		let amount = request.action.amount();
@@ -204,10 +190,7 @@ impl<T: Config> Pallet<T> {
 		let request = &scheduled_requests[request_idx];
 
 		let now = <Round<T>>::get().current;
-		ensure!(
-			request.when_executable <= now,
-			<Error<T>>::PendingDelegationRequestNotDueYet
-		);
+		ensure!(request.when_executable <= now, <Error<T>>::PendingDelegationRequestNotDueYet);
 
 		match request.action {
 			DelegationAction::Revoke(amount) => {
@@ -248,7 +231,7 @@ impl<T: Config> Pallet<T> {
 					<DelegatorState<T>>::insert(&delegator, state);
 				}
 				Ok(().into())
-			}
+			},
 			DelegationAction::Decrease(_) => {
 				// remove from pending requests
 				let amount = scheduled_requests.remove(request_idx).action.amount();
@@ -299,11 +282,11 @@ impl<T: Config> Pallet<T> {
 						} else {
 							// must rm entire delegation if bond.amount <= less or cancel request
 							Err(<Error<T>>::DelegationBelowMin.into())
-						};
+						}
 					}
 				}
 				Err(<Error<T>>::DelegationDNE.into())
-			}
+			},
 		}
 	}
 
@@ -332,7 +315,7 @@ impl<T: Config> Pallet<T> {
 				Some(revoke_req) if matches!(revoke_req.action, DelegationAction::Revoke(_)) => {
 					existing_revoke_count += 1;
 					revoke_req // re-insert the same Revoke request
-				}
+				},
 				_ => ScheduledRequest {
 					delegator: delegator.clone(),
 					action: DelegationAction::Revoke(bonded_amount.clone()),
@@ -346,7 +329,7 @@ impl<T: Config> Pallet<T> {
 		}
 
 		if existing_revoke_count == state.delegations.0.len() {
-			return Err(<Error<T>>::DelegatorAlreadyLeaving.into());
+			return Err(<Error<T>>::DelegatorAlreadyLeaving.into())
 		}
 
 		updated_scheduled_requests
@@ -431,10 +414,7 @@ impl<T: Config> Pallet<T> {
 				.ok_or(<Error<T>>::DelegatorNotLeaving)?;
 			let request = &scheduled_requests[request_idx];
 
-			ensure!(
-				request.when_executable <= now,
-				<Error<T>>::DelegatorCannotLeaveYet
-			);
+			ensure!(request.when_executable <= now, <Error<T>>::DelegatorCannotLeaveYet);
 
 			validated_scheduled_requests.push((bond.clone(), scheduled_requests, request_idx))
 		}
@@ -483,9 +463,8 @@ impl<T: Config> Pallet<T> {
 	) {
 		let mut scheduled_requests = <DelegationScheduledRequests<T>>::get(collator);
 
-		let maybe_request_idx = scheduled_requests
-			.iter()
-			.position(|req| &req.delegator == delegator);
+		let maybe_request_idx =
+			scheduled_requests.iter().position(|req| &req.delegator == delegator);
 
 		if let Some(request_idx) = maybe_request_idx {
 			let request = scheduled_requests.remove(request_idx);
@@ -507,11 +486,9 @@ impl<T: Config> Pallet<T> {
 		collator: &T::AccountId,
 		delegator: &T::AccountId,
 	) -> bool {
-		<DelegationScheduledRequests<T>>::get(collator)
-			.iter()
-			.any(|req| {
-				&req.delegator == delegator && matches!(req.action, DelegationAction::Revoke(_))
-			})
+		<DelegationScheduledRequests<T>>::get(collator).iter().any(|req| {
+			&req.delegator == delegator && matches!(req.action, DelegationAction::Revoke(_))
+		})
 	}
 }
 
@@ -524,10 +501,7 @@ mod tests {
 	fn test_cancel_request_with_state_removes_request_for_correct_delegator_and_updates_state() {
 		let mut state = Delegator {
 			id: 1,
-			delegations: OrderedSet::from(vec![Bond {
-				amount: 100,
-				owner: 2,
-			}]),
+			delegations: OrderedSet::from(vec![Bond { amount: 100, owner: 2 }]),
 			total: 100,
 			less_total: 100,
 			status: crate::DelegatorStatus::Active,
@@ -567,10 +541,7 @@ mod tests {
 			state,
 			Delegator {
 				id: 1,
-				delegations: OrderedSet::from(vec![Bond {
-					amount: 100,
-					owner: 2,
-				}]),
+				delegations: OrderedSet::from(vec![Bond { amount: 100, owner: 2 }]),
 				total: 100,
 				less_total: 0,
 				status: crate::DelegatorStatus::Active,
@@ -582,10 +553,7 @@ mod tests {
 	fn test_cancel_request_with_state_does_nothing_when_request_does_not_exist() {
 		let mut state = Delegator {
 			id: 1,
-			delegations: OrderedSet::from(vec![Bond {
-				amount: 100,
-				owner: 2,
-			}]),
+			delegations: OrderedSet::from(vec![Bond { amount: 100, owner: 2 }]),
 			total: 100,
 			less_total: 100,
 			status: crate::DelegatorStatus::Active,
@@ -611,10 +579,7 @@ mod tests {
 			state,
 			Delegator {
 				id: 1,
-				delegations: OrderedSet::from(vec![Bond {
-					amount: 100,
-					owner: 2,
-				}]),
+				delegations: OrderedSet::from(vec![Bond { amount: 100, owner: 2 }]),
 				total: 100,
 				less_total: 100,
 				status: crate::DelegatorStatus::Active,

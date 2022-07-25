@@ -49,11 +49,7 @@ fn create_funded_delegator<T: Config>(
 	collator_delegator_count: u32,
 ) -> Result<T::AccountId, &'static str> {
 	let (user, total) = create_funded_user::<T>(string, n, extra);
-	let bond = if min_bond {
-		min_delegator_stk::<T>()
-	} else {
-		total
-	};
+	let bond = if min_bond { min_delegator_stk::<T>() } else { total };
 	Pallet::<T>::delegate(
 		RawOrigin::Signed(user.clone()).into(),
 		collator,
@@ -73,16 +69,8 @@ fn create_funded_collator<T: Config>(
 	candidate_count: u32,
 ) -> Result<T::AccountId, &'static str> {
 	let (user, total) = create_funded_user::<T>(string, n, extra);
-	let bond = if min_bond {
-		min_candidate_stk::<T>()
-	} else {
-		total
-	};
-	Pallet::<T>::join_candidates(
-		RawOrigin::Signed(user.clone()).into(),
-		bond,
-		candidate_count,
-	)?;
+	let bond = if min_bond { min_candidate_stk::<T>() } else { total };
+	Pallet::<T>::join_candidates(RawOrigin::Signed(user.clone()).into(), bond, candidate_count)?;
 	Ok(user)
 }
 
@@ -1060,15 +1048,12 @@ benchmarks! {
 
 #[cfg(test)]
 mod tests {
-	use crate::benchmarks::*;
-	use crate::mock::Test;
+	use crate::{benchmarks::*, mock::Test};
 	use frame_support::assert_ok;
 	use sp_io::TestExternalities;
 
 	pub fn new_test_ext() -> TestExternalities {
-		let t = frame_system::GenesisConfig::default()
-			.build_storage::<Test>()
-			.unwrap();
+		let t = frame_system::GenesisConfig::default().build_storage::<Test>().unwrap();
 		TestExternalities::new(t)
 	}
 
@@ -1297,8 +1282,4 @@ mod tests {
 	}
 }
 
-impl_benchmark_test_suite!(
-	Pallet,
-	crate::benchmarks::tests::new_test_ext(),
-	crate::mock::Test
-);
+impl_benchmark_test_suite!(Pallet, crate::benchmarks::tests::new_test_ext(), crate::mock::Test);

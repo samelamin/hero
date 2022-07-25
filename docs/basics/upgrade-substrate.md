@@ -304,7 +304,7 @@ __Double check!__
 # here the branch needs a bump in version
 sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.22", default-features = false }
 # to
-sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.24", default-features = false }
+sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.25", default-features = false }
 ```
 
 Make the apropriate fixes where needed, and __compile the code__ to update `Cargo.lock`
@@ -322,9 +322,9 @@ A pull request is not required, so long as a branch exists you can use it to pat
 Search and replace dependancies to  update Polkadot to new release version  the rest to the new Polkadot branch.
 ```toml
 # Polkadot dependancies have ` branch = "release-v<VERSION>" `
-polkadot-cli =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.24" }
+polkadot-cli =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
 # Things that depend on polkadot have ` branch = "polkadot-v<VERSION> `
-frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.24" }
+frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.25" }
 ```
 
 

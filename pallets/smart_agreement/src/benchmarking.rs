@@ -5,14 +5,8 @@ use super::*;
 use crate::info_types::AgreementType;
 #[allow(unused)]
 use crate::Pallet as SmartAgreement;
-use frame_benchmarking::{
-	benchmarks,
-	impl_benchmark_test_suite,
-	whitelisted_caller
-};
-use frame_support::{
-	sp_runtime::traits::Hash,
-};
+use frame_benchmarking::{benchmarks, impl_benchmark_test_suite, whitelisted_caller};
+use frame_support::sp_runtime::traits::Hash;
 use frame_system::RawOrigin;
 
 benchmarks! {

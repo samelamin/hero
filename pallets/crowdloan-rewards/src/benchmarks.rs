@@ -16,7 +16,6 @@
 
 #![cfg(feature = "nada")]
 
-
 use crate::{BalanceOf, Call, Pallet, WRAPPED_BYTES_POSTFIX, WRAPPED_BYTES_PREFIX};
 use cumulus_pallet_parachain_system::Pallet as RelayPallet;
 use cumulus_primitives_core::{

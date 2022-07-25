@@ -65,7 +65,7 @@ cd polkadot
 ```
 * Checkout the latest working commits:
 ```bash
-git checkout release-v0.9.24
+git checkout release-v0.9.25
 ```
 * Build the relay chain:
 ```bash
