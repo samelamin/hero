@@ -7,14 +7,15 @@ services:
   #     - "9933:9933"
   #     - "9944:9944"
   #     - "9615:9615"
-  #   image: parity/polkadot:latest
+  #   image: parity/polkadot:v0.9.24
   #   volumes:
   #     - "rococo-data-alice:/data"
   #     - "./../../res:/data/res"
   #   command: |
   #     --alice
-  #     --chain data/res/rococo-raw.json
+  #     --chain rococo-local
   #     --validator
+  #     --force-authoring
   #     --base-path /data
   #     --port 30333
   #     --ws-port 9944
@@ -25,6 +26,18 @@ services:
   #     --rpc-methods Unsafe
   #     --prometheus-external
   #     --discover-local
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 2048M
+  #       reservations:
+  #         cpus: '0.50'
+  #         memory: 1024M
+  #   networks:
+  #     testing_net:
+  #       ipv4_address: 172.28.1.1
+
 
   # bob:
   #   container_name: bob
@@ -33,17 +46,36 @@ services:
   #     - "9934:9933"
   #     - "9945:9944"
   #     - "9616:9615"
-  #   image: parity/polkadot:latest
+  #   image: parity/polkadot:v0.9.24
   #   volumes:
   #     - "rococo-data-bob:/data"
   #     - "./../../res:/data/res"
   #   command: |
   #     --bob
-  #     --chain data/res/rococo-raw.json
+  #     --chain rococo-local
   #     --validator
+  #     --force-authoring
   #     --base-path /data
   #     --port 30333
   #     --ws-port 9944
+  #     --unsafe-ws-external
+  #     --unsafe-rpc-external
+  #     --rpc-cors all
+  #     --rpc-external
+  #     --rpc-methods Unsafe
+  #     --prometheus-external
+  #     --discover-local
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         cpus: '1'
+  #         memory: 2048M
+  #       reservations:
+  #         cpus: '0.50'
+  #         memory: 1024M
+  #   networks:
+  #     testing_net:
+  #       ipv4_address: 172.28.1.2
 
   # charlie:
   #   container_name: charlie
@@ -151,7 +183,10 @@ services:
       - "9715:9615"
       - "30343:30343"
       - "9977:9977"
-    image: gcr.io/paid-network-202104/hero-collator:0.0.1-594c4bfd40d
+    image: gcr.io/paid-network-202104/hero-collator:latest
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.3
 
 volumes:
   rococo-data-alice:
@@ -159,3 +194,10 @@ volumes:
   rococo-data-charlie:
   prometheus_data:
   grafana_data:
+
+networks:
+  testing_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
