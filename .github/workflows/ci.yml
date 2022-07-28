@@ -55,7 +55,7 @@ jobs:
           docker push ${{ env.IMAGE }}
 
   run-zombienet-tests:
-    if: true
+    if: false
     needs: [build-hero-collator]
     runs-on: gcp-self-hosted-runner
     env:

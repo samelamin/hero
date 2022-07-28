@@ -26,6 +26,11 @@ services:
   #     --rpc-methods Unsafe
   #     --prometheus-external
   #     --discover-local
+  #   ulimits:
+  #     &a1
+  #     nofile:
+  #       soft: 65536
+  #       hard: 65536
   #   networks:
   #     testing_net:
   #       ipv4_address: 172.28.1.1
@@ -43,6 +48,7 @@ services:
   #     - "./../../res:/data/res"
   #   command: |
   #     --bob
+  #     --name=bob
   #     --chain rococo-local
   #     --validator
   #     --force-authoring
@@ -56,6 +62,7 @@ services:
   #     --rpc-methods Unsafe
   #     --prometheus-external
   #     --discover-local
+  #   ulimits: *a1  
   #   networks:
   #     testing_net:
   #       ipv4_address: 172.28.1.2
@@ -162,13 +169,13 @@ services:
     platform: linux/amd64
     network_mode: host
     # ports:
-      # - "40333:40333"
-      # - "8844:8844"
-      # - "9715:9615"
-      # - "30343:30343"
-      # - "9977:9977"
-    image: gcr.io/paid-network-202104/hero-collator:0.0.1-e862ae018b4
-    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --base-path /tmp/parachain/alice --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /ip4/192.168.1.251/tcp/30333/p2p/12D3KooWK5XxHUdA37SLp6Fu9TTyDNp14LfECJQEHeW1PzJ2nrAX"
+    #   - "40333:40333"
+    #   - "8844:8844"
+    #   - "9715:9615"
+    #   - "30343:30343"
+    #   - "9977:9977"
+    image: gcr.io/paid-network-202104/hero-collator:0.0.1-db94d728119
+    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --tmp --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /ip4/192.168.1.251/tcp/30333/p2p/12D3KooWSKYjbuHk7jhD5zPeacBGMLSnSCz7UWoUQCGBCmC4kdrp"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
