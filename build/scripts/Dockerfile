@@ -7,7 +7,7 @@ LABEL description="Docker image for Hero" \
 	io.hero.image.description="Hero: a substrate blockchain" \
 	io.hero.image.documentation="https://github.com/PAIDNetwork/hero"
 
-RUN apt update && apt install -y telnet
+RUN apt update && apt install -y telnet curl wget
 
 # create user to run target with
 RUN useradd -m -u 1000 -U -s /bin/bash -d /hero hero
@@ -24,7 +24,7 @@ RUN hero-collator build-spec --disable-default-bootnode > /hero/res/rococo-local
 # minimize attack surface && test target
 # RUN rm -rf /usr/bin /usr/sbin
 
-USER hero
+# USER hero
 
 EXPOSE 40333-40335 8844-8848 6965-6969 30343-30345 9977-9979
 

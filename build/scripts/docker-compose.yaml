@@ -1,39 +1,36 @@
 version: '3.2'
 services:
-  # alice:
-  #   container_name: alice
-  #   ports:
-  #     - "30333:30333"
-  #     - "9933:9933"
-  #     - "9944:9944"
-  #     - "9615:9615"
-  #   image: parity/polkadot:v0.9.24
-  #   volumes:
-  #     - "rococo-data-alice:/data"
-  #     - "./../../res:/data/res"
-  #   command: |
-  #     --alice
-  #     --chain rococo-local
-  #     --validator
-  #     --force-authoring
-  #     --base-path /data
-  #     --port 30333
-  #     --ws-port 9944
-  #     --unsafe-ws-external
-  #     --unsafe-rpc-external
-  #     --rpc-cors all
-  #     --rpc-external
-  #     --rpc-methods Unsafe
-  #     --prometheus-external
-  #     --discover-local
-  #   ulimits:
-  #     &a1
-  #     nofile:
-  #       soft: 65536
-  #       hard: 65536
-  #   networks:
-  #     testing_net:
-  #       ipv4_address: 172.28.1.1
+  alice:
+    container_name: alice
+    ports:
+      - "30333:30333"
+      - "9922:9933"
+      - "9944:9944"
+      - "9615:9615"
+    image: parity/polkadot:v0.9.24
+    volumes:
+      - "rococo-data-alice:/data"
+      - "./../../res:/data/res"
+    command: |
+      --alice
+      --chain /data/res/rococo-custom-2-raw.json
+      --validator
+      --force-authoring
+      --base-path /data
+      --port 30333
+      --ws-port 9944
+      --unsafe-ws-external
+      --unsafe-rpc-external
+      --rpc-cors all
+      --rpc-external
+      --rpc-methods Unsafe
+      --prometheus-external
+      --discover-local
+    ulimits:
+      &a1
+      nofile:
+        soft: 65536
+        hard: 65536
 
   # bob:
   #   container_name: bob
@@ -167,6 +164,8 @@ services:
   hero:
     container_name: hero_collator
     platform: linux/amd64
+    depends_on: 
+    - alice
     network_mode: host
     # ports:
     #   - "40333:40333"
@@ -175,7 +174,7 @@ services:
     #   - "30343:30343"
     #   - "9977:9977"
     image: gcr.io/paid-network-202104/hero-collator:0.0.1-db94d728119
-    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --tmp --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /ip4/192.168.1.251/tcp/30333/p2p/12D3KooWSKYjbuHk7jhD5zPeacBGMLSnSCz7UWoUQCGBCmC4kdrp"
+    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json -d /tmp/hero --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /dns4/alice/tcp/30333/p2p/12D3KooWCnPbSd61Kr6SfGsREEP3EroLYD1gxoA1P5mKJFp6Vcov"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -185,13 +184,6 @@ volumes:
   rococo-data-charlie:
   prometheus_data:
   grafana_data:
-
-networks:
-  testing_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
 
 # alice 12D3KooWLd7Lw3j3ujGT7uooVDFzruWeuocmTnnSDtzisAmRu2Mp
 # bob 12D3KooWKhzh29JErHotvrT6q8sy58K4ozuPjJo17Tfcb4eAY9VN
