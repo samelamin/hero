@@ -83,6 +83,8 @@ polkadot-cli =        { git = "https://github.com/paritytech/polkadot", branch =
 polkadot-parachain =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
 polkadot-primitives = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
 polkadot-service =    { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
+polkadot-test-service = { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
+parachain-staking = 	{ path = "../pallets/parachain-staking",   default-features = false }
 xcm =                 { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25", default-features = false }
 
 # Cumulus Dependencies

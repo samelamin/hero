@@ -2,16 +2,17 @@ use cumulus_primitives_core::ParaId;
 use hex_literal::hex;
 
 use hero_runtime::{
-	AccountId, AuraId, EVMConfig, EthereumConfig, GenesisConfig, Signature, SudoConfig,
+	AccountId, AuraId, Balance, EVMConfig, EthereumConfig, GenesisConfig, Signature, SudoConfig,
 	EXISTENTIAL_DEPOSIT,
 };
+use parachain_staking::{InflationInfo, Range};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
 use sp_core::{sr25519, Pair, Public, H160, U256};
 use sp_runtime::{
 	traits::{IdentifyAccount, Verify},
-	AccountId32,
+	AccountId32, Perbill,
 };
 use std::str::FromStr;
 
@@ -65,6 +66,24 @@ where
 /// The input must be a tuple of individual keys (a single arg for now since we have just one key).
 pub fn template_session_keys(keys: AuraId) -> hero_runtime::SessionKeys {
 	hero_runtime::SessionKeys { aura: keys }
+}
+
+pub fn inflation_config(blocks_per_round: u32) -> InflationInfo<Balance> {
+	/// Convert an annual inflation to a round inflation
+	/// `round = pow(1+annual, 1/rounds_per_year) - 1`
+	fn to_round_inflation(annual: Range<Perbill>, blocks_per_round: u32) -> Range<Perbill> {
+		use parachain_staking::inflation::{perbill_annual_to_perbill_round, BLOCKS_PER_YEAR};
+		perbill_annual_to_perbill_round(annual, BLOCKS_PER_YEAR / blocks_per_round)
+	}
+	let fivepercent = Perbill::from_percent(5);
+	let annual = Range { min: fivepercent, ideal: fivepercent, max: fivepercent };
+
+	InflationInfo {
+		// We have no staking expectations since inflation range is a singular value
+		expect: Range { min: 0, ideal: 0, max: 0 },
+		annual,
+		round: to_round_inflation(annual, blocks_per_round),
+	}
 }
 
 pub fn development_config() -> ChainSpec {
@@ -321,14 +340,10 @@ fn testnet_genesis(
 			balances: endowed_accounts.iter().cloned().map(|k| (k, 1 << 60)).collect(),
 		},
 		parachain_info: hero_runtime::ParachainInfoConfig { parachain_id: id },
-		collator_selection: hero_runtime::CollatorSelectionConfig {
-			invulnerables: invulnerables.iter().cloned().map(|(acc, _)| acc).collect(),
-			candidacy_bond: EXISTENTIAL_DEPOSIT * 16,
-			..Default::default()
-		},
 		session: hero_runtime::SessionConfig {
 			keys: invulnerables
-				.into_iter()
+				.iter()
+				.cloned()
 				.map(|(acc, aura)| {
 					(
 						acc.clone(),                 // account id
@@ -372,6 +387,14 @@ fn testnet_genesis(
 		technical_committee: Default::default(),
 		democracy: Default::default(),
 		treasury: Default::default(),
-		parachain_staking: Default::default(),
+		parachain_staking: hero_runtime::ParachainStakingConfig {
+			candidates: invulnerables
+				.iter()
+				.cloned()
+				.map(|(acc, _)| (acc, hero_runtime::MinCollatorStk::get()))
+				.collect(),
+			delegations: vec![],
+			inflation_config: inflation_config(hero_runtime::DefaultBlocksPerRound::get()),
+		},
 	}
 }
