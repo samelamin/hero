@@ -13,7 +13,34 @@ env:
   K3S_VERSION: "v1.21.2-k3s1"
 
 jobs:
+  quality:
+    runs-on: gcp-self-hosted-runner
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+
+      - name: 🫠 rustfmt 🫠
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: --check
+
+      - name: 📎 clippy 📎
+        uses: actions-rs/cargo@v1
+        with:
+          command: clippy
+
+      - name: 🃏 check 🃏
+        uses: actions-rs/cargo@v1
+        with:
+          command: check
+
   build-hero-collator:
+    needs: [quality]
     if: true
     runs-on: gcp-self-hosted-runner
     outputs:
@@ -40,7 +67,7 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          
+
       - name: 🤖 Building Collator 🤖
         if: true
         run: |
