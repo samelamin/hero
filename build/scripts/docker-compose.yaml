@@ -4,7 +4,7 @@ services:
     container_name: alice
     ports:
       - "30333:30333"
-      - "9922:9933"
+      - "9933:9933"
       - "9944:9944"
       - "9615:9615"
     image: parity/polkadot:v0.9.24
@@ -13,17 +13,16 @@ services:
       - "./../../res:/data/res"
     command: |
       --alice
+      --name alice
       --chain /data/res/rococo-custom-2-raw.json
       --validator
       --force-authoring
       --base-path /data
-      --port 30333
-      --ws-port 9944
       --unsafe-ws-external
       --unsafe-rpc-external
       --rpc-cors all
       --rpc-external
-      --rpc-methods Unsafe
+      --rpc-methods=unsafe
       --prometheus-external
       --discover-local
     ulimits:
@@ -32,159 +31,173 @@ services:
         soft: 65536
         hard: 65536
 
-  # bob:
-  #   container_name: bob
-  #   ports:
-  #     - "30334:30333"
-  #     - "9934:9933"
-  #     - "9945:9944"
-  #     - "9616:9615"
-  #   image: parity/polkadot:v0.9.24
-  #   volumes:
-  #     - "rococo-data-bob:/data"
-  #     - "./../../res:/data/res"
-  #   command: |
-  #     --bob
-  #     --name=bob
-  #     --chain rococo-local
-  #     --validator
-  #     --force-authoring
-  #     --base-path /data
-  #     --port 30333
-  #     --ws-port 9944
-  #     --unsafe-ws-external
-  #     --unsafe-rpc-external
-  #     --rpc-cors all
-  #     --rpc-external
-  #     --rpc-methods Unsafe
-  #     --prometheus-external
-  #     --discover-local
-  #   ulimits: *a1  
-  #   networks:
-  #     testing_net:
-  #       ipv4_address: 172.28.1.2
+  bob:
+    container_name: bob
+    ports:
+      - "30334:30333"
+      - "9934:9933"
+      - "9945:9944"
+      - "9616:9615"
+    image: parity/polkadot:v0.9.24
+    volumes:
+      - "rococo-data-bob:/data"
+      - "./../../res:/data/res"
+    command: |
+      --bob
+      --name=bob
+      --chain /data/res/rococo-custom-2-raw.json
+      --validator
+      --force-authoring
+      --base-path /data
+      --unsafe-ws-external
+      --unsafe-rpc-external
+      --rpc-cors all
+      --rpc-external
+      --rpc-methods=unsafe
+      --prometheus-external
+      --discover-local
+    ulimits: *a1  
 
-  # charlie:
-  #   container_name: charlie
-  #   ports:
-  #     - "30335:30333"
-  #     - "9935:9933"
-  #     - "9946:9944"
-  #     - "9617:9615"
-  #   image: parity/polkadot:latest
-  #   volumes:
-  #     - "rococo-data-charlie:/data"
-  #     - "./../../res:/data/res"
-  #   command: |
-  #     --charlie
-  #     --chain data/res/rococo-raw.json
-  #     --validator
-  #     --base-path /data
-  #     --port 30333
-  #     --ws-port 9944
-  
-  # frontend:
-  #   container_name: frontend
-  #   image: jacogr/polkadot-js-apps:latest
-  #   ports:
-  #     - "80:80"
- 
-  # # https://github.com/vegasbrianc/prometheus/blob/master/docker-compose.yml
-  # prometheus:
-  #   container_name: prometheus
-  #   image: prom/prometheus:v2.36.2
-  #   volumes:
-  #     - ./prometheus/:/etc/prometheus/
-  #     - prometheus_data:/prometheus
-  #   command:
-  #     - '--config.file=/etc/prometheus/prometheus.yml'
-  #     - '--storage.tsdb.path=/prometheus'
-  #     - '--web.console.libraries=/usr/share/prometheus/console_libraries'
-  #     - '--web.console.templates=/usr/share/prometheus/consoles'
-  #   ports:
-  #     - 9090:9090
+  charlie:
+    container_name: charlie
+    ports:
+      - "30234:30333"
+      - "9924:9933"
+      - "9925:9944"
+      - "9626:9615"
+    image: parity/polkadot:v0.9.24
+    volumes:
+      - "rococo-data-charlie:/data"
+      - "./../../res:/data/res"
+    command: |
+      --charlie
+      --name=charlie
+      --chain /data/res/rococo-custom-2-raw.json
+      --validator
+      --force-authoring
+      --base-path /data
+      --unsafe-ws-external
+      --unsafe-rpc-external
+      --rpc-cors all
+      --rpc-external
+      --rpc-methods=unsafe
+      --prometheus-external
+      --discover-local
+    ulimits: *a1  
 
-  # grafana:
-  #   container_name: grafana
-  #   user: "472"
-  #   image: grafana/grafana
-  #   depends_on:
-  #     - prometheus
-  #   env_file:
-  #     - ./grafana/config.monitoring
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - grafana_data:/var/lib/grafana
-  #     - ./grafana/provisioning/:/etc/grafana/provisioning/
-
-  # alertmanager:
-  #   container_name: alertmanager
-  #   image: prom/alertmanager
-  #   ports:
-  #     - 9093:9093
-  #   volumes:
-  #     - ./alertmanager/:/etc/alertmanager/
-  #   command:
-  #     - '--config.file=/etc/alertmanager/config.yml'
-  #     - '--storage.path=/alertmanager'
-  
-  # node-exporter:
-  #   container_name: node-exporter
-  #   image: quay.io/prometheus/node-exporter:latest
-  #   volumes:
-  #     - /proc:/host/proc:ro
-  #     - /sys:/host/sys:ro
-  #     - /:/rootfs:ro
-  #   command:
-  #     - "--web.listen-address=:9100"
-  #     - "--path.procfs=/host/proc"
-  #     - "--path.sysfs=/host/sys"
-  #     - "--path.rootfs=/rootfs" # Necessary for collecting host filesystem metrics.
-  #     - "--collector.filesystem.ignored-mount-points='^/(sys|proc|dev|host|etc|rootfs/var/lib/docker/containers|rootfs/var/lib/docker/overlay2|rootfs/run/docker/netns|rootfs/var/lib/docker/aufs)($$|/)'"
-  #   ports:
-  #     - 9100:9100
-  #     # mode: host
-
-  #   restart: always
-
-  # cadvisor:
-  #   image: gcr.io/cadvisor/cadvisor
-  #   volumes:
-  #     - /:/rootfs:ro
-  #     - /var/run:/var/run:rw
-  #     - /sys:/sys:ro
-  #     - /var/lib/docker/:/var/lib/docker:ro
-  #   ports:
-  #     - 8080:8080
-  #   restart: always
-  #   deploy:
-  #     mode: global
-  
-  hero:
-    container_name: hero_collator
+  hero-0:
+    container_name: hero-0
     platform: linux/amd64
     depends_on: 
     - alice
-    network_mode: host
-    # ports:
-    #   - "40333:40333"
-    #   - "8844:8844"
-    #   - "9715:9615"
-    #   - "30343:30343"
-    #   - "9977:9977"
-    image: gcr.io/paid-network-202104/hero-collator:0.0.1-db94d728119
-    command: bash -c "hero-collator --alice --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json -d /tmp/hero --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977 --bootnodes /dns4/alice/tcp/30333/p2p/12D3KooWCnPbSd61Kr6SfGsREEP3EroLYD1gxoA1P5mKJFp6Vcov"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+    - bob
+    - charlie
+    ports:
+      - "40333:40333"
+      - "8844:8844"
+      - "9715:9615"
+      - "30343:30343"
+      - "9977:9977"
+    image: gcr.io/paid-network-202104/hero-collator:0.0.1-9975804e0cf
+    volumes:
+      - "hero-data-dave:/data"
+    command: bash -c "hero-collator --dave --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --base-path /tmp/hero --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977"
+    ulimits: *a1  
 
+  hero-1:
+    container_name: hero-1
+    platform: linux/amd64
+    depends_on: 
+    - alice
+    - bob
+    ports:
+      - "40334:40333"
+      - "8845:8844"
+      - "9716:9615"
+      - "30345:30343"
+      - "9987:9977"
+    image: gcr.io/paid-network-202104/hero-collator:0.0.1-9975804e0cf
+    volumes:
+      - "hero-data-eve:/data"
+    command: bash -c "hero-collator --eve --collator --force-authoring --chain /hero/res/rococo-local-parachain-2000-raw.json --base-path /tmp/hero --port 40333 --ws-port 8844 --unsafe-ws-external --unsafe-rpc-external --rpc-cors all --rpc-external --discover-local --rpc-methods Unsafe --prometheus-external -- --execution wasm --chain /hero/res/rococo-custom-2-raw.json --port 30343 --ws-port 9977"
+    ulimits: *a1  
+
+  prometheus:
+    container_name: prometheus
+    image: prom/prometheus:v2.36.2
+    volumes:
+      - ./prometheus/:/etc/prometheus/
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+
+  grafana:
+    container_name: grafana
+    user: "472"
+    image: grafana/grafana
+    depends_on:
+      - prometheus
+    env_file:
+      - ./grafana/config.monitoring
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/:/etc/grafana/provisioning/
+  
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter:latest
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command: 
+      - '--path.procfs=/host/proc' 
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    ports:
+      - 9100:9100
+    restart: unless-stopped
+    deploy:
+      mode: global
+
+  alertmanager:
+    container_name: alertmanager
+    image: prom/alertmanager
+    ports:
+      - 9093:9093
+    volumes:
+      - ./alertmanager/:/etc/alertmanager/
+    command:
+      - '--config.file=/etc/alertmanager/config.yml'
+      - '--storage.path=/alertmanager'
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    container_name: cadvisor
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 8080:8080
+    restart: always
+    deploy:
+      mode: global
+  
 volumes:
   rococo-data-alice:
   rococo-data-bob:
   rococo-data-charlie:
+  hero-data-dave:
+  hero-data-eve:
   prometheus_data:
   grafana_data:
-
-# alice 12D3KooWLd7Lw3j3ujGT7uooVDFzruWeuocmTnnSDtzisAmRu2Mp
-# bob 12D3KooWKhzh29JErHotvrT6q8sy58K4ozuPjJo17Tfcb4eAY9VN
-# https://github.com/paritytech/polkadot/blob/master/doc/docker.md
