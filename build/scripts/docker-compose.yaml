@@ -7,7 +7,7 @@ services:
       - "9933:9933"
       - "9944:9944"
       - "9615:9615"
-    image: parity/polkadot:v0.9.24
+    image: parity/polkadot:v0.9.25
     volumes:
       - "rococo-data-alice:/data"
       - "./../../res:/data/res"
@@ -27,9 +27,10 @@ services:
       --discover-local
     ulimits:
       &a1
+      nproc: 65535
       nofile:
-        soft: 65536
-        hard: 65536
+        soft: 26677
+        hard: 46677
 
   bob:
     container_name: bob
@@ -38,7 +39,7 @@ services:
       - "9934:9933"
       - "9945:9944"
       - "9616:9615"
-    image: parity/polkadot:v0.9.24
+    image: parity/polkadot:v0.9.25
     volumes:
       - "rococo-data-bob:/data"
       - "./../../res:/data/res"
@@ -65,7 +66,7 @@ services:
       - "9924:9933"
       - "9925:9944"
       - "9626:9615"
-    image: parity/polkadot:v0.9.24
+    image: parity/polkadot:v0.9.25
     volumes:
       - "rococo-data-charlie:/data"
       - "./../../res:/data/res"

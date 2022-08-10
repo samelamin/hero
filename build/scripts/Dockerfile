@@ -24,7 +24,7 @@ RUN hero-collator build-spec --disable-default-bootnode > /hero/res/rococo-local
 # minimize attack surface && test target
 # RUN rm -rf /usr/bin /usr/sbin
 
-# USER hero
+USER hero
 
 EXPOSE 40333-40335 8844-8848 6965-6969 30343-30345 9977-9979
 
