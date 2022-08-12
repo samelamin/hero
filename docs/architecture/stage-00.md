@@ -58,23 +58,18 @@ the wheel.
 
 ### `ServiceAgreement`
 
-The actual agreement logic for binding escrow, holding it for the appropriate time and releasing or extending the binding period based on events.
+See [glossary](glossary.md/#serviceagreement)
 
 ### Escrow
 
-Is a stash account that holds funds under control of solely the contract logic.
+See [glossary](glossary.md/#escrow)
 
-#### Ordinary Arbiter
+#### Arbiter
 
-An ordinary arbiter is an arbiter that does not have any requirements regarding education or qualification beyond its identity being verified and sufficient escrow being put down. Sufficient here determines eligibility for certain contract values.
+See [glossary](glossary.md/#arbiter)
+
 
 Ordinary arbiters register themselves to be registered to be available within a certain time frame to take on casting their vote to resolve a dispute one way or another.
-
-### Professional Arbiters
-
-Professionally trained arbiters with i.e. a law degree or similar on the relevant jurisdictions. These must be verified and will only be available for appeals but not regular contract disputes.
-
-No verification is done at this stage, they are flagged as being _professionals_ manually.
 
 ### Contract Disputes
 
