@@ -1,7 +1,7 @@
 [package]
 name = "hero"
 version = "0.0.1"
-authors = ["PAID Network DevHub <https://github.com/PAIDNetwork>"]
+authors = [ "PAID Network DevHub <https://github.com/PAIDNetwork>" ]
 build = "build.rs"
 description = "Hero is a Polkadot parachain on which can deploy solidity smart contracts."
 edition = "2021"
@@ -16,13 +16,13 @@ path = "src/main.rs"
 
 [dependencies]
 async-trait = "0.1"
-clap = { version = "3.2.5", features = ["derive"] }
+clap = { version = "3.2.5", features = [ "derive" ] }
 derive_more = "0.99.2"
 log = "0.4.17"
 codec = { package = "parity-scale-codec", version = "3.1", features = [
 	"derive",
 ] }
-serde = { version = "1.0.137", features = ["derive"] }
+serde = { version = "1.0.137", features = [ "derive" ] }
 hex-literal = "0.3.4"
 structopt = "0.3.8"
 serde_json = "1.0"
@@ -34,7 +34,7 @@ tracing-core = "0.1.26"
 # RPC related Dependencies
 jsonrpc-core = "18.0.0"
 jsonrpc-pubsub = "18.0.0"
-jsonrpsee = { version = "0.14.0", features = ["server", "macros"] }
+jsonrpsee = { version = "0.14.0", features = [ "server", "macros" ] }
 
 # Local Parachain Runtime
 hero-runtime = { path = "../runtime" }
@@ -126,7 +126,7 @@ fc-rpc = { git = "https://github.com/paritytech/frontier", branch = "master" }
 fc-rpc-core = { git = "https://github.com/paritytech/frontier", branch = "master" }
 
 [package.metadata.docs.rs]
-targets = ["x86_64-unknown-linux-gnu"]
+targets = [ "x86_64-unknown-linux-gnu" ]
 
 [build-dependencies]
 substrate-build-script-utils = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.25" }
@@ -136,4 +136,4 @@ runtime-benchmarks = [
 	"hero-runtime/runtime-benchmarks",
 	"polkadot-cli/runtime-benchmarks",
 ]
-try-runtime = ["hero-runtime/try-runtime"]
+try-runtime = [ "hero-runtime/try-runtime" ]

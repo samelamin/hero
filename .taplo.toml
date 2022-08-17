@@ -1,18 +1,46 @@
 # use /w taplo-cli
 # format options https://taplo.tamasfe.dev/configuration/formatter-options.html
 
+# iff you're a vscode user, `ext install tamasfe.even-better-toml`
 
-[[rule]]
-include = ["**/Cargo.toml"]
-
-[rule.formatting]
+[formatting]
+align_entries = false
+align_comments = false
 reorder_keys = false
+array_auto_expand = false
 array_auto_collapse = false
-array_auto_expand = true
-compact_arrays = true
+compact_arrays = false
 compact_entries = false
 allowed_blank_lines = 2
-trailing_newline = true
+trailing_newline = false
 indent_string = "\t"
+indent_entries = false
+indent_tables = false
+column_width = 100
+
+[[rule]]
+include = [ "**/Cargo.toml" ]
+exclude = [ "zombienet_tests/**/*.toml" ]
+
+[rule.formatting]
+align_comments = true
+
+[[rule]]
+include = [ "Cargo.toml" ]
+keys = [ "workspace", "members" ]
+
+[rule.formatting]
+array_auto_expand = true
+reorder_keys = true
 
 
+[[rule]]
+include = [ "zombienet_tests/**/*.toml" ]
+exclude = [ "**/Cargo.toml" ]
+
+[rule.formatting]
+array_auto_expand = true
+allowed_blank_lines = 3
+trailing_newline = true
+indent_tables = true
+column_width = 120

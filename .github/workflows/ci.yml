@@ -23,6 +23,21 @@ jobs:
             override: true
             components: rustfmt, clippy
 
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-taplo-${{ hashFiles('**/Cargo.lock') }}
+
+      - uses: actions-rs/cargo@v1
+        with:
+          command: install
+          args: --git https://github.com/drahnr/taplo.git --branch all taplo-cli
+
+      - name: 🫠 taplo fmt 🫠
+        run: taplo fmt --check
+
       - name: 🫠 rustfmt 🫠
         uses: actions-rs/cargo@v1
         with:

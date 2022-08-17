@@ -8,24 +8,24 @@ default_command = "polkadot"
 default_args = [ "-lparachain=debug" ]
 chain = "rococo-local"
 
-  [[relaychain.nodes]]
-  name = "alice"
-  validator = true
+	[[relaychain.nodes]]
+	name = "alice"
+	validator = true
 
-  [[relaychain.nodes]]
-  name = "bob"
-  validator = true
+	[[relaychain.nodes]]
+	name = "bob"
+	validator = true
 
 [[parachains]]
 id = 2000
 cumulus_based = true
 
-  [parachains.collator]
-  name = "collator01"
-  image = "{{IMAGE}}"
-  command = "hero-collator"
-  args = ["-lparachain=debug"]
-  
+	[parachains.collator]
+	name = "collator01"
+	image = "{{IMAGE}}"
+	command = "hero-collator"
+	args = [ "-lparachain=debug" ]
+
 [types.Header]
 number = "u64"
 parent_hash = "Hash"

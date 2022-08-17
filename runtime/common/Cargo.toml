@@ -1,7 +1,7 @@
 [package]
 name = "runtime-common"
 version = "1.0.0"
-authors = ["PAID Network DevHub <https://github.com/PAIDNetwork>"]
+authors = [ "PAID Network DevHub <https://github.com/PAIDNetwork>" ]
 edition = "2021"
 license = "LGPL-3.0"
 homepage = ""
@@ -10,8 +10,6 @@ repository = ""
 [dependencies]
 
 [features]
-default = ["std"]
-std = [
-]
-runtime-benchmarks = [
-]
+default = [ "std" ]
+std = [  ]
+runtime-benchmarks = [  ]
