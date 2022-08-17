@@ -9,7 +9,7 @@ on:
 env:
   GCP_PROJECT_ID: "paid-network-202104"
   ZOMBIENET_VERSION: "v1.2.36"
-  POLKADOT_VERSION: "v0.9.24"
+  POLKADOT_VERSION: "v0.9.25"
   K3S_VERSION: "v1.21.2-k3s1"
 
 jobs:
@@ -97,7 +97,7 @@ jobs:
           docker push ${{ env.IMAGE }}
 
   run-zombienet-tests:
-    if: false
+    if: true
     needs: [build-hero-collator]
     runs-on: gcp-self-hosted-runner
     env:
