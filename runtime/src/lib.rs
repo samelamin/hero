@@ -390,14 +390,16 @@ impl pallet_erc721::Config for Runtime {
 }
 
 parameter_types! {
-	pub const AgreementLimit: u128 = 500;
-	pub const AgreementLimitForUser: u64 = 30;
+	pub const NumVotesForApproval: u32 = 2;
+	pub const MaxProposalsForUser: u32 = 2;
 }
 
 impl pallet_smart_agreement::Config for Runtime {
 	type Event = Event;
-	type MaxAgreements = AgreementLimit;
-	type MaxAgreementsForUser = AgreementLimitForUser;
+	type Currency = Balances;
+	type NumVotesForApproval = NumVotesForApproval;
+	type MaxProposalsForUser = MaxProposalsForUser;
+	type EscrowPallet = ();
 }
 
 parameter_types! {

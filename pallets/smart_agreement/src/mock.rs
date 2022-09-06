@@ -1,30 +1,14 @@
 use crate as pallet_smart_agreement;
 use frame_support::{parameter_types, traits::Everything};
 use frame_system as system;
-use sp_core::{sr25519::Signature, Pair, Public, H256};
+use sp_core::H256;
 use sp_runtime::{
 	testing::Header,
-	traits::{BlakeTwo256, IdentifyAccount, IdentityLookup, Verify},
+	traits::{BlakeTwo256, IdentityLookup},
 };
 
 type UncheckedExtrinsic = frame_system::mocking::MockUncheckedExtrinsic<Test>;
 type Block = frame_system::mocking::MockBlock<Test>;
-
-pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::AccountId;
-pub type AccountPublic = <Signature as Verify>::Signer;
-
-fn get_from_seed<TPublic: Public>(seed: &str) -> <TPublic::Pair as Pair>::Public {
-	TPublic::Pair::from_string(&format!("//{}", seed), None)
-		.expect("static values are valid; qed")
-		.public()
-}
-
-pub fn get_account_id_from_seed<TPublic: Public>(seed: &str) -> AccountId
-where
-	AccountPublic: From<<TPublic::Pair as Pair>::Public>,
-{
-	AccountPublic::from(get_from_seed::<TPublic>(seed)).into_account()
-}
 
 // Configure a mock runtime to test the pallet.
 frame_support::construct_runtime!(
@@ -33,8 +17,9 @@ frame_support::construct_runtime!(
 		NodeBlock = Block,
 		UncheckedExtrinsic = UncheckedExtrinsic,
 	{
-		System: frame_system::{Pallet, Call, Config, Storage, Event<T>},
-		SmartAgreement: pallet_smart_agreement::{Pallet, Call, Storage, Event<T>},
+		System: frame_system = 1,
+		Balances: pallet_balances = 2,
+		SmartAgreement: pallet_smart_agreement = 3,
 	}
 );
 
@@ -61,7 +46,7 @@ impl system::Config for Test {
 	type BlockHashCount = BlockHashCount;
 	type Version = ();
 	type PalletInfo = PalletInfo;
-	type AccountData = ();
+	type AccountData = pallet_balances::AccountData<u32>;
 	type OnNewAccount = ();
 	type OnKilledAccount = ();
 	type SystemWeightInfo = ();
@@ -71,17 +56,57 @@ impl system::Config for Test {
 }
 
 parameter_types! {
-	pub const AgreementLimitForUser: u64 = 2;
-	pub const AgreementLimit: u128 = 3;
+	pub const NumVotesForApproval: u32 = 2;
+	pub const MaxProposalsForUser: u32 = 2;
 }
 
 impl pallet_smart_agreement::Config for Test {
 	type Event = Event;
-	type MaxAgreementsForUser = AgreementLimitForUser;
-	type MaxAgreements = AgreementLimit;
+	type Currency = Balances;
+	type NumVotesForApproval = NumVotesForApproval;
+	type MaxProposalsForUser = MaxProposalsForUser;
+	type EscrowPallet = ();
 }
+
+parameter_types! {
+	pub const ExistentialDeposit: u32 = 1_000_000;
+	pub const MaxLocks: u32 = 50;
+	pub const MaxReserves: u32 = 50;
+}
+
+impl pallet_balances::Config for Test {
+	type Balance = u32;
+	type DustRemoval = ();
+	type Event = Event;
+	type MaxLocks = MaxLocks;
+	type MaxReserves = MaxReserves;
+	type ReserveIdentifier = [u8; 8];
+	type ExistentialDeposit = ExistentialDeposit;
+	type AccountStore = System;
+	type WeightInfo = ();
+}
+
+// Test Externalities specific imports
+use sp_core::testing::SR25519;
+use sp_keystore::{testing::KeyStore, KeystoreExt, SyncCryptoStore};
+use std::sync::Arc;
 
 // Build genesis storage according to the mock runtime.
 pub fn new_test_ext() -> sp_io::TestExternalities {
-	system::GenesisConfig::default().build_storage::<Test>().unwrap().into()
+	// Generated using subkey
+	const ALICE_PHRASE: &str =
+		"news slush supreme milk chapter athlete soap sausage put clutch what kitten";
+	const BOB_PHRASE: &str =
+		"monitor exhibit resource stumble subject nut valid furnace obscure misery satoshi assume";
+	const EVE_PHRASE: &str =
+		"rain matter permit differ deer master purchase galaxy avoid amused drink unit";
+
+	let keystore = KeyStore::new();
+	keystore.sr25519_generate_new(SR25519, Some(ALICE_PHRASE)).unwrap();
+	keystore.sr25519_generate_new(SR25519, Some(BOB_PHRASE)).unwrap();
+	keystore.sr25519_generate_new(SR25519, Some(EVE_PHRASE)).unwrap();
+	let t = system::GenesisConfig::default().build_storage::<Test>().unwrap();
+	let mut ext = sp_io::TestExternalities::from(t);
+	ext.register_extension(KeystoreExt(Arc::new(keystore)));
+	ext
 }
