@@ -2,17 +2,16 @@
 
 This testing steps are based on the [Cumulus tutorial](https://docs.substrate.io/tutorials/v3/cumulus/start-relay/)
 
-
 #### Software versioning
 
 This steps have been tested on:
 
-* [Polkadot official repository](https://github.com/paritytech/polkadot), branch = polkadot-v0.9.18
-* This Hero repository, branch = polkadot-v0.9.18
-* Polkadot-JS Apps v0.112.2-37. It is generally expected that the [hosted Polkadot-JS Apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer) should work.
+-   [Polkadot official repository](https://github.com/paritytech/polkadot), branch = polkadot-v0.9.25
+-   This Hero repository, branch = polkadot-v0.9.25
+-   Polkadot-JS Apps v0.112.2-37. It is generally expected that the [hosted Polkadot-JS Apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer) should work.
 
 > NOTE: Exact Versions Matter
-You must use the exact versions set forth in this document to ensure that you do not run into conflicts.
+> You must use the exact versions set forth in this document to ensure that you do not run into conflicts.
 
 ---
 
@@ -25,7 +24,7 @@ Switch into the Polkadot directory:
 `cd polkadot`
 
 Checkout the proper commit:
-`git checkout release-v0.9.18`
+`git checkout release-v0.9.25`
 
 Build the relay chain Node:
 `cargo build --release`
@@ -36,6 +35,7 @@ Check if the help page prints to ensure the node is built correctly:
 If the help page is printed, you have succeeded in building a Polkadot node.
 
 ---
+
 #### Building the Hero node
 
 Clone this Hero
@@ -45,7 +45,7 @@ Switch into the parachain template directory
 `cd substrate-parachain-template`
 
 Checkout the proper commit
-`git checkout polkadot-v0.9.18`
+`git checkout polkadot-v0.9.25`
 
 Build the parachain template collator
 `cargo build --release`
@@ -57,16 +57,20 @@ this will take 15 to 60 mins to complete.
 If the help page is printed, you have succeeded in building a Cumulus-based parachain collator.
 
 ---
+
 #### Relay chain specification
 
 Use Pre-configured chain spec files, which include a two-validator relay chain with Alice and Bob as authorities chain spec file:
-* Plain rococo-local relay chain spec ... Paste this rococo-custom-2-plain.json file inside the relay chain project folder/chainspec/
-* Raw rococo-local relay chain spec ... Paste this rococo-custom-2-raw.json file inside the relay chain project folder/chainspec/
+
+-   Plain rococo-local relay chain spec ... Paste this rococo-custom-2-plain.json file inside the relay chain project folder/chainspec/
+-   Raw rococo-local relay chain spec ... Paste this rococo-custom-2-raw.json file inside the relay chain project folder/chainspec/
 
 Plain chain spec files are in a more human readable and modifiable format for your inspection. You will need to convert it to a SCALE encoded raw chain spec to use when starting your nodes. Jump to the raw chainspec generation section to see how to do that.
 
-----
+---
+
 #### Start your relay chain
+
 Start Relay `Alice` node
 
 ```bash
@@ -100,6 +104,7 @@ Copy Alice node's Peer ID in the logs.
 Confirm both nodes have found 1 peer!
 
 ---
+
 #### Connect a Parachain
 
 Open Polkadot.js.org > network dropdown > development > click on "local node" > Switch
@@ -108,7 +113,7 @@ Under the Network > Parachains > click on Parathreads tab and use the "+ ParaId 
 
 ---
 
-####  Configure a parachain for a specific relay chain & para ID
+#### Configure a parachain for a specific relay chain & para ID
 
 Go to your parachain
 // Assumes that `rococo-local` is in `node/chan_spec.rs` as the relay you registered with
@@ -137,9 +142,9 @@ Then generate a raw chain spec derived from your modified plain chain spec:
 ./target/release/hero build-spec --chain rococo-local-parachain-plain.json --raw --disable-default-bootnode > rococo-local-parachain-2000-raw.json
 ```
 
-
 ---
-####  Generate Wasm runtime validation and genesis state
+
+#### Generate Wasm runtime validation and genesis state
 
 in parachain folder:
 
@@ -149,9 +154,9 @@ in parachain folder:
 ./target/release/hero export-genesis-state --chain rococo-local-parachain-2000-raw.json > para-2000-genesis
 ```
 
-
 ---
-####  Start the collator node
+
+#### Start the collator node
 
 Assume rococo-local-parachain-2000-raw.json is iniside your parachain project folder, and rococo-custom-2-raw.json is inside your relay chain project folder
 
@@ -184,9 +189,9 @@ Go to Developer -> Extrinsics > sudo
 Pick paraSudoWrapper -> sudoScheduleParaInitialize(id, genesis) as the extrinsic type, shown below.
 In the extrinsics parameters, specify:
 
-* Set the id: ParaId to 2,000
-* genesisHead: upload the file para-2000-genesis (from the previous step)
-* validationCode: upload the file para-2000-wasm (from the previous step)
-* Set the parachain: Bool option to Yes
+-   Set the id: ParaId to 2,000
+-   genesisHead: upload the file para-2000-genesis (from the previous step)
+-   validationCode: upload the file para-2000-wasm (from the previous step)
+-   Set the parachain: Bool option to Yes
 
 This dispatch, if successful, will emit the `sudo.Sudid` event, viewable in the relay chain explorer page.

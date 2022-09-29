@@ -100,6 +100,7 @@ pallet-evm-precompile-modexp = { git = "https://github.com/paritytech/frontier",
 pallet-ethereum = { git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.25" }
 fp-self-contained = { git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.25" }
 fp-rpc = { git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.25" }
+fp-evm = { git = "https://github.com/paritytech/frontier", default-features = false, branch = "polkadot-v0.9.25" }
 
 [features]
 default = [ "std" ]
@@ -117,6 +118,7 @@ std = [
 	"cumulus-primitives-timestamp/std",
 	"cumulus-primitives-utility/std",
 	"cumulus-pallet-dmp-queue/std",
+	"fp-evm/std",
 	"fp-self-contained/std",
 	"frame-executive/std",
 	"frame-support/std",

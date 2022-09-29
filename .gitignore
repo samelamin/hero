@@ -14,27 +14,10 @@ archives
 # The cache for docker container dependency
 /.cargo/config
 
-.DS_Store
 .idea
 .vscode
-zmain.sh
-zarchives.sh
-zrun.sh
-zfrontier.sh
-zrecipes.sh
-zrococo.sh
-rococo-local-parachain-plain.json
-rococo-remote-parachain-plain.json
-rococo-local-parachain-2000-raw.json
-rococo-remote-parachain-????-raw.json
-para-????-genesis
-para-????-wasm
-para-genesis
-para-wasm
-parachain-raw.json
-rococo-local-cfde.json
-
-
-zombienet-linux*
-zombienet/examples
-zombienet/test*
+zz-*.sh
+rococo-*.json
+para-*-genesis
+para-*-wasm
+sweep.timestamp
