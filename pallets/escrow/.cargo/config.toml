@@ -1,0 +1,4 @@
+[target.'cfg(all())']
+rustflags = [
+	"-Aclippy::new_ret_no_self",
+]
