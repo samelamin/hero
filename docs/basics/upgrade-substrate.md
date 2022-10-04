@@ -295,7 +295,7 @@ to our patched forked version with a specific branch _( we will define the patch
 ```toml
 # .../hero/Cargo.toml
 [patch."https://github.com/paritytech/frontier"]
-pallet-evm = { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.25" }
+pallet-evm = { git = "https://github.com/PAIDNetwork/frontier", branch = "patch-polkadot-v0.9.27" }
 ( ... )
 ```
 
@@ -344,7 +344,7 @@ git checkout polkadot-v0.9.22
 ```bash
 Checkout the new patch branch
 ```bash
-git checkout -b patch-polkadot-v0.9.25
+git checkout -b patch-polkadot-v0.9.27
 ````
 
 ### Update all the dependanies
@@ -356,7 +356,7 @@ git checkout -b patch-polkadot-v0.9.25
 # here the branch needs a bump in version
 sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.22", default-features = false }
 # to
-sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.25", default-features = false }
+sp-core = { version = "6.0.0", git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.27", default-features = false }
 ```
 
 Make the apropriate fixes where needed, and **compile the code** to update `Cargo.lock`
@@ -368,7 +368,7 @@ cargo update && cargo build --release
 After making your changes you can finally push
 
 ```bash
-git push --set-upstream origin patch-polkadot-v0.9.25
+git push --set-upstream origin patch-polkadot-v0.9.27
 ```
 
 A pull request is not required, so long as a branch exists you can use it to patch.
@@ -379,9 +379,9 @@ Search and replace dependancies to update Polkadot to new release version the re
 
 ```toml
 # Polkadot dependancies have ` branch = "release-v<VERSION>" `
-polkadot-cli =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.25" }
+polkadot-cli =  { git = "https://github.com/paritytech/polkadot", branch = "release-v0.9.27" }
 # Things that depend on polkadot have ` branch = "polkadot-v<VERSION> `
-frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.25" }
+frame-executive =              { git = "https://github.com/paritytech/substrate", default-features = false, branch = "polkadot-v0.9.27" }
 ```
 
 Many dependancies will change the apis so you will need to fix any

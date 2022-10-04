@@ -8,7 +8,6 @@
 include!(concat!(env!("OUT_DIR"), "/wasm_binary.rs"));
 
 use codec::{Decode, Encode};
-use log::info;
 pub use parachain_staking::{InflationInfo, Range};
 use smallvec::smallvec;
 use sp_api::impl_runtime_apis;
@@ -58,14 +57,11 @@ use weights::RocksDbWeight;
 use cumulus_pallet_parachain_system::RelayNumberStrictlyIncreases;
 use pallet_ethereum::Transaction as EthereumTransaction;
 
-// Polkadot Imports
-use polkadot_runtime_common::SlowAdjustingFeeUpdate;
-
 // Frontier Imports
 use pallet_ethereum::{Call::transact, EthereumBlockHashMapping};
 use pallet_evm::{
-	Account as EVMAccount, EnsureAddressNever, EnsureAddressRoot, EnsureAddressTruncated,
-	FeeCalculator, GasWeightMapping, HashedAddressMapping, Runner,
+	Account as EVMAccount, EnsureAddressTruncated, FeeCalculator, GasWeightMapping,
+	HashedAddressMapping, Runner,
 };
 use pallet_transaction_payment::CurrencyAdapter;
 #[cfg(any(feature = "std", test))]
@@ -302,6 +298,7 @@ impl WeightToFeePolynomial for WeightToFee {
 	}
 }
 impl pallet_transaction_payment::Config for Runtime {
+	type Event = Event;
 	type OnChargeTransaction = CurrencyAdapter<Balances, ()>;
 	type OperationalFeeMultiplier = ConstU8<5>;
 	type WeightToFee = IdentityFee<Balance>; //WeightToFee;

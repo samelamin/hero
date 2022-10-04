@@ -3,7 +3,7 @@ use hex_literal::hex;
 
 use hero_runtime::{
 	opaque::SessionKeys, AccountId, AuraId, Balance, EVMConfig, EthereumConfig, GenesisConfig,
-	Signature, SudoConfig, SystemConfig, EXISTENTIAL_DEPOSIT,
+	Signature, SudoConfig, SystemConfig,
 };
 use parachain_staking::{InflationInfo, Range};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};

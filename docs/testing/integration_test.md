@@ -6,8 +6,8 @@ This testing steps are based on the [Cumulus tutorial](https://docs.substrate.io
 
 This steps have been tested on:
 
--   [Polkadot official repository](https://github.com/paritytech/polkadot), branch = polkadot-v0.9.25
--   This Hero repository, branch = polkadot-v0.9.25
+-   [Polkadot official repository](https://github.com/paritytech/polkadot), branch = polkadot-v0.9.27
+-   This Hero repository, branch = polkadot-v0.9.27
 -   Polkadot-JS Apps v0.112.2-37. It is generally expected that the [hosted Polkadot-JS Apps](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9944#/explorer) should work.
 
 > NOTE: Exact Versions Matter
@@ -24,7 +24,7 @@ Switch into the Polkadot directory:
 `cd polkadot`
 
 Checkout the proper commit:
-`git checkout release-v0.9.25`
+`git checkout release-v0.9.27`
 
 Build the relay chain Node:
 `cargo build --release`
@@ -45,7 +45,7 @@ Switch into the parachain template directory
 `cd substrate-parachain-template`
 
 Checkout the proper commit
-`git checkout polkadot-v0.9.25`
+`git checkout polkadot-v0.9.27`
 
 Build the parachain template collator
 `cargo build --release`
