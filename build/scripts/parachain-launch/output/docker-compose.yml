@@ -24,7 +24,8 @@ services:
       - --execution=wasm
     environment:
       RUST_LOG: parachain::candidate-backing=trace,parachain::candidate-selection=trace,parachain::pvf=debug,parachain::provisioner=trace
-    ulimits: &a1
+    ulimits:
+      &a1
       nofile:
         soft: 65536
         hard: 65536
@@ -65,7 +66,7 @@ services:
       dockerfile: parachain-2000.Dockerfile
     command:
       - --base-path=/hero/data
-      - --chain=/app/dev-2000.json
+      - --chain=/app/local-2000.json
       - --ws-external
       - --rpc-external
       - --rpc-cors=all
@@ -76,7 +77,7 @@ services:
       - --wasm-execution=compiled
       - --execution=wasm
       - --alice
-      - --node-key=9dd2b3b95221a51f9bf559c3d0407fc001416f8883d2032aa14082303ac3e9c4
+      - --node-key=94c1a67a21a895a879e19d14ae74b2d874f2609401da2cd3f58b2c10c558ca65
       - --listen-addr=/ip4/0.0.0.0/tcp/30333
       - --
       - --chain=/app/rococo-local.json
