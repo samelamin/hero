@@ -1,28 +1,29 @@
-
-FROM rust:1.65-slim as builder
-RUN apt-get update && apt-get install -y git cmake pkg-config libssl-dev clang libclang-dev gnupg2 ca-certificates awscli wget curl vim
-RUN rustup default nightly && rustup target add wasm32-unknown-unknown
-
+# This file is sourced from https://github.com/paritytech/polkadot/blob/master/scripts/ci/dockerfiles/polkadot/polkadot_builder.Dockerfile
+FROM docker.io/paritytech/ci-linux:production as builder
 
 RUN git clone -b add_docker_file https://github.com/samelamin/hero
-WORKDIR /hero
+WORKDIR /builds/hero
+
 RUN cargo build --release
 
-# FROM docker.io/library/ubuntu:20.04
-FROM debian:bullseye-slim
+# the collator stage is normally built once, cached, and then ignored, but can
+# be specified with the --target build flag. This adds some extra tooling to the
+# image, which is required for a launcher script. The script simply adds two
+# arguments to the list passed in:
+#
+#   --bootnodes /ip4/127.0.0.1/tcp/30333/p2p/PEER_ID
+#
+# with the appropriate ip and ID for both Alice and Bob
+FROM debian:buster-slim as collator
+RUN apt-get update && apt-get install jq curl bash -y && \
+    curl -sSo /wait-for-it.sh https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh && \
+    chmod +x /wait-for-it.sh && \
+    curl -sL https://deb.nodesource.com/setup_12.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install --global yarn && \
+    yarn global add @polkadot/api-cli@0.10.0-beta.14
 
-RUN apt-get update && apt-get install -y git awscli wget curl vim
+COPY --from=builder \
+    /builds/hero/target/release/hero /usr/bin
 
-LABEL description="Multistage Docker image for the hero collator" \
-	image.type="builder" \
-	image.description="Hero Collator" \
-
-COPY --from=builder /hero/target/release/hero /usr/local/bin
-
-RUN mkdir -p /data /hero/.local/share && \
-	ln -s /data /hero/.local/share/hero && \
-# check if executable works in this container
-	/usr/local/bin/hero --version
-
-EXPOSE 30333 9944 9945 9615
-VOLUME ["/data"]
+ENTRYPOINT ["/usr/bin/hero"]
