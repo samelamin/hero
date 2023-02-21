@@ -60,13 +60,13 @@ services:
       - 9935:9933
       - 30335:30333
     volumes:
-      - parachain-2000-0:/data
+      - parachain-2000-0:/hero/data
     build:
       context: .
       dockerfile: parachain-2000.Dockerfile
     command:
-      - --base-path=/data
-      - --chain=/app/hero-local-2000.json
+      - --base-path=/hero/data
+      - --chain=/app/local-2000.json
       - --ws-external
       - --rpc-external
       - --rpc-cors=all
@@ -77,7 +77,7 @@ services:
       - --wasm-execution=compiled
       - --execution=wasm
       - --alice
-      - --node-key=15c931b2a198ea9bcb8170d41e4d838e11300d7b678f0e23c4f6b1e50977e4ef
+      - --node-key=04984f451bbbf3ca6a6968ed461fdb4441aacfe6bcc2d7fd4d8137b588c6c97f
       - --listen-addr=/ip4/0.0.0.0/tcp/30333
       - --
       - --chain=/app/rococo-local.json

@@ -1,2 +1,2 @@
-FROM samelamin/hero:demo
+FROM samelamin/hero:entry
 COPY . /app
