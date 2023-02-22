@@ -13,11 +13,10 @@ archives
 
 # The cache for docker container dependency
 /.cargo/config
-
+*.DS_Store
 .idea
 .vscode
 zz-*.sh
-rococo-*.json
 para-*-genesis
 para-*-wasm
 sweep.timestamp
