@@ -7,20 +7,14 @@ Hero is Polkadot parachain on which we can deploy and use solidity smart contrac
 
 
 ## Running a Hero Collator
-1.) First things first is to [install docker](https://www.docker.com/products/docker-desktop) for your particular platform.
+1.) First thing is to [install docker](https://www.docker.com/products/docker-desktop) for your particular platform.
 
-2.) clone Hero repository `git clone https://github.com/PAIDNetwork/hero.git && cd hero`
+2.) in the root hero folder run the below command
+  ```
+  docker-compose -f build/scripts/parachain-launch/output/docker-compose.yml build --no-cache && docker-compose -f build/scripts/parachain-launch/output/docker-compose.yml up -d
+  ```
 
-3.) build docker base `docker build -f Dockerfile.base -t paidnetwork/rust .`
-
-4.) build collator image `docker build -t paidnetwork/collator .`
-
-5.) Open the following ports `30344` `40334` `6968` `8845` `9978` if you would like to connect to your collator remotely open port `80`
-
-6.) run the collator and frontend `docker-compose -f scripts/docker-compose-collator.yaml up -d`
-
-You now should beable to view your collator via [polkadotjs](https://polkadot.js.org/apps/#/explorer) switch your network and under
-the `Develoment tab` click `Custom` and paste `ws://localhost:8845` then click `Switch` at the top.
+After a min or two you now should be able to view your collator producing blocks via [polkadotjs](https://polkadot.js.org/apps/?rpc=ws%3A%2F%2F127.0.0.1%3A9946#/explorer)
 
 ## Hero Dev Environment Docker
 
