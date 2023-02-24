@@ -18,6 +18,7 @@ services:
       - --rpc-cors=all
       - --name=alice
       - --alice
+      - --allow-private-ipv4
       - --rpc-methods=unsafe
       - --wasm-execution=compiled
       - --execution=wasm
@@ -46,20 +47,22 @@ services:
       - --rpc-cors=all
       - --name=bob
       - --bob
+      -  --allow-private-ipv4
       - --rpc-methods=unsafe
       - --wasm-execution=compiled
       - --execution=wasm
     environment:
       RUST_LOG: parachain::candidate-backing=trace,parachain::candidate-selection=trace,parachain::pvf=debug,parachain::provisioner=trace
     ulimits: *a1
-  hero:
+  hero-1:
     container_name: hero-1
+    restart: always
     ports:
       - 9946:9944
       - 9935:9933
       - 30335:30333
     volumes:
-      - ./hero_db/hero:/hero/data
+      - ./hero_db/hero-1:/hero/data
     image: samelamin/hero:parachain-demo
     command:
       - --base-path=/hero/data
@@ -69,13 +72,44 @@ services:
       - --rpc-cors=all
       - --name=parachain-2000-0
       - --collator
+      - --allow-private-ipv4
       - --rpc-methods=unsafe
       - --force-authoring
       - --wasm-execution=compiled
       - --execution=wasm
-      - --alice
+      - --bob
       - --node-key=94c1a67a21a895a879e19d14ae74b2d874f2609401da2cd3f58b2c10c558ca65
-      - --listen-addr=/ip4/0.0.0.0/tcp/30333
+      - --
+      - --chain=/app/rococo-local.json
+      - --wasm-execution=compiled
+      - --execution=wasm
+  hero-2:
+    container_name: hero-2
+    restart: always
+    depends_on:
+      - "hero-1"
+    ports:
+      - 9947:9944
+      - 9936:9933
+      - 30336:30333
+    volumes:
+      - ./hero_db/hero-2:/hero/data
+    image: samelamin/hero:parachain-demo
+    command:
+      - --base-path=/hero/data
+      - --chain=/app/local-2000.json
+      - --bootnodes=/ip4/127.0.0.1/tcp/30335/p2p/12D3KooWMrBJVdD4Tq9brTp76bkXeTdkx28CYfRKj9BVjapBSjm2
+      - --ws-external
+      - --rpc-external
+      - --rpc-cors=all
+      - --name=parachain-2000-0
+      - --collator
+      - --allow-private-ipv4
+      - --rpc-methods=unsafe
+      - --force-authoring
+      - --wasm-execution=compiled
+      - --execution=wasm
+      - --bob
       - --
       - --chain=/app/rococo-local.json
       - --wasm-execution=compiled

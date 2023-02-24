@@ -1,31 +1,26 @@
+FROM docker.io/paritytech/ci-linux:production as builder
+
+WORKDIR /hero
+RUN git clone -b add_docker_file https://github.com/samelamin/hero
+WORKDIR /hero/hero
+RUN cargo build --locked --release
+
 FROM docker.io/library/ubuntu:20.04
 
-LABEL description="Docker image for Hero" \
-	io.hero.image.type="collator" \
-	io.hero.image.authors="obrienalaribe@gmail.com, devops@master.ventures" \
-	io.hero.image.vendor="Hero Chain" \
-	io.hero.image.description="Hero: a substrate blockchain" \
-	io.hero.image.documentation="https://github.com/PAIDNetwork/hero"
+COPY --from=builder /hero/hero/target/release/hero /usr/local/bin
 
-RUN apt update && apt install -y telnet curl wget
-
-# create user to run target with
-RUN useradd -m -u 1000 -U -s /bin/bash -d /hero hero
-
-# copy target & chain spec files
-COPY ./target/release/hero /usr/local/bin/hero-collator
-COPY ./res               /hero/res
-
-RUN hero-collator build-spec --disable-default-bootnode > /hero/res/rococo-local-parachain-plain.json \
-	&& hero-collator build-spec --chain /hero/res/rococo-local-parachain-plain.json --raw --disable-default-bootnode > /hero/res/rococo-local-parachain-2000-raw.json \
-	&& hero-collator export-genesis-wasm --chain /hero/res/rococo-local-parachain-2000-raw.json > /hero/res/para-2000-wasm \
-	&& hero-collator export-genesis-state --chain /hero/res/rococo-local-parachain-2000-raw.json > /hero/res/para-2000-genesis
-
-# minimize attack surface && test target
-# RUN rm -rf /usr/bin /usr/sbin
+RUN useradd -m -u 1000 -U -s /bin/sh -d /hero hero && \
+	mkdir -p /data /hero/.local/share && \
+	chown -R hero:hero /data && \
+	ln -s /data /hero/.local/share/hero && \
+# unclutter and minimize the attack surface
+	rm -rf /usr/bin /usr/sbin && \
+# check if executable works in this container
+	/usr/local/bin/hero --version
 
 USER hero
 
-EXPOSE 40333-40335 8844-8848 6965-6969 30343-30345 9977-9979
+EXPOSE 30333 9933 9944 9615
+VOLUME ["/data"]
 
-ENTRYPOINT ["/usr/local/bin/hero-collator"]
+ENTRYPOINT ["/usr/local/bin/hero"]
