@@ -1,15 +1,14 @@
 version: "3.7"
 services:
-  relaychain-alice:
+  alice:
+    container_name: alice
     ports:
       - 9944:9944
       - 9933:9933
       - 30333:30333
     volumes:
-      - relaychain-alice:/data
-    build:
-      context: .
-      dockerfile: relaychain.Dockerfile
+      - ./hero_db/alice:/data
+    image: samelamin/hero:relaychain-demo
     command:
       - --base-path=/data
       - --chain=/app/rococo-local.json
@@ -29,16 +28,15 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-  relaychain-bob:
+  bob:
+    container_name: bob
     ports:
       - 9945:9944
       - 9934:9933
       - 30334:30333
     volumes:
-      - relaychain-bob:/data
-    build:
-      context: .
-      dockerfile: relaychain.Dockerfile
+      - ./hero_db/bob:/data
+    image: samelamin/hero:relaychain-demo
     command:
       - --base-path=/data
       - --chain=/app/rococo-local.json
@@ -54,16 +52,15 @@ services:
     environment:
       RUST_LOG: parachain::candidate-backing=trace,parachain::candidate-selection=trace,parachain::pvf=debug,parachain::provisioner=trace
     ulimits: *a1
-  parachain-2000-0:
+  hero:
+    container_name: hero-1
     ports:
       - 9946:9944
       - 9935:9933
       - 30335:30333
     volumes:
-      - parachain-2000-0:/hero/data
-    build:
-      context: .
-      dockerfile: parachain-2000.Dockerfile
+      - ./hero_db/hero:/hero/data
+    image: samelamin/hero:parachain-demo
     command:
       - --base-path=/hero/data
       - --chain=/app/local-2000.json
@@ -86,7 +83,4 @@ services:
     environment:
       RUST_LOG: sc_basic_authorship=trace,cumulus-consensus=trace,cumulus-collator=trace,collator_protocol=trace,collation_generation=trace,aura=debug
     ulimits: *a1
-volumes:
-  relaychain-alice: null
-  relaychain-bob: null
-  parachain-2000-0: null
+
